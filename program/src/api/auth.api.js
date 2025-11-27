@@ -75,7 +75,7 @@ export const signup = async (full_name, email, password, pharmacyData) => {
       email,
       password,
       role_id: 2, // Manager
-      pharmacy: pharmacyData
+      pharmacy: pharmacyData,
     }),
   });
 };
@@ -116,7 +116,7 @@ export const logout = async () => {
       await apiClient('/auth/logout', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
     }
@@ -193,7 +193,7 @@ export const verifyToken = async () => {
     const response = await apiClient('/auth/verify', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 

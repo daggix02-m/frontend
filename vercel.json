@@ -1,7 +1,12 @@
 {
-  "root": "auth",
-  "framework": "create-react-app",
-  "buildCommand": "npm run build",
-  "outputDirectory": "build",
-  "installCommand": "npm install"
+  "framework": "vite",
+  "buildCommand": "cd program && npm run build",
+  "outputDirectory": "program/dist",
+  "installCommand": "cd program && npm install",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }

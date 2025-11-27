@@ -1,3 +1,4 @@
+
 import { refreshToken } from './auth.api';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
@@ -15,9 +16,7 @@ const isTokenExpired = (token) => {
 export const apiClient = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
 
-
   const token = localStorage.getItem('accessToken');
-
 
   if (token && isTokenExpired(token)) {
     try {
@@ -32,7 +31,7 @@ export const apiClient = async (endpoint, options = {}) => {
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      ...(token && { 'Authorization': `Bearer ${token}` }),
+      ...(token && { Authorization: `Bearer ${token}` }),
       ...options.headers,
     },
     ...options,
@@ -41,24 +40,20 @@ export const apiClient = async (endpoint, options = {}) => {
   try {
     let response = await fetch(url, config);
 
-
     if (response.status === 401) {
       try {
         await refreshToken();
-
 
         const newToken = localStorage.getItem('accessToken');
         config.headers['Authorization'] = `Bearer ${newToken}`;
 
         response = await fetch(url, config);
       } catch (refreshError) {
-
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         throw new Error('Session expired. Please log in again.');
       }
     }
-
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -74,16 +69,13 @@ export const apiClient = async (endpoint, options = {}) => {
   }
 };
 
-
 export const getAccessToken = () => {
   return localStorage.getItem('accessToken');
 };
 
-
 export const isAuthenticated = () => {
   const token = localStorage.getItem('accessToken');
   if (!token) return false;
-
 
   return !isTokenExpired(token);
 };

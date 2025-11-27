@@ -19,10 +19,7 @@ export const Card = React.forwardRef(({ className, ...props }, ref) => {
   return (
     <div
       ref={ref}
-      className={cn(
-        'rounded-lg border bg-card text-card-foreground shadow-sm',
-        className
-      )}
+      className={cn('rounded-lg border bg-card text-card-foreground shadow-sm', className)}
       {...props}
     />
   );
@@ -30,13 +27,7 @@ export const Card = React.forwardRef(({ className, ...props }, ref) => {
 Card.displayName = 'Card';
 
 export const CardHeader = React.forwardRef(({ className, ...props }, ref) => {
-  return (
-    <div
-      ref={ref}
-      className={cn('flex flex-col space-y-1.5 p-6', className)}
-      {...props}
-    />
-  );
+  return <div ref={ref} className={cn('flex flex-col space-y-1.5 p-6', className)} {...props} />;
 });
 CardHeader.displayName = 'CardHeader';
 
@@ -44,10 +35,7 @@ export const CardTitle = React.forwardRef(({ className, children, ...props }, re
   return (
     <h3
       ref={ref}
-      className={cn(
-        'text-2xl font-semibold leading-none tracking-tight',
-        className
-      )}
+      className={cn('text-2xl font-semibold leading-none tracking-tight', className)}
       {...props}
     >
       {children}
@@ -57,31 +45,17 @@ export const CardTitle = React.forwardRef(({ className, children, ...props }, re
 CardTitle.displayName = 'CardTitle';
 
 export const CardDescription = React.forwardRef(({ className, ...props }, ref) => {
-  return (
-    <p
-      ref={ref}
-      className={cn('text-sm text-muted-foreground', className)}
-      {...props}
-    />
-  );
+  return <p ref={ref} className={cn('text-sm text-muted-foreground', className)} {...props} />;
 });
 CardDescription.displayName = 'CardDescription';
 
 export const CardContent = React.forwardRef(({ className, ...props }, ref) => {
-  return (
-    <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />
-  );
+  return <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />;
 });
 CardContent.displayName = 'CardContent';
 
 export const CardFooter = React.forwardRef(({ className, ...props }, ref) => {
-  return (
-    <div
-      ref={ref}
-      className={cn('flex items-center p-6 pt-0', className)}
-      {...props}
-    />
-  );
+  return <div ref={ref} className={cn('flex items-center p-6 pt-0', className)} {...props} />;
 });
 CardFooter.displayName = 'CardFooter';
 
@@ -112,11 +86,7 @@ export const Alert = ({ type = 'default', className, ...props }) => {
 
   return (
     <div
-      className={cn(
-        'p-4 rounded-md text-sm flex items-center',
-        typeClasses[type],
-        className
-      )}
+      className={cn('p-4 rounded-md text-sm flex items-center', typeClasses[type], className)}
       {...props}
     />
   );
@@ -133,9 +103,7 @@ export const FormField = ({ children, className, ...props }) => {
 FormField.displayName = 'FormField';
 
 export const FormLabel = ({ className, ...props }) => {
-  return (
-    <Label className={cn('text-sm font-medium', className)} {...props} />
-  );
+  return <Label className={cn('text-sm font-medium', className)} {...props} />;
 };
 FormLabel.displayName = 'FormLabel';
 
@@ -150,31 +118,17 @@ export const FormMessage = ({ error, className, ...props }) => {
 FormMessage.displayName = 'FormMessage';
 
 export const Table = React.forwardRef(({ className, ...props }, ref) => {
-  return (
-    <table
-      ref={ref}
-      className={cn('w-full caption-bottom text-sm', className)}
-      {...props}
-    />
-  );
+  return <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />;
 });
 Table.displayName = 'Table';
 
 export const TableHeader = React.forwardRef(({ className, ...props }, ref) => {
-  return (
-    <thead ref={ref} className={cn('[&_tr]:border-b', className)} {...props} />
-  );
+  return <thead ref={ref} className={cn('[&_tr]:border-b', className)} {...props} />;
 });
 TableHeader.displayName = 'TableHeader';
 
 export const TableBody = React.forwardRef(({ className, ...props }, ref) => {
-  return (
-    <tbody
-      ref={ref}
-      className={cn('[&_tr:last-child]:border-0', className)}
-      {...props}
-    />
-  );
+  return <tbody ref={ref} className={cn('[&_tr:last-child]:border-0', className)} {...props} />;
 });
 TableBody.displayName = 'TableBody';
 
@@ -221,7 +175,8 @@ export const Badge = React.forwardRef(({ className, variant = 'default', ...prop
   const variants = {
     default: 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80',
     secondary: 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
-    destructive: 'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
+    destructive:
+      'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
     outline: 'text-foreground',
   };
 
