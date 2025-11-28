@@ -27,21 +27,21 @@ export function BillingManagement() {
     ];
 
     return (
-        <div className='space-y-6 p-6'>
+        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
             <div>
                 <h1 className='text-3xl font-bold tracking-tight'>Billing Management</h1>
                 <p className='text-muted-foreground mt-2'>Handle billing issues and payment disputes</p>
             </div>
 
             {/* Stats Grid */}
-            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+            <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
-                        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
                             <CardTitle className='text-sm font-medium'>{stat.title}</CardTitle>
                             <stat.icon className='h-4 w-4 text-muted-foreground' />
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className='px-6 pb-6'>
                             <div className='text-2xl font-bold'>{stat.value}</div>
                             <p className='text-xs text-muted-foreground mt-1'>{stat.trend} from last month</p>
                         </CardContent>
@@ -55,34 +55,36 @@ export function BillingManagement() {
                     <CardTitle>Recent Billing Issues</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Pharmacy</TableHead>
-                                <TableHead>Issue Type</TableHead>
-                                <TableHead>Amount</TableHead>
-                                <TableHead>Date</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {billingIssues.map((issue) => (
-                                <TableRow key={issue.id}>
-                                    <TableCell className='font-medium'>{issue.pharmacy}</TableCell>
-                                    <TableCell>{issue.issue}</TableCell>
-                                    <TableCell>{issue.amount}</TableCell>
-                                    <TableCell>{issue.date}</TableCell>
-                                    <TableCell>{getStatusBadge(issue.status)}</TableCell>
-                                    <TableCell>
-                                        <Button size='sm' variant='outline'>
-                                            View Details
-                                        </Button>
-                                    </TableCell>
+                    <div className='overflow-x-auto'>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Pharmacy</TableHead>
+                                    <TableHead>Issue Type</TableHead>
+                                    <TableHead>Amount</TableHead>
+                                    <TableHead>Date</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Actions</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {billingIssues.map((issue) => (
+                                    <TableRow key={issue.id}>
+                                        <TableCell className='font-medium'>{issue.pharmacy}</TableCell>
+                                        <TableCell>{issue.issue}</TableCell>
+                                        <TableCell>{issue.amount}</TableCell>
+                                        <TableCell>{issue.date}</TableCell>
+                                        <TableCell>{getStatusBadge(issue.status)}</TableCell>
+                                        <TableCell>
+                                            <Button size='sm' variant='outline'>
+                                                View Details
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </CardContent>
             </Card>
 

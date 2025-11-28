@@ -26,28 +26,28 @@ export function RefundsDiscounts() {
     ];
 
     return (
-        <div className='space-y-6 p-6'>
+        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
             <div>
                 <h1 className='text-3xl font-bold tracking-tight'>Refunds & Discounts</h1>
                 <p className='text-muted-foreground mt-2'>Configure refund policies and discount rules</p>
             </div>
 
             {/* Stats Grid */}
-            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+            <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
-                        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
                             <CardTitle className='text-sm font-medium'>{stat.title}</CardTitle>
                             <stat.icon className={`h-4 w-4 ${stat.color}`} />
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className='px-6 pb-6'>
                             <div className='text-2xl font-bold'>{stat.value}</div>
                         </CardContent>
                     </Card>
                 ))}
             </div>
 
-            <div className='grid gap-6 md:grid-cols-2'>
+            <div className='grid gap-6 grid-cols-1 md:grid-cols-2'>
                 {/* Refund Policy */}
                 <Card>
                     <CardHeader>
@@ -168,7 +168,7 @@ export function RefundsDiscounts() {
                     <CardDescription>Set limits for automatic approval</CardDescription>
                 </CardHeader>
                 <CardContent className='space-y-4'>
-                    <div className='grid gap-4 md:grid-cols-2'>
+                    <div className='grid gap-4 grid-cols-1 md:grid-cols-2'>
                         <div className='space-y-2'>
                             <label className='text-sm font-medium'>Max Refund Amount (Auto-Approve)</label>
                             <Input type='number' placeholder='100' />

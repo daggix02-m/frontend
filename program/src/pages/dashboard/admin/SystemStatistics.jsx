@@ -39,11 +39,11 @@ export function SystemStatistics() {
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
-                        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
                             <CardTitle className='text-sm font-medium'>{stat.title}</CardTitle>
                             <stat.icon className={`h-5 w-5 ${stat.color}`} />
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className='px-6 pb-6'>
                             <div className='text-3xl font-bold'>{stat.value}</div>
                             <p className='text-xs text-muted-foreground mt-1'>
                                 <span className='text-green-600 font-medium'>{stat.trend}</span> from last month

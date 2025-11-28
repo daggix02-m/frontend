@@ -23,13 +23,13 @@ export function SubscriptionManagement() {
     ];
 
     return (
-        <div className='space-y-6'>
+        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
             <div>
                 <h2 className='text-3xl font-bold tracking-tight'>Subscription Management</h2>
                 <p className='text-muted-foreground'>Manage subscription plans and billing.</p>
             </div>
 
-            <div className='grid gap-6 md:grid-cols-3'>
+            <div className='grid gap-6 grid-cols-1 md:grid-cols-3'>
                 {plans.map((plan) => (
                     <Card key={plan.name} className={plan.popular ? 'border-primary shadow-lg' : ''}>
                         <CardHeader>

@@ -10,6 +10,7 @@ export function POSSales({ role = 'cashier' }) {
 
     const [searchTerm, setSearchTerm] = useState('');
     const [discount, setDiscount] = useState(0);
+    const [paymentMethod, setPaymentMethod] = useState('cash');
 
     const products = [
         { id: 3, name: 'Ibuprofen 400mg', price: 8.99, stock: 200 },
@@ -43,11 +44,32 @@ export function POSSales({ role = 'cashier' }) {
     };
 
     const handleCheckout = () => {
-        console.log('Processing checkout:', { cart, total, discount });
-        // Backend integration needed
-        alert('Sale processed successfully!');
+        if (cart.length === 0) return;
+        if (window.confirm(`Process payment of $${total.toFixed(2)} via ${paymentMethod}?`)) {
+            console.log('Processing checkout:', { cart, total, discount, paymentMethod });
+            // Backend integration needed
+            alert('Sale processed successfully!');
+            setCart([]);
+            setDiscount(0);
+            setPaymentMethod('cash');
+        }
+    };
+
+    const handleHoldTransaction = () => {
+        if (cart.length === 0) return;
+        alert('Transaction held successfully.');
         setCart([]);
-        setDiscount(0);
+    };
+
+    const handleRetrieveHeld = () => {
+        alert('No held transactions found.');
+    };
+
+    const handleProcessReturn = () => {
+        const receiptId = prompt('Enter Receipt ID for return:');
+        if (receiptId) {
+            alert(`Processing return for receipt: ${receiptId}`);
+        }
     };
 
     const canApplyDiscount = role === 'manager' || discount <= 10; // Cashiers limited to 10%
@@ -199,11 +221,19 @@ export function POSSales({ role = 'cashier' }) {
                             <div className='space-y-2'>
                                 <p className='text-sm font-medium'>Payment Method</p>
                                 <div className='grid grid-cols-2 gap-2'>
-                                    <Button variant='outline' className='h-20 flex-col'>
+                                    <Button
+                                        variant={paymentMethod === 'cash' ? 'default' : 'outline'}
+                                        className='h-20 flex-col'
+                                        onClick={() => setPaymentMethod('cash')}
+                                    >
                                         <Banknote className='h-6 w-6 mb-1' />
                                         Cash
                                     </Button>
-                                    <Button variant='outline' className='h-20 flex-col'>
+                                    <Button
+                                        variant={paymentMethod === 'card' ? 'default' : 'outline'}
+                                        className='h-20 flex-col'
+                                        onClick={() => setPaymentMethod('card')}
+                                    >
                                         <CreditCard className='h-6 w-6 mb-1' />
                                         Card
                                     </Button>
@@ -229,13 +259,13 @@ export function POSSales({ role = 'cashier' }) {
                             <CardTitle>Quick Actions</CardTitle>
                         </CardHeader>
                         <CardContent className='space-y-2'>
-                            <Button variant='outline' className='w-full'>
+                            <Button variant='outline' className='w-full' onClick={handleHoldTransaction}>
                                 Hold Transaction
                             </Button>
-                            <Button variant='outline' className='w-full'>
+                            <Button variant='outline' className='w-full' onClick={handleRetrieveHeld}>
                                 Retrieve Held
                             </Button>
-                            <Button variant='outline' className='w-full'>
+                            <Button variant='outline' className='w-full' onClick={handleProcessReturn}>
                                 Process Return
                             </Button>
                         </CardContent>

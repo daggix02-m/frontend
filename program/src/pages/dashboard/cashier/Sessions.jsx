@@ -4,13 +4,13 @@ import { Clock, DollarSign } from 'lucide-react';
 
 export function Sessions() {
     return (
-        <div className='space-y-6'>
+        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
             <div>
                 <h2 className='text-3xl font-bold tracking-tight'>Cash Sessions</h2>
                 <p className='text-muted-foreground'>Open and close your daily cash sessions.</p>
             </div>
 
-            <div className='grid gap-6 md:grid-cols-2'>
+            <div className='grid gap-6 grid-cols-1 md:grid-cols-2'>
                 <Card>
                     <CardHeader>
                         <CardTitle>Current Session</CardTitle>
@@ -34,7 +34,17 @@ export function Sessions() {
                             </div>
                         </div>
 
-                        <Button className='w-full' variant='destructive'>Close Session</Button>
+                        <Button
+                            className='w-full'
+                            variant='destructive'
+                            onClick={() => {
+                                if (window.confirm('Are you sure you want to close the current session?')) {
+                                    alert('Session closed successfully. Report generated.');
+                                }
+                            }}
+                        >
+                            Close Session
+                        </Button>
                     </CardContent>
                 </Card>
 

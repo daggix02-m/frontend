@@ -37,8 +37,8 @@ export function PlatformUsers() {
     ];
 
     return (
-        <div className='space-y-6 p-6'>
-            <div className='flex items-center justify-between'>
+        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
+            <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
                 <div>
                     <h1 className='text-3xl font-bold tracking-tight'>Platform Users</h1>
                     <p className='text-muted-foreground mt-2'>Manage platform administrator accounts</p>
@@ -50,14 +50,14 @@ export function PlatformUsers() {
             </div>
 
             {/* Stats Grid */}
-            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+            <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
-                        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
                             <CardTitle className='text-sm font-medium'>{stat.title}</CardTitle>
                             <stat.icon className={`h-4 w-4 ${stat.color}`} />
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className='px-6 pb-6'>
                             <div className='text-2xl font-bold'>{stat.value}</div>
                         </CardContent>
                     </Card>
@@ -67,7 +67,7 @@ export function PlatformUsers() {
             {/* Search and Filters */}
             <Card>
                 <CardContent className='pt-6'>
-                    <div className='flex gap-4'>
+                    <div className='flex flex-col sm:flex-row gap-4'>
                         <Input placeholder='Search users...' className='max-w-sm' />
                         <Button variant='outline'>Filter by Role</Button>
                         <Button variant='outline'>Filter by Status</Button>
@@ -81,39 +81,41 @@ export function PlatformUsers() {
                     <CardTitle>Administrator Accounts</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Email</TableHead>
-                                <TableHead>Role</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Last Active</TableHead>
-                                <TableHead>Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {users.map((user) => (
-                                <TableRow key={user.id}>
-                                    <TableCell className='font-medium'>{user.name}</TableCell>
-                                    <TableCell>{user.email}</TableCell>
-                                    <TableCell>{getRoleBadge(user.role)}</TableCell>
-                                    <TableCell>{getStatusBadge(user.status)}</TableCell>
-                                    <TableCell>{user.lastActive}</TableCell>
-                                    <TableCell>
-                                        <div className='flex gap-2'>
-                                            <Button size='sm' variant='outline'>
-                                                Edit
-                                            </Button>
-                                            <Button size='sm' variant='outline'>
-                                                Logs
-                                            </Button>
-                                        </div>
-                                    </TableCell>
+                    <div className='overflow-x-auto'>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Email</TableHead>
+                                    <TableHead>Role</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Last Active</TableHead>
+                                    <TableHead>Actions</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {users.map((user) => (
+                                    <TableRow key={user.id}>
+                                        <TableCell className='font-medium'>{user.name}</TableCell>
+                                        <TableCell>{user.email}</TableCell>
+                                        <TableCell>{getRoleBadge(user.role)}</TableCell>
+                                        <TableCell>{getStatusBadge(user.status)}</TableCell>
+                                        <TableCell>{user.lastActive}</TableCell>
+                                        <TableCell>
+                                            <div className='flex gap-2'>
+                                                <Button size='sm' variant='outline'>
+                                                    Edit
+                                                </Button>
+                                                <Button size='sm' variant='outline'>
+                                                    Logs
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </CardContent>
             </Card>
 

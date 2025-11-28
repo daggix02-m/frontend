@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody
 import { Package, CheckCircle, Clock, Truck } from 'lucide-react';
 
 export function StockReceiving() {
-    const [deliveries] = useState([
+    const [deliveries, setDeliveries] = useState([
         { id: 'DEL-001', supplier: 'MedSupply Co.', poNumber: 'PO-12345', items: 15, status: 'pending', expectedDate: '2025-11-28', value: '$2,450' },
         { id: 'DEL-002', supplier: 'PharmaDirect', poNumber: 'PO-12346', items: 8, status: 'in-transit', expectedDate: '2025-11-29', value: '$1,230' },
         { id: 'DEL-003', supplier: 'HealthWholesale', poNumber: 'PO-12347', items: 22, status: 'received', expectedDate: '2025-11-27', value: '$3,890' },
@@ -26,9 +26,9 @@ export function StockReceiving() {
             'in-transit': Truck,
             received: CheckCircle,
         };
-        const Icon = icons[status];
+        const Icon = icons[status] || Clock;
         return (
-            <Badge variant={variants[status]} className='flex items-center gap-1 w-fit'>
+            <Badge variant={variants[status] || 'default'} className='flex items-center gap-1 w-fit'>
                 <Icon className='h-3 w-3' />
                 {status}
             </Badge>
@@ -36,33 +36,36 @@ export function StockReceiving() {
     };
 
     const stats = [
-        { title: 'Pending Deliveries', value: '5', icon: Clock, color: 'text-orange-600' },
-        { title: 'In Transit', value: '3', icon: Truck, color: 'text-blue-600' },
-        { title: 'Received Today', value: '2', icon: CheckCircle, color: 'text-green-600' },
+        { title: 'Pending Deliveries', value: deliveries.filter(d => d.status === 'pending').length, icon: Clock, color: 'text-orange-600' },
+        { title: 'In Transit', value: deliveries.filter(d => d.status === 'in-transit').length, icon: Truck, color: 'text-blue-600' },
+        { title: 'Received Today', value: deliveries.filter(d => d.status === 'received').length, icon: CheckCircle, color: 'text-green-600' },
         { title: 'Total Value', value: '$7,570', icon: Package, color: 'text-purple-600' },
     ];
 
     const handleReceiveDelivery = (id) => {
-        console.log('Receiving delivery:', id);
-        // Backend integration needed
+        if (window.confirm('Start receiving process for this delivery?')) {
+            setDeliveries(deliveries.map(d =>
+                d.id === id ? { ...d, status: 'received' } : d
+            ));
+        }
     };
 
     return (
-        <div className='space-y-6 p-6'>
+        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
             <div>
                 <h1 className='text-3xl font-bold tracking-tight'>Stock Receiving</h1>
                 <p className='text-muted-foreground mt-2'>Receive deliveries and update stock quantities</p>
             </div>
 
             {/* Stats Grid */}
-            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+            <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
-                        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
                             <CardTitle className='text-sm font-medium'>{stat.title}</CardTitle>
                             <stat.icon className={`h-4 w-4 ${stat.color}`} />
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className='px-6 pb-6'>
                             <div className='text-2xl font-bold'>{stat.value}</div>
                         </CardContent>
                     </Card>
@@ -75,44 +78,46 @@ export function StockReceiving() {
                     <CardTitle>Expected Deliveries</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Delivery ID</TableHead>
-                                <TableHead>Supplier</TableHead>
-                                <TableHead>PO Number</TableHead>
-                                <TableHead>Items</TableHead>
-                                <TableHead>Expected Date</TableHead>
-                                <TableHead>Value</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {deliveries.map((delivery) => (
-                                <TableRow key={delivery.id}>
-                                    <TableCell className='font-medium'>{delivery.id}</TableCell>
-                                    <TableCell>{delivery.supplier}</TableCell>
-                                    <TableCell>{delivery.poNumber}</TableCell>
-                                    <TableCell>{delivery.items}</TableCell>
-                                    <TableCell>{delivery.expectedDate}</TableCell>
-                                    <TableCell>{delivery.value}</TableCell>
-                                    <TableCell>{getStatusBadge(delivery.status)}</TableCell>
-                                    <TableCell>
-                                        {delivery.status === 'pending' ? (
-                                            <Button size='sm' variant='outline' onClick={() => handleReceiveDelivery(delivery.id)}>
-                                                Receive
-                                            </Button>
-                                        ) : (
-                                            <Button size='sm' variant='outline'>
-                                                View
-                                            </Button>
-                                        )}
-                                    </TableCell>
+                    <div className='overflow-x-auto'>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Delivery ID</TableHead>
+                                    <TableHead>Supplier</TableHead>
+                                    <TableHead>PO Number</TableHead>
+                                    <TableHead>Items</TableHead>
+                                    <TableHead>Expected Date</TableHead>
+                                    <TableHead>Value</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Actions</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {deliveries.map((delivery) => (
+                                    <TableRow key={delivery.id}>
+                                        <TableCell className='font-medium'>{delivery.id}</TableCell>
+                                        <TableCell>{delivery.supplier}</TableCell>
+                                        <TableCell>{delivery.poNumber}</TableCell>
+                                        <TableCell>{delivery.items}</TableCell>
+                                        <TableCell>{delivery.expectedDate}</TableCell>
+                                        <TableCell>{delivery.value}</TableCell>
+                                        <TableCell>{getStatusBadge(delivery.status)}</TableCell>
+                                        <TableCell>
+                                            {delivery.status === 'pending' ? (
+                                                <Button size='sm' variant='outline' onClick={() => handleReceiveDelivery(delivery.id)}>
+                                                    Receive
+                                                </Button>
+                                            ) : (
+                                                <Button size='sm' variant='outline'>
+                                                    View
+                                                </Button>
+                                            )}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </CardContent>
             </Card>
 
@@ -123,7 +128,7 @@ export function StockReceiving() {
                 </CardHeader>
                 <CardContent>
                     <div className='space-y-4'>
-                        <div className='grid gap-4 md:grid-cols-2'>
+                        <div className='grid gap-4 grid-cols-1 md:grid-cols-2'>
                             <div>
                                 <p className='text-sm font-medium'>Supplier: MedSupply Co.</p>
                                 <p className='text-sm text-muted-foreground'>PO Number: PO-12345</p>
@@ -134,34 +139,36 @@ export function StockReceiving() {
                             </div>
                         </div>
 
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Product</TableHead>
-                                    <TableHead>Ordered Qty</TableHead>
-                                    <TableHead>Received Qty</TableHead>
-                                    <TableHead>Batch Number</TableHead>
-                                    <TableHead>Expiry Date</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {receivingItems.map((item) => (
-                                    <TableRow key={item.id}>
-                                        <TableCell className='font-medium'>{item.product}</TableCell>
-                                        <TableCell>{item.ordered}</TableCell>
-                                        <TableCell>
-                                            <Input type='number' placeholder='0' className='w-24' max={item.ordered} />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Input placeholder='Batch #' className='w-32' />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Input type='date' className='w-40' />
-                                        </TableCell>
+                        <div className='overflow-x-auto'>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Product</TableHead>
+                                        <TableHead>Ordered Qty</TableHead>
+                                        <TableHead>Received Qty</TableHead>
+                                        <TableHead>Batch Number</TableHead>
+                                        <TableHead>Expiry Date</TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                                </TableHeader>
+                                <TableBody>
+                                    {receivingItems.map((item) => (
+                                        <TableRow key={item.id}>
+                                            <TableCell className='font-medium'>{item.product}</TableCell>
+                                            <TableCell>{item.ordered}</TableCell>
+                                            <TableCell>
+                                                <Input type='number' placeholder='0' className='w-24' max={item.ordered} />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Input placeholder='Batch #' className='w-32' />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Input type='date' className='w-40' />
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
 
                         <div className='flex gap-2'>
                             <Button>Complete Receiving</Button>

@@ -41,38 +41,38 @@ export function Receipts() {
             {/* Quick Stats */}
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 <Card>
-                    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
                         <CardTitle className='text-sm font-medium'>Today's Receipts</CardTitle>
                         <FileText className='h-4 w-4 text-muted-foreground' />
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className='px-6 pb-6'>
                         <div className='text-2xl font-bold'>45</div>
                     </CardContent>
                 </Card>
                 <Card>
-                    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
                         <CardTitle className='text-sm font-medium'>Printed</CardTitle>
                         <Printer className='h-4 w-4 text-muted-foreground' />
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className='px-6 pb-6'>
                         <div className='text-2xl font-bold'>38</div>
                     </CardContent>
                 </Card>
                 <Card>
-                    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
                         <CardTitle className='text-sm font-medium'>Emailed</CardTitle>
                         <Mail className='h-4 w-4 text-muted-foreground' />
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className='px-6 pb-6'>
                         <div className='text-2xl font-bold'>12</div>
                     </CardContent>
                 </Card>
                 <Card>
-                    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
                         <CardTitle className='text-sm font-medium'>Total Amount</CardTitle>
                         <Download className='h-4 w-4 text-muted-foreground' />
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className='px-6 pb-6'>
                         <div className='text-2xl font-bold'>$2,345</div>
                     </CardContent>
                 </Card>

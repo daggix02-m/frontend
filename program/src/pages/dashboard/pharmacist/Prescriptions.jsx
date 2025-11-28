@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody
 import { FileText, AlertCircle, CheckCircle, Clock, Search } from 'lucide-react';
 
 export function Prescriptions() {
-    const [prescriptions] = useState([
+    const [prescriptions, setPrescriptions] = useState([
         { id: 'RX-001', patient: 'John Doe', doctor: 'Dr. Smith', medication: 'Amoxicillin 500mg', dosage: '3x daily', duration: '7 days', status: 'pending', date: '2025-11-28' },
         { id: 'RX-002', patient: 'Jane Smith', doctor: 'Dr. Johnson', medication: 'Lisinopril 10mg', dosage: '1x daily', duration: '30 days', status: 'validated', date: '2025-11-28' },
         { id: 'RX-003', patient: 'Mike Brown', doctor: 'Dr. Williams', medication: 'Metformin 850mg', dosage: '2x daily', duration: '90 days', status: 'dispensed', date: '2025-11-27' },
@@ -23,9 +23,9 @@ export function Prescriptions() {
             dispensed: CheckCircle,
             rejected: AlertCircle,
         };
-        const Icon = icons[status];
+        const Icon = icons[status] || Clock;
         return (
-            <Badge variant={variants[status]} className='flex items-center gap-1 w-fit'>
+            <Badge variant={variants[status] || 'default'} className='flex items-center gap-1 w-fit'>
                 <Icon className='h-3 w-3' />
                 {status}
             </Badge>
@@ -33,22 +33,26 @@ export function Prescriptions() {
     };
 
     const stats = [
-        { title: 'Pending Validation', value: '12', icon: Clock, color: 'text-orange-600' },
-        { title: 'Validated Today', value: '28', icon: CheckCircle, color: 'text-green-600' },
-        { title: 'Dispensed Today', value: '24', icon: FileText, color: 'text-blue-600' },
+        { title: 'Pending Validation', value: prescriptions.filter(p => p.status === 'pending').length, icon: Clock, color: 'text-orange-600' },
+        { title: 'Validated Today', value: prescriptions.filter(p => p.status === 'validated').length, icon: CheckCircle, color: 'text-green-600' },
+        { title: 'Dispensed Today', value: prescriptions.filter(p => p.status === 'dispensed').length, icon: FileText, color: 'text-blue-600' },
         { title: 'Flagged', value: '3', icon: AlertCircle, color: 'text-red-600' },
     ];
 
     const handleValidate = (id) => {
-        console.log('Validating prescription:', id);
-        // Backend integration needed
-        alert(`Prescription ${id} validated successfully!`);
+        if (window.confirm('Are you sure you want to validate this prescription?')) {
+            setPrescriptions(prescriptions.map(p =>
+                p.id === id ? { ...p, status: 'validated' } : p
+            ));
+        }
     };
 
     const handleDispense = (id) => {
-        console.log('Dispensing prescription:', id);
-        // Backend integration needed
-        alert(`Prescription ${id} dispensed successfully!`);
+        if (window.confirm('Confirm dispensing for this prescription?')) {
+            setPrescriptions(prescriptions.map(p =>
+                p.id === id ? { ...p, status: 'dispensed' } : p
+            ));
+        }
     };
 
     return (
@@ -62,11 +66,11 @@ export function Prescriptions() {
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
-                        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
                             <CardTitle className='text-sm font-medium'>{stat.title}</CardTitle>
                             <stat.icon className={`h-4 w-4 ${stat.color}`} />
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className='px-6 pb-6'>
                             <div className='text-2xl font-bold'>{stat.value}</div>
                         </CardContent>
                     </Card>
@@ -76,7 +80,7 @@ export function Prescriptions() {
             {/* Search */}
             <Card>
                 <CardContent className='pt-6'>
-                    <div className='relative w-full'>
+                    <div className='relative w-full md:max-w-md'>
                         <Search className='absolute left-3 top-3 h-4 w-4 text-muted-foreground' />
                         <Input placeholder='Search by prescription ID, patient name, or medication...' className='pl-10' />
                     </div>
@@ -89,52 +93,54 @@ export function Prescriptions() {
                     <CardTitle>Active Prescriptions</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Prescription ID</TableHead>
-                                <TableHead>Patient</TableHead>
-                                <TableHead>Doctor</TableHead>
-                                <TableHead>Medication</TableHead>
-                                <TableHead>Dosage</TableHead>
-                                <TableHead>Duration</TableHead>
-                                <TableHead>Date</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {prescriptions.map((rx) => (
-                                <TableRow key={rx.id}>
-                                    <TableCell className='font-medium'>{rx.id}</TableCell>
-                                    <TableCell>{rx.patient}</TableCell>
-                                    <TableCell>{rx.doctor}</TableCell>
-                                    <TableCell>{rx.medication}</TableCell>
-                                    <TableCell>{rx.dosage}</TableCell>
-                                    <TableCell>{rx.duration}</TableCell>
-                                    <TableCell>{rx.date}</TableCell>
-                                    <TableCell>{getStatusBadge(rx.status)}</TableCell>
-                                    <TableCell>
-                                        <div className='flex gap-2'>
-                                            {rx.status === 'pending' && (
-                                                <Button size='sm' variant='outline' onClick={() => handleValidate(rx.id)}>
-                                                    Validate
-                                                </Button>
-                                            )}
-                                            {rx.status === 'validated' && (
-                                                <Button size='sm' variant='outline' onClick={() => handleDispense(rx.id)}>
-                                                    Dispense
-                                                </Button>
-                                            )}
-                                            <Button size='sm' variant='outline'>
-                                                View
-                                            </Button>
-                                        </div>
-                                    </TableCell>
+                    <div className='overflow-x-auto'>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Prescription ID</TableHead>
+                                    <TableHead>Patient</TableHead>
+                                    <TableHead>Doctor</TableHead>
+                                    <TableHead>Medication</TableHead>
+                                    <TableHead>Dosage</TableHead>
+                                    <TableHead>Duration</TableHead>
+                                    <TableHead>Date</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Actions</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {prescriptions.map((rx) => (
+                                    <TableRow key={rx.id}>
+                                        <TableCell className='font-medium'>{rx.id}</TableCell>
+                                        <TableCell>{rx.patient}</TableCell>
+                                        <TableCell>{rx.doctor}</TableCell>
+                                        <TableCell>{rx.medication}</TableCell>
+                                        <TableCell>{rx.dosage}</TableCell>
+                                        <TableCell>{rx.duration}</TableCell>
+                                        <TableCell>{rx.date}</TableCell>
+                                        <TableCell>{getStatusBadge(rx.status)}</TableCell>
+                                        <TableCell>
+                                            <div className='flex gap-2'>
+                                                {rx.status === 'pending' && (
+                                                    <Button size='sm' variant='outline' onClick={() => handleValidate(rx.id)}>
+                                                        Validate
+                                                    </Button>
+                                                )}
+                                                {rx.status === 'validated' && (
+                                                    <Button size='sm' variant='outline' onClick={() => handleDispense(rx.id)}>
+                                                        Dispense
+                                                    </Button>
+                                                )}
+                                                <Button size='sm' variant='outline'>
+                                                    View
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </CardContent>
             </Card>
 

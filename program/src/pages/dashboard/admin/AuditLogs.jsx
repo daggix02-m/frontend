@@ -9,7 +9,7 @@ export function AuditLogs() {
     ];
 
     return (
-        <div className='space-y-6'>
+        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
             <div>
                 <h2 className='text-3xl font-bold tracking-tight'>Audit Logs</h2>
                 <p className='text-muted-foreground'>View system-wide security and activity logs.</p>
@@ -20,26 +20,28 @@ export function AuditLogs() {
                     <CardTitle>Recent Activity</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Action</TableHead>
-                                <TableHead>User</TableHead>
-                                <TableHead>Timestamp</TableHead>
-                                <TableHead>Details</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {logs.map((log) => (
-                                <TableRow key={log.id}>
-                                    <TableCell className='font-medium'>{log.action}</TableCell>
-                                    <TableCell>{log.user}</TableCell>
-                                    <TableCell>{log.timestamp}</TableCell>
-                                    <TableCell className='text-muted-foreground'>{log.details}</TableCell>
+                    <div className='overflow-x-auto'>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Action</TableHead>
+                                    <TableHead>User</TableHead>
+                                    <TableHead>Timestamp</TableHead>
+                                    <TableHead>Details</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {logs.map((log) => (
+                                    <TableRow key={log.id}>
+                                        <TableCell className='font-medium'>{log.action}</TableCell>
+                                        <TableCell>{log.user}</TableCell>
+                                        <TableCell>{log.timestamp}</TableCell>
+                                        <TableCell className='text-muted-foreground'>{log.details}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </CardContent>
             </Card>
         </div>

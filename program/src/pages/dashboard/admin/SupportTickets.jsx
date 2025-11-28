@@ -39,21 +39,21 @@ export function SupportTickets() {
     ];
 
     return (
-        <div className='space-y-6 p-6'>
+        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
             <div>
                 <h1 className='text-3xl font-bold tracking-tight'>Support Tickets</h1>
                 <p className='text-muted-foreground mt-2'>Manage and respond to pharmacy support requests</p>
             </div>
 
             {/* Stats Grid */}
-            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+            <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
-                        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
                             <CardTitle className='text-sm font-medium'>{stat.title}</CardTitle>
                             <stat.icon className={`h-4 w-4 ${stat.color}`} />
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className='px-6 pb-6'>
                             <div className='text-2xl font-bold'>{stat.value}</div>
                         </CardContent>
                     </Card>
@@ -63,7 +63,7 @@ export function SupportTickets() {
             {/* Filters */}
             <Card>
                 <CardContent className='pt-6'>
-                    <div className='flex gap-4'>
+                    <div className='flex flex-col sm:flex-row gap-4'>
                         <Select className='w-48'>
                             <option value='all'>All Status</option>
                             <option value='open'>Open</option>
@@ -93,38 +93,40 @@ export function SupportTickets() {
                     <CardTitle>All Tickets</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Ticket ID</TableHead>
-                                <TableHead>Pharmacy</TableHead>
-                                <TableHead>Subject</TableHead>
-                                <TableHead>Priority</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Assignee</TableHead>
-                                <TableHead>Created</TableHead>
-                                <TableHead>Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {tickets.map((ticket) => (
-                                <TableRow key={ticket.id}>
-                                    <TableCell className='font-medium'>{ticket.id}</TableCell>
-                                    <TableCell>{ticket.pharmacy}</TableCell>
-                                    <TableCell>{ticket.subject}</TableCell>
-                                    <TableCell>{getPriorityBadge(ticket.priority)}</TableCell>
-                                    <TableCell>{getStatusBadge(ticket.status)}</TableCell>
-                                    <TableCell>{ticket.assignee}</TableCell>
-                                    <TableCell>{ticket.created}</TableCell>
-                                    <TableCell>
-                                        <Button size='sm' variant='outline'>
-                                            View
-                                        </Button>
-                                    </TableCell>
+                    <div className='overflow-x-auto'>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Ticket ID</TableHead>
+                                    <TableHead>Pharmacy</TableHead>
+                                    <TableHead>Subject</TableHead>
+                                    <TableHead>Priority</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Assignee</TableHead>
+                                    <TableHead>Created</TableHead>
+                                    <TableHead>Actions</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {tickets.map((ticket) => (
+                                    <TableRow key={ticket.id}>
+                                        <TableCell className='font-medium'>{ticket.id}</TableCell>
+                                        <TableCell>{ticket.pharmacy}</TableCell>
+                                        <TableCell>{ticket.subject}</TableCell>
+                                        <TableCell>{getPriorityBadge(ticket.priority)}</TableCell>
+                                        <TableCell>{getStatusBadge(ticket.status)}</TableCell>
+                                        <TableCell>{ticket.assignee}</TableCell>
+                                        <TableCell>{ticket.created}</TableCell>
+                                        <TableCell>
+                                            <Button size='sm' variant='outline'>
+                                                View
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </CardContent>
             </Card>
         </div>

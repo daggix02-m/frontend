@@ -13,13 +13,13 @@ export function ImportData() {
     };
 
     return (
-        <div className='space-y-6'>
+        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
             <div>
                 <h2 className='text-3xl font-bold tracking-tight'>Import Data</h2>
                 <p className='text-muted-foreground'>Import data from Excel files into the system.</p>
             </div>
 
-            <div className='grid gap-6 md:grid-cols-2'>
+            <div className='grid gap-6 grid-cols-1 md:grid-cols-2'>
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">

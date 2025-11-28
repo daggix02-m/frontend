@@ -3,13 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, Button, Inpu
 
 export function Settings() {
     return (
-        <div className='space-y-6'>
+        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
             <div>
                 <h2 className='text-3xl font-bold tracking-tight'>Settings</h2>
                 <p className='text-muted-foreground'>Manage pharmacy configuration and subscription.</p>
             </div>
 
-            <div className='grid gap-6'>
+            <div className='grid gap-6 grid-cols-1'>
                 <Card>
                     <CardHeader>
                         <CardTitle>Pharmacy Profile</CardTitle>

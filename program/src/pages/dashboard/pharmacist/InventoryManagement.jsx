@@ -3,13 +3,36 @@ import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody
 import { Package, AlertTriangle, TrendingDown, Search, Plus } from 'lucide-react';
 
 export function InventoryManagement() {
-    const [products] = useState([
+    const [products, setProducts] = useState([
         { id: 1, name: 'Paracetamol 500mg', category: 'Pain Relief', stock: 450, minStock: 200, expiryDate: '2026-06-15', location: 'A1-B2' },
         { id: 2, name: 'Amoxicillin 250mg', category: 'Antibiotics', stock: 180, minStock: 150, expiryDate: '2025-12-20', location: 'A2-C3' },
         { id: 3, name: 'Ibuprofen 400mg', category: 'Pain Relief', stock: 85, minStock: 100, expiryDate: '2026-03-10', location: 'A1-B3' },
         { id: 4, name: 'Aspirin 100mg', category: 'Cardiovascular', stock: 320, minStock: 150, expiryDate: '2025-12-05', location: 'A3-D1' },
         { id: 5, name: 'Vitamin C 1000mg', category: 'Supplements', stock: 25, minStock: 50, expiryDate: '2026-08-30', location: 'B1-A2' },
     ]);
+
+    const handleUpdateStock = (id) => {
+        const newStock = prompt('Enter new stock level:');
+        if (newStock && !isNaN(newStock)) {
+            setProducts(products.map(p =>
+                p.id === id ? { ...p, stock: parseInt(newStock) } : p
+            ));
+        }
+    };
+
+    const handleRequestStock = (id) => {
+        alert(`Stock replenishment requested for product ID: ${id}`);
+    };
+
+    const handleMarkReturn = (id) => {
+        if (window.confirm('Mark this item for return due to expiry?')) {
+            alert(`Product ID: ${id} marked for return.`);
+        }
+    };
+
+    const handleGlobalRequest = () => {
+        alert('Global replenishment request sent for all low stock items.');
+    };
 
     const getStockStatus = (stock, minStock) => {
         if (stock < minStock * 0.5) return { label: 'Critical', variant: 'destructive' };
@@ -42,7 +65,7 @@ export function InventoryManagement() {
                     <h1 className='text-3xl font-bold tracking-tight'>Inventory Management</h1>
                     <p className='text-muted-foreground mt-2'>Track and manage branch inventory</p>
                 </div>
-                <Button>
+                <Button onClick={handleGlobalRequest}>
                     <Plus className='mr-2 h-4 w-4' />
                     Request Replenishment
                 </Button>
@@ -117,7 +140,7 @@ export function InventoryManagement() {
                                                 <Badge variant={expiryStatus.variant}>{expiryStatus.label}</Badge>
                                             </TableCell>
                                             <TableCell>
-                                                <Button size='sm' variant='outline'>
+                                                <Button size='sm' variant='outline' onClick={() => handleUpdateStock(product.id)}>
                                                     Update
                                                 </Button>
                                             </TableCell>
@@ -149,7 +172,7 @@ export function InventoryManagement() {
                                             <p className='font-medium'>{product.name}</p>
                                             <p className='text-sm text-muted-foreground'>Expires: {product.expiryDate}</p>
                                         </div>
-                                        <Button size='sm' variant='outline'>
+                                        <Button size='sm' variant='outline' onClick={() => handleMarkReturn(product.id)}>
                                             Mark for Return
                                         </Button>
                                     </div>
@@ -177,7 +200,7 @@ export function InventoryManagement() {
                                                 Stock: {product.stock} / Min: {product.minStock}
                                             </p>
                                         </div>
-                                        <Button size='sm' variant='outline'>
+                                        <Button size='sm' variant='outline' onClick={() => handleRequestStock(product.id)}>
                                             Request Stock
                                         </Button>
                                     </div>
