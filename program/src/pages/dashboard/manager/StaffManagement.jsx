@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -161,25 +162,23 @@ export function StaffManagement() {
                 </div>
                 <div className='space-y-2'>
                   <label className='text-sm font-medium'>Role</label>
-                  <select
-                    className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                  <Select
                     value={newStaff.role}
                     onChange={handleRoleChange}
                   >
                     <option value='Pharmacist'>Pharmacist</option>
                     <option value='Cashier'>Cashier</option>
-                  </select>
+                  </Select>
                 </div>
                 <div className='space-y-2'>
                   <label className='text-sm font-medium'>Assign Branch</label>
-                  <select
-                    className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                  <Select
                     value={newStaff.branch}
                     onChange={(e) => setNewStaff({ ...newStaff, branch: e.target.value })}
                   >
                     <option value='Main Branch'>Main Branch</option>
                     <option value='Downtown Branch'>Downtown Branch</option>
-                  </select>
+                  </Select>
                 </div>
                 <div className='flex justify-end gap-2 pt-4'>
                   <Button type='button' variant='outline' onClick={() => setIsAddModalOpen(false)}>

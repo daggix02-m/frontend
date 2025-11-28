@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Button, Select } from '@/components/ui/ui';
+import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Button } from '@/components/ui/ui';
+import { Select } from '@/components/ui/select';
 import { Ticket, MessageSquare, User, Clock } from 'lucide-react';
 
 export function SupportTickets() {

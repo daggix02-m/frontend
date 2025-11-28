@@ -45,7 +45,7 @@ export function SubscriptionManagement() {
                             <ul className='space-y-2'>
                                 {plan.features.map((feature, index) => (
                                     <li key={index} className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400'>
-                                        <Check size={16} className='text-green-500' />
+                                        <Check size={16} className='text-green-600' />
                                         {feature}
                                     </li>
                                 ))}

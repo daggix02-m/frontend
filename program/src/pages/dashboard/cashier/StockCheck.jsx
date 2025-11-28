@@ -40,7 +40,7 @@ export function StockCheck() {
                                 <TableRow key={product.id}>
                                     <TableCell className='font-medium'>{product.name}</TableCell>
                                     <TableCell>
-                                        <span className={product.stock < 100 ? 'text-red-500 font-medium' : 'text-green-600'}>
+                                        <span className={product.stock < 100 ? 'text-red-600 font-medium' : 'text-green-600'}>
                                             {product.stock} units
                                         </span>
                                     </TableCell>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, Button, Input, Select } from '@/components/ui/ui';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, Button, Input } from '@/components/ui/ui';
+import { Select } from '@/components/ui/select';
 import { Percent, DollarSign, Tag, Settings } from 'lucide-react';
 
 export function RefundsDiscounts() {
