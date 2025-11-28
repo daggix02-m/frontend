@@ -32,14 +32,14 @@ export function Receipts() {
     };
 
     return (
-        <div className='space-y-6 p-6'>
+        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
             <div>
                 <h1 className='text-3xl font-bold tracking-tight'>Receipts & Invoices</h1>
                 <p className='text-muted-foreground mt-2'>Print, email, and manage customer receipts</p>
             </div>
 
             {/* Quick Stats */}
-            <div className='grid gap-4 md:grid-cols-4'>
+            <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 <Card>
                     <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                         <CardTitle className='text-sm font-medium'>Today's Receipts</CardTitle>
@@ -125,7 +125,7 @@ export function Receipts() {
                     <CardTitle>Receipt Preview</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className='border rounded-lg p-6 max-w-md mx-auto bg-white text-black'>
+                    <div className='border rounded-lg p-4 max-w-full mx-auto bg-white text-black'>
                         <div className='text-center mb-4'>
                             <h2 className='text-xl font-bold'>PharmaCare</h2>
                             <p className='text-sm'>Main Branch</p>

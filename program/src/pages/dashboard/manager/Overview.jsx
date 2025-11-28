@@ -31,18 +31,18 @@ export function Overview() {
   ];
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
       <h2 className='text-3xl font-bold tracking-tight'>Dashboard Overview</h2>
-      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+      <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <Card key={index}>
-              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
                 <CardTitle className='text-sm font-medium'>{stat.title}</CardTitle>
                 <Icon className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
-              <CardContent>
+              <CardContent className='px-6 pb-6'>
                 <div className='text-2xl font-bold'>{stat.value}</div>
                 <p className='text-xs text-muted-foreground'>{stat.change}</p>
               </CardContent>
@@ -50,7 +50,7 @@ export function Overview() {
           );
         })}
       </div>
-      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-7'>
+      <div className='grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-7'>
         <Card className='col-span-4'>
           <CardHeader>
             <CardTitle>Recent Sales</CardTitle>

@@ -36,7 +36,7 @@ export function InventoryManagement() {
     ];
 
     return (
-        <div className='space-y-6 p-6'>
+        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
             <div className='flex items-center justify-between'>
                 <div>
                     <h1 className='text-3xl font-bold tracking-tight'>Inventory Management</h1>
@@ -49,7 +49,7 @@ export function InventoryManagement() {
             </div>
 
             {/* Stats Grid */}
-            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+            <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
                         <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
@@ -67,7 +67,7 @@ export function InventoryManagement() {
             <Card>
                 <CardContent className='pt-6'>
                     <div className='flex gap-4'>
-                        <div className='relative flex-1'>
+                        <div className='relative w-full'>
                             <Search className='absolute left-3 top-3 h-4 w-4 text-muted-foreground' />
                             <Input placeholder='Search products...' className='pl-10' />
                         </div>
@@ -129,7 +129,7 @@ export function InventoryManagement() {
             </Card>
 
             {/* Quick Actions */}
-            <div className='grid gap-4 md:grid-cols-2'>
+            <div className='grid gap-4 grid-cols-1 md:grid-cols-2'>
                 <Card>
                     <CardHeader>
                         <CardTitle className='flex items-center gap-2'>

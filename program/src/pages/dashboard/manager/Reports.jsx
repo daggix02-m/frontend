@@ -4,13 +4,13 @@ import { BarChart3, TrendingUp, DollarSign, CreditCard } from 'lucide-react';
 
 export function Reports() {
     return (
-        <div className='space-y-6'>
+        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
             <div>
                 <h2 className='text-3xl font-bold tracking-tight'>Reports & Analytics</h2>
                 <p className='text-muted-foreground'>View financial and POS performance reports.</p>
             </div>
 
-            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+            <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 <Card>
                     <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                         <CardTitle className='text-sm font-medium'>Total Revenue</CardTitle>
@@ -53,7 +53,7 @@ export function Reports() {
                 </Card>
             </div>
 
-            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-7'>
+            <div className='grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-7'>
                 <Card className='col-span-4'>
                     <CardHeader>
                         <CardTitle>Revenue Over Time</CardTitle>

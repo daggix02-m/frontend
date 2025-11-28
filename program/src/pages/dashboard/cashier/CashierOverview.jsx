@@ -4,15 +4,15 @@ import { ShoppingCart, DollarSign, CreditCard, TrendingUp } from 'lucide-react';
 
 export function CashierOverview() {
   return (
-    <div className='space-y-6'>
+    <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
       <h2 className='text-3xl font-bold tracking-tight'>Cashier Dashboard</h2>
-      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+      <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
         <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
             <CardTitle className='text-sm font-medium'>Total Sales</CardTitle>
             <DollarSign className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
-          <CardContent>
+          <CardContent className='px-6 pb-6'>
             <div className='text-2xl font-bold'>$1,245.50</div>
             <p className='text-xs text-muted-foreground'>Today</p>
           </CardContent>

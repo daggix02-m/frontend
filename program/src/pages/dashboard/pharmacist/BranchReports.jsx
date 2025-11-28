@@ -29,14 +29,14 @@ export function BranchReports() {
     ];
 
     return (
-        <div className='space-y-6 p-6'>
+        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
             <div>
                 <h1 className='text-3xl font-bold tracking-tight'>Branch Reports</h1>
                 <p className='text-muted-foreground mt-2'>View branch-level sales and inventory reports</p>
             </div>
 
             {/* Main Stats Grid */}
-            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+            <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
                         <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
@@ -53,7 +53,7 @@ export function BranchReports() {
                 ))}
             </div>
 
-            <div className='grid gap-6 md:grid-cols-2'>
+            <div className='grid gap-6 grid-cols-1 md:grid-cols-2'>
                 {/* Top Selling Products */}
                 <Card>
                     <CardHeader>
@@ -107,7 +107,7 @@ export function BranchReports() {
                     <CardTitle>Inventory Summary</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className='grid gap-4 md:grid-cols-4'>
+                    <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                         <div className='text-center p-4 border rounded-lg'>
                             <p className='text-2xl font-bold'>234</p>
                             <p className='text-sm text-muted-foreground mt-1'>Total Products</p>
@@ -134,7 +134,7 @@ export function BranchReports() {
                     <CardTitle>Prescription Statistics</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className='grid gap-4 md:grid-cols-3'>
+                    <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3'>
                         <div className='text-center p-4 border rounded-lg'>
                             <p className='text-2xl font-bold'>89</p>
                             <p className='text-sm text-muted-foreground mt-1'>Filled Today</p>

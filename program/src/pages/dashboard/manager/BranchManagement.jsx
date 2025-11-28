@@ -48,7 +48,7 @@ export function BranchManagement() {
   };
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
       <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
         <div>
           <h2 className='text-3xl font-bold tracking-tight'>Branch Management</h2>
@@ -63,7 +63,7 @@ export function BranchManagement() {
         <CardHeader>
           <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
             <CardTitle>All Branches</CardTitle>
-            <div className='relative w-full md:w-64'>
+            <div className='relative w-full'>
               <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
               <Input placeholder='Search branches...' className='pl-8' />
             </div>

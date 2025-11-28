@@ -52,14 +52,14 @@ export function Prescriptions() {
     };
 
     return (
-        <div className='space-y-6 p-6'>
+        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
             <div>
                 <h1 className='text-3xl font-bold tracking-tight'>Prescription Management</h1>
                 <p className='text-muted-foreground mt-2'>Validate and dispense prescriptions</p>
             </div>
 
             {/* Stats Grid */}
-            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+            <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
                         <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
@@ -76,7 +76,7 @@ export function Prescriptions() {
             {/* Search */}
             <Card>
                 <CardContent className='pt-6'>
-                    <div className='relative'>
+                    <div className='relative w-full'>
                         <Search className='absolute left-3 top-3 h-4 w-4 text-muted-foreground' />
                         <Input placeholder='Search by prescription ID, patient name, or medication...' className='pl-10' />
                     </div>
