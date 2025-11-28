@@ -50,8 +50,8 @@ export function Overview() {
           );
         })}
       </div>
-      <div className='grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-7'>
-        <Card className='col-span-4'>
+      <div className='grid gap-4 grid-cols-1 lg:grid-cols-7'>
+        <Card className='col-span-1 lg:col-span-4'>
           <CardHeader>
             <CardTitle>Recent Sales</CardTitle>
           </CardHeader>
@@ -81,7 +81,7 @@ export function Overview() {
             </div>
           </CardContent>
         </Card>
-        <Card className='col-span-3'>
+        <Card className='col-span-1 lg:col-span-3'>
           <CardHeader>
             <CardTitle>Top Selling Products</CardTitle>
           </CardHeader>

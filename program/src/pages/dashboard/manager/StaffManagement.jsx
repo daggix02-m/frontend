@@ -78,7 +78,7 @@ export function StaffManagement() {
         <CardHeader>
           <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
             <CardTitle>All Staff Members</CardTitle>
-            <div className='relative w-full'>
+            <div className='relative w-full md:max-w-md'>
               <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
               <Input placeholder='Search staff...' className='pl-8' />
             </div>
@@ -131,7 +131,7 @@ export function StaffManagement() {
 
       {/* Add Staff Modal */}
       {isAddModalOpen && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
           <Card className='w-full max-w-md'>
             <CardHeader>
               <CardTitle>Add New Staff Member</CardTitle>

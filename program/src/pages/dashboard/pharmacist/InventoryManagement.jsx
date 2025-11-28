@@ -37,7 +37,7 @@ export function InventoryManagement() {
 
     return (
         <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
-            <div className='flex items-center justify-between'>
+            <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
                 <div>
                     <h1 className='text-3xl font-bold tracking-tight'>Inventory Management</h1>
                     <p className='text-muted-foreground mt-2'>Track and manage branch inventory</p>
@@ -66,8 +66,8 @@ export function InventoryManagement() {
             {/* Search and Filters */}
             <Card>
                 <CardContent className='pt-6'>
-                    <div className='flex gap-4'>
-                        <div className='relative w-full'>
+                    <div className='flex flex-col sm:flex-row gap-4'>
+                        <div className='relative w-full md:max-w-md'>
                             <Search className='absolute left-3 top-3 h-4 w-4 text-muted-foreground' />
                             <Input placeholder='Search products...' className='pl-10' />
                         </div>
@@ -83,48 +83,50 @@ export function InventoryManagement() {
                     <CardTitle>Branch Inventory</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Product Name</TableHead>
-                                <TableHead>Category</TableHead>
-                                <TableHead>Stock Level</TableHead>
-                                <TableHead>Min Stock</TableHead>
-                                <TableHead>Location</TableHead>
-                                <TableHead>Expiry Date</TableHead>
-                                <TableHead>Stock Status</TableHead>
-                                <TableHead>Expiry Status</TableHead>
-                                <TableHead>Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {products.map((product) => {
-                                const stockStatus = getStockStatus(product.stock, product.minStock);
-                                const expiryStatus = getExpiryStatus(product.expiryDate);
-                                return (
-                                    <TableRow key={product.id}>
-                                        <TableCell className='font-medium'>{product.name}</TableCell>
-                                        <TableCell>{product.category}</TableCell>
-                                        <TableCell>{product.stock}</TableCell>
-                                        <TableCell>{product.minStock}</TableCell>
-                                        <TableCell>{product.location}</TableCell>
-                                        <TableCell>{product.expiryDate}</TableCell>
-                                        <TableCell>
-                                            <Badge variant={stockStatus.variant}>{stockStatus.label}</Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant={expiryStatus.variant}>{expiryStatus.label}</Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Button size='sm' variant='outline'>
-                                                Update
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
+                    <div className='overflow-x-auto'>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Product Name</TableHead>
+                                    <TableHead>Category</TableHead>
+                                    <TableHead>Stock Level</TableHead>
+                                    <TableHead>Min Stock</TableHead>
+                                    <TableHead>Location</TableHead>
+                                    <TableHead>Expiry Date</TableHead>
+                                    <TableHead>Stock Status</TableHead>
+                                    <TableHead>Expiry Status</TableHead>
+                                    <TableHead>Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {products.map((product) => {
+                                    const stockStatus = getStockStatus(product.stock, product.minStock);
+                                    const expiryStatus = getExpiryStatus(product.expiryDate);
+                                    return (
+                                        <TableRow key={product.id}>
+                                            <TableCell className='font-medium'>{product.name}</TableCell>
+                                            <TableCell>{product.category}</TableCell>
+                                            <TableCell>{product.stock}</TableCell>
+                                            <TableCell>{product.minStock}</TableCell>
+                                            <TableCell>{product.location}</TableCell>
+                                            <TableCell>{product.expiryDate}</TableCell>
+                                            <TableCell>
+                                                <Badge variant={stockStatus.variant}>{stockStatus.label}</Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge variant={expiryStatus.variant}>{expiryStatus.label}</Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Button size='sm' variant='outline'>
+                                                    Update
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </CardContent>
             </Card>
 

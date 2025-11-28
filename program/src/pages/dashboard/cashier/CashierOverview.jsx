@@ -18,31 +18,31 @@ export function CashierOverview() {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
             <CardTitle className='text-sm font-medium'>Transactions</CardTitle>
             <ShoppingCart className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
-          <CardContent>
+          <CardContent className='px-6 pb-6'>
             <div className='text-2xl font-bold'>84</div>
             <p className='text-xs text-muted-foreground'>Today</p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
             <CardTitle className='text-sm font-medium'>Card Payments</CardTitle>
             <CreditCard className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
-          <CardContent>
+          <CardContent className='px-6 pb-6'>
             <div className='text-2xl font-bold'>65%</div>
             <p className='text-xs text-muted-foreground'>Of total transactions</p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
             <CardTitle className='text-sm font-medium'>Avg. Transaction Value</CardTitle>
             <TrendingUp className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
-          <CardContent>
+          <CardContent className='px-6 pb-6'>
             <div className='text-2xl font-bold'>$14.82</div>
             <p className='text-xs text-muted-foreground'>+2% from last week</p>
           </CardContent>
