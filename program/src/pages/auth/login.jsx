@@ -194,12 +194,7 @@ export function LoginPage() {
           </form>
 
           <div className='flex items-center justify-between text-sm'>
-            <a
-              href='/auth/forgot-password'
-              className='text-muted-foreground hover:text-primary underline underline-offset-4'
-            >
-              Forgot Password?
-            </a>
+
             <a
               href='/auth/signup'
               className='text-muted-foreground hover:text-primary underline underline-offset-4'

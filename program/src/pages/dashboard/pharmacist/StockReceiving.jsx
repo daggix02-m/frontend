@@ -1,0 +1,205 @@
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Button, Input } from '@/components/ui/ui';
+import { Package, CheckCircle, Clock, Truck } from 'lucide-react';
+
+export function StockReceiving() {
+    const [deliveries] = useState([
+        { id: 'DEL-001', supplier: 'MedSupply Co.', poNumber: 'PO-12345', items: 15, status: 'pending', expectedDate: '2025-11-28', value: '$2,450' },
+        { id: 'DEL-002', supplier: 'PharmaDirect', poNumber: 'PO-12346', items: 8, status: 'in-transit', expectedDate: '2025-11-29', value: '$1,230' },
+        { id: 'DEL-003', supplier: 'HealthWholesale', poNumber: 'PO-12347', items: 22, status: 'received', expectedDate: '2025-11-27', value: '$3,890' },
+    ]);
+
+    const [receivingItems] = useState([
+        { id: 1, product: 'Paracetamol 500mg', ordered: 500, received: 0, batchNo: '', expiryDate: '' },
+        { id: 2, product: 'Amoxicillin 250mg', ordered: 200, received: 0, batchNo: '', expiryDate: '' },
+        { id: 3, product: 'Ibuprofen 400mg', ordered: 300, received: 0, batchNo: '', expiryDate: '' },
+    ]);
+
+    const getStatusBadge = (status) => {
+        const variants = {
+            pending: 'default',
+            'in-transit': 'default',
+            received: 'secondary',
+        };
+        const icons = {
+            pending: Clock,
+            'in-transit': Truck,
+            received: CheckCircle,
+        };
+        const Icon = icons[status];
+        return (
+            <Badge variant={variants[status]} className='flex items-center gap-1 w-fit'>
+                <Icon className='h-3 w-3' />
+                {status}
+            </Badge>
+        );
+    };
+
+    const stats = [
+        { title: 'Pending Deliveries', value: '5', icon: Clock, color: 'text-orange-600' },
+        { title: 'In Transit', value: '3', icon: Truck, color: 'text-blue-600' },
+        { title: 'Received Today', value: '2', icon: CheckCircle, color: 'text-green-600' },
+        { title: 'Total Value', value: '$7,570', icon: Package, color: 'text-purple-600' },
+    ];
+
+    const handleReceiveDelivery = (id) => {
+        console.log('Receiving delivery:', id);
+        // Backend integration needed
+    };
+
+    return (
+        <div className='space-y-6 p-6'>
+            <div>
+                <h1 className='text-3xl font-bold tracking-tight'>Stock Receiving</h1>
+                <p className='text-muted-foreground mt-2'>Receive deliveries and update stock quantities</p>
+            </div>
+
+            {/* Stats Grid */}
+            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+                {stats.map((stat, index) => (
+                    <Card key={index}>
+                        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                            <CardTitle className='text-sm font-medium'>{stat.title}</CardTitle>
+                            <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                        </CardHeader>
+                        <CardContent>
+                            <div className='text-2xl font-bold'>{stat.value}</div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+
+            {/* Expected Deliveries */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Expected Deliveries</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Delivery ID</TableHead>
+                                <TableHead>Supplier</TableHead>
+                                <TableHead>PO Number</TableHead>
+                                <TableHead>Items</TableHead>
+                                <TableHead>Expected Date</TableHead>
+                                <TableHead>Value</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {deliveries.map((delivery) => (
+                                <TableRow key={delivery.id}>
+                                    <TableCell className='font-medium'>{delivery.id}</TableCell>
+                                    <TableCell>{delivery.supplier}</TableCell>
+                                    <TableCell>{delivery.poNumber}</TableCell>
+                                    <TableCell>{delivery.items}</TableCell>
+                                    <TableCell>{delivery.expectedDate}</TableCell>
+                                    <TableCell>{delivery.value}</TableCell>
+                                    <TableCell>{getStatusBadge(delivery.status)}</TableCell>
+                                    <TableCell>
+                                        {delivery.status === 'pending' ? (
+                                            <Button size='sm' variant='outline' onClick={() => handleReceiveDelivery(delivery.id)}>
+                                                Receive
+                                            </Button>
+                                        ) : (
+                                            <Button size='sm' variant='outline'>
+                                                View
+                                            </Button>
+                                        )}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+
+            {/* Receiving Form */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Receive Delivery: DEL-001</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className='space-y-4'>
+                        <div className='grid gap-4 md:grid-cols-2'>
+                            <div>
+                                <p className='text-sm font-medium'>Supplier: MedSupply Co.</p>
+                                <p className='text-sm text-muted-foreground'>PO Number: PO-12345</p>
+                            </div>
+                            <div>
+                                <p className='text-sm font-medium'>Expected Date: 2025-11-28</p>
+                                <p className='text-sm text-muted-foreground'>Total Items: 15</p>
+                            </div>
+                        </div>
+
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Product</TableHead>
+                                    <TableHead>Ordered Qty</TableHead>
+                                    <TableHead>Received Qty</TableHead>
+                                    <TableHead>Batch Number</TableHead>
+                                    <TableHead>Expiry Date</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {receivingItems.map((item) => (
+                                    <TableRow key={item.id}>
+                                        <TableCell className='font-medium'>{item.product}</TableCell>
+                                        <TableCell>{item.ordered}</TableCell>
+                                        <TableCell>
+                                            <Input type='number' placeholder='0' className='w-24' max={item.ordered} />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Input placeholder='Batch #' className='w-32' />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Input type='date' className='w-40' />
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+
+                        <div className='flex gap-2'>
+                            <Button>Complete Receiving</Button>
+                            <Button variant='outline'>Save as Draft</Button>
+                            <Button variant='outline'>Print Receiving Report</Button>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Recent Receipts */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Recent Receipts</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className='space-y-3'>
+                        {[
+                            { id: 'DEL-003', supplier: 'HealthWholesale', items: 22, date: '2025-11-27', value: '$3,890' },
+                            { id: 'DEL-002', supplier: 'PharmaDirect', items: 18, date: '2025-11-26', value: '$2,340' },
+                            { id: 'DEL-001', supplier: 'MedSupply Co.', items: 15, date: '2025-11-25', value: '$1,890' },
+                        ].map((receipt, index) => (
+                            <div key={index} className='flex items-center justify-between border-b pb-2 last:border-0'>
+                                <div>
+                                    <p className='font-medium'>{receipt.id} - {receipt.supplier}</p>
+                                    <p className='text-sm text-muted-foreground'>{receipt.items} items • {receipt.date}</p>
+                                </div>
+                                <div className='text-right'>
+                                    <p className='font-bold'>{receipt.value}</p>
+                                    <Button size='sm' variant='outline'>
+                                        View Receipt
+                                    </Button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    );
+}

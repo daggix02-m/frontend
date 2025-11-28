@@ -13,6 +13,12 @@ import {
   ShoppingCart,
   FileText,
   Activity,
+  ClipboardList,
+  CreditCard,
+  BarChart3,
+  ArrowRightLeft,
+  Clock,
+  Search,
 } from 'lucide-react';
 import { logout } from '@/api/auth.api';
 
@@ -20,7 +26,7 @@ export function DashboardLayout({ role = 'manager' }) {
   // Default to manager for now, but should be passed or retrieved
   const navigate = useNavigate();
   const location = useLocation();
-  const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -31,23 +37,32 @@ export function DashboardLayout({ role = 'manager' }) {
   const roleNavItems = {
     admin: [
       { label: 'System Overview', path: '/admin/overview', icon: LayoutDashboard },
-      { label: 'User Management', path: '/admin/users', icon: Users },
-      { label: 'System Settings', path: '/admin/settings', icon: Settings },
+      { label: 'Pharmacy Management', path: '/admin/pharmacies', icon: Building2 },
+      { label: 'Subscriptions', path: '/admin/subscriptions', icon: CreditCard },
+      { label: 'Global Settings', path: '/admin/settings', icon: Settings },
+      { label: 'Audit Logs', path: '/admin/audit-logs', icon: ClipboardList },
     ],
     manager: [
       { label: 'Overview', path: '/manager/overview', icon: LayoutDashboard },
       { label: 'Branches', path: '/manager/branches', icon: Building2 },
       { label: 'Staff', path: '/manager/staff', icon: Users },
+      { label: 'Inventory & Products', path: '/manager/inventory', icon: Pill },
+      { label: 'Reports', path: '/manager/reports', icon: BarChart3 },
+      { label: 'Settings', path: '/manager/settings', icon: Settings },
+      { label: 'Import Data', path: '/manager/import', icon: FileText },
     ],
     pharmacist: [
       { label: 'Dashboard', path: '/pharmacist/overview', icon: LayoutDashboard },
       { label: 'Inventory', path: '/pharmacist/inventory', icon: Pill },
       { label: 'Prescriptions', path: '/pharmacist/prescriptions', icon: FileText },
+      { label: 'Stock Transfers', path: '/pharmacist/transfers', icon: ArrowRightLeft },
     ],
     cashier: [
       { label: 'Dashboard', path: '/cashier/overview', icon: LayoutDashboard },
-      { label: 'POS', path: '/cashier/pos', icon: ShoppingCart },
-      { label: 'Sales History', path: '/cashier/sales', icon: Activity },
+      { label: 'POS', path: '/cashier/pos-sales', icon: ShoppingCart },
+      { label: 'Sales History', path: '/cashier/receipts', icon: Activity },
+      { label: 'Sessions', path: '/cashier/sessions', icon: Clock },
+      { label: 'Stock Check', path: '/cashier/stock', icon: Search },
     ],
   };
 
@@ -55,11 +70,18 @@ export function DashboardLayout({ role = 'manager' }) {
 
   return (
     <div className='min-h-screen bg-gray-100 dark:bg-gray-900 flex'>
+      {/* Mobile Sidebar Backdrop */}
+      {isSidebarOpen && (
+        <div
+          className='fixed inset-0 bg-black/50 z-40 lg:hidden'
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:relative lg:translate-x-0`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          } lg:relative lg:translate-x-0`}
       >
         <div className='h-full flex flex-col'>
           <div className='p-6 border-b dark:border-gray-700 flex items-center justify-between'>
@@ -83,11 +105,11 @@ export function DashboardLayout({ role = 'manager' }) {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                    isActive
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
+                  onClick={() => setIsSidebarOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    }`}
                 >
                   <Icon size={20} />
                   <span className='font-medium'>{item.label}</span>

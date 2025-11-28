@@ -1,6 +1,10 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
+// Re-export components from separate files
+export { Button } from './button';
+export { Input } from './input';
+
 export const Label = React.forwardRef(({ className, ...props }, ref) => {
   return (
     <label

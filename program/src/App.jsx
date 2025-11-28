@@ -8,25 +8,55 @@ import { DashboardLayout } from './layouts/DashboardLayout';
 import { Overview } from './pages/dashboard/manager/Overview';
 import { BranchManagement } from './pages/dashboard/manager/BranchManagement';
 import { StaffManagement } from './pages/dashboard/manager/StaffManagement';
+import { ImportData } from './pages/dashboard/manager/ImportData';
+import { InventoryManagement } from './pages/dashboard/manager/InventoryManagement';
+import { Reports } from './pages/dashboard/manager/Reports';
+import { Settings } from './pages/dashboard/manager/Settings';
 import { AdminOverview } from './pages/dashboard/admin/AdminOverview';
+import { PharmacyManagement } from './pages/dashboard/admin/PharmacyManagement';
+import { SubscriptionManagement } from './pages/dashboard/admin/SubscriptionManagement';
+import { AuditLogs } from './pages/dashboard/admin/AuditLogs';
+import { AdminSettings } from './pages/dashboard/admin/AdminSettings';
 import { PharmacistOverview } from './pages/dashboard/pharmacist/PharmacistOverview';
+import { StockTransfers } from './pages/dashboard/pharmacist/StockTransfers';
 import { CashierOverview } from './pages/dashboard/cashier/CashierOverview';
+import { Sessions } from './pages/dashboard/cashier/Sessions';
+import { StockCheck } from './pages/dashboard/cashier/StockCheck';
+import { BillingManagement } from './pages/dashboard/admin/BillingManagement';
+import { SupportTickets } from './pages/dashboard/admin/SupportTickets';
+import { SystemStatistics } from './pages/dashboard/admin/SystemStatistics';
+import { PlatformUsers } from './pages/dashboard/admin/PlatformUsers';
+import { StockTransferApproval } from './pages/dashboard/manager/StockTransferApproval';
+import { RefundsDiscounts } from './pages/dashboard/manager/RefundsDiscounts';
+import { ManagerPOSSales } from './pages/dashboard/manager/POSSales';
+import { Prescriptions } from './pages/dashboard/pharmacist/Prescriptions';
+import { InventoryManagement as PharmacistInventory } from './pages/dashboard/pharmacist/InventoryManagement';
+import { BranchReports } from './pages/dashboard/pharmacist/BranchReports';
+import { StockReceiving } from './pages/dashboard/pharmacist/StockReceiving';
+import { CashierPOSSales } from './pages/dashboard/cashier/POSSales';
+import { Receipts } from './pages/dashboard/cashier/Receipts';
 
 // Role Protected Route component
 const RoleProtectedRoute = ({ children, allowedRoles }) => {
   const token = localStorage.getItem('accessToken');
   const userRole = localStorage.getItem('userRole'); // Assuming we store role in localStorage on login
 
+  console.log('RoleProtectedRoute Check:', { path: window.location.pathname, token: !!token, userRole, allowedRoles });
+
   if (!token) {
+    console.log('No token, redirecting to login');
     return <Navigate to='/auth/login' replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(userRole)) {
+  const normalizedUserRole = userRole ? userRole.toLowerCase() : '';
+
+  if (allowedRoles && !allowedRoles.includes(normalizedUserRole)) {
+    console.log(`Role mismatch. User: ${normalizedUserRole}, Allowed: ${allowedRoles}. Redirecting...`);
     // Redirect to appropriate dashboard based on actual role
-    if (userRole === 'admin') return <Navigate to='/admin/overview' replace />;
-    if (userRole === 'manager') return <Navigate to='/manager/overview' replace />;
-    if (userRole === 'pharmacist') return <Navigate to='/pharmacist/overview' replace />;
-    if (userRole === 'cashier') return <Navigate to='/cashier/overview' replace />;
+    if (normalizedUserRole === 'admin') return <Navigate to='/admin/overview' replace />;
+    if (normalizedUserRole === 'manager') return <Navigate to='/manager/overview' replace />;
+    if (normalizedUserRole === 'pharmacist') return <Navigate to='/pharmacist/overview' replace />;
+    if (normalizedUserRole === 'cashier') return <Navigate to='/cashier/overview' replace />;
     return <Navigate to='/auth/login' replace />;
   }
 
@@ -34,6 +64,7 @@ const RoleProtectedRoute = ({ children, allowedRoles }) => {
 };
 
 function App() {
+  console.log('App.jsx: Rendering App component');
   return (
     <Router>
       <Routes>
@@ -55,7 +86,14 @@ function App() {
         >
           <Route index element={<Navigate to='/admin/overview' replace />} />
           <Route path='overview' element={<AdminOverview />} />
-          {/* Add other admin routes here */}
+          <Route path='pharmacies' element={<PharmacyManagement />} />
+          <Route path='subscriptions' element={<SubscriptionManagement />} />
+          <Route path='audit-logs' element={<AuditLogs />} />
+          <Route path='settings' element={<AdminSettings />} />
+          <Route path='billing' element={<BillingManagement />} />
+          <Route path='support-tickets' element={<SupportTickets />} />
+          <Route path='statistics' element={<SystemStatistics />} />
+          <Route path='platform-users' element={<PlatformUsers />} />
         </Route>
 
         {/* Manager Routes */}
@@ -71,6 +109,13 @@ function App() {
           <Route path='overview' element={<Overview />} />
           <Route path='branches' element={<BranchManagement />} />
           <Route path='staff' element={<StaffManagement />} />
+          <Route path='inventory' element={<InventoryManagement />} />
+          <Route path='reports' element={<Reports />} />
+          <Route path='settings' element={<Settings />} />
+          <Route path='import' element={<ImportData />} />
+          <Route path='stock-transfers' element={<StockTransferApproval />} />
+          <Route path='refunds-discounts' element={<RefundsDiscounts />} />
+          <Route path='pos-sales' element={<ManagerPOSSales />} />
         </Route>
 
         {/* Pharmacist Routes */}
@@ -84,7 +129,11 @@ function App() {
         >
           <Route index element={<Navigate to='/pharmacist/overview' replace />} />
           <Route path='overview' element={<PharmacistOverview />} />
-          {/* Add other pharmacist routes here */}
+          <Route path='inventory' element={<PharmacistInventory />} />
+          <Route path='transfers' element={<StockTransfers />} />
+          <Route path='prescriptions' element={<Prescriptions />} />
+          <Route path='reports' element={<BranchReports />} />
+          <Route path='stock-receiving' element={<StockReceiving />} />
         </Route>
 
         {/* Cashier Routes */}
@@ -98,7 +147,10 @@ function App() {
         >
           <Route index element={<Navigate to='/cashier/overview' replace />} />
           <Route path='overview' element={<CashierOverview />} />
-          {/* Add other cashier routes here */}
+          <Route path='sessions' element={<Sessions />} />
+          <Route path='stock' element={<StockCheck />} />
+          <Route path='pos-sales' element={<CashierPOSSales />} />
+          <Route path='receipts' element={<Receipts />} />
         </Route>
 
         {/* Fallback */}

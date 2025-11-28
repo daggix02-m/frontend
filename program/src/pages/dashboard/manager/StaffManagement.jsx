@@ -63,7 +63,7 @@ export function StaffManagement() {
 
   return (
     <div className='space-y-6'>
-      <div className='flex items-center justify-between'>
+      <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
         <div>
           <h2 className='text-3xl font-bold tracking-tight'>Staff Management</h2>
           <p className='text-muted-foreground'>Manage your pharmacists and cashiers.</p>
@@ -75,54 +75,56 @@ export function StaffManagement() {
 
       <Card>
         <CardHeader>
-          <div className='flex items-center justify-between'>
+          <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
             <CardTitle>All Staff Members</CardTitle>
-            <div className='relative w-64'>
+            <div className='relative w-full md:w-64'>
               <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
               <Input placeholder='Search staff...' className='pl-8' />
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Branch</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className='text-right'>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {staff.map((member) => (
-                <TableRow key={member.id}>
-                  <TableCell>
-                    <div className='flex flex-col'>
-                      <span className='font-medium'>{member.name}</span>
-                      <span className='text-xs text-muted-foreground'>{member.email}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={member.role === 'Pharmacist' ? 'default' : 'secondary'}>
-                      {member.role}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{member.branch}</TableCell>
-                  <TableCell>
-                    <Badge variant='outline' className='text-green-600 border-green-600'>
-                      {member.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className='text-right'>
-                    <Button variant='ghost' size='sm'>
-                      Edit
-                    </Button>
-                  </TableCell>
+          <div className='overflow-x-auto'>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Branch</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className='text-right'>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {staff.map((member) => (
+                  <TableRow key={member.id}>
+                    <TableCell>
+                      <div className='flex flex-col'>
+                        <span className='font-medium'>{member.name}</span>
+                        <span className='text-xs text-muted-foreground'>{member.email}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={member.role === 'Pharmacist' ? 'default' : 'secondary'}>
+                        {member.role}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className='whitespace-nowrap'>{member.branch}</TableCell>
+                    <TableCell>
+                      <Badge variant='outline' className='text-green-600 border-green-600'>
+                        {member.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className='text-right'>
+                      <Button variant='ghost' size='sm'>
+                        Edit
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 

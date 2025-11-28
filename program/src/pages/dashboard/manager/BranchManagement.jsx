@@ -49,7 +49,7 @@ export function BranchManagement() {
 
   return (
     <div className='space-y-6'>
-      <div className='flex items-center justify-between'>
+      <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
         <div>
           <h2 className='text-3xl font-bold tracking-tight'>Branch Management</h2>
           <p className='text-muted-foreground'>Manage your pharmacy branches here.</p>
@@ -61,49 +61,51 @@ export function BranchManagement() {
 
       <Card>
         <CardHeader>
-          <div className='flex items-center justify-between'>
+          <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
             <CardTitle>All Branches</CardTitle>
-            <div className='relative w-64'>
+            <div className='relative w-full md:w-64'>
               <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
               <Input placeholder='Search branches...' className='pl-8' />
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Branch Name</TableHead>
-                <TableHead>Address</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead className='text-right'>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {branches.map((branch) => (
-                <TableRow key={branch.id}>
-                  <TableCell className='font-medium'>{branch.name}</TableCell>
-                  <TableCell>
-                    <div className='flex items-center text-muted-foreground'>
-                      <MapPin className='mr-2 h-3 w-3' />
-                      {branch.address}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className='flex items-center text-muted-foreground'>
-                      <Phone className='mr-2 h-3 w-3' />
-                      {branch.contact}
-                    </div>
-                  </TableCell>
-                  <TableCell className='text-right'>
-                    <Button variant='ghost' size='sm'>
-                      Edit
-                    </Button>
-                  </TableCell>
+          <div className='overflow-x-auto'>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Branch Name</TableHead>
+                  <TableHead>Address</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead className='text-right'>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {branches.map((branch) => (
+                  <TableRow key={branch.id}>
+                    <TableCell className='font-medium'>{branch.name}</TableCell>
+                    <TableCell>
+                      <div className='flex items-center text-muted-foreground'>
+                        <MapPin className='mr-2 h-3 w-3' />
+                        <span className='whitespace-nowrap'>{branch.address}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className='flex items-center text-muted-foreground'>
+                        <Phone className='mr-2 h-3 w-3' />
+                        <span className='whitespace-nowrap'>{branch.contact}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className='text-right'>
+                      <Button variant='ghost' size='sm'>
+                        Edit
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
