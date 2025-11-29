@@ -165,85 +165,87 @@ export function StaffManagement() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className='overflow-x-auto'>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Branch</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Online Status</TableHead>
-                  <TableHead>Last Active</TableHead>
-                  <TableHead className='text-right'>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredStaff.length > 0 ? (
-                  filteredStaff.map((member) => (
-                    <TableRow key={member.id}>
-                      <TableCell>
-                        <div className='flex flex-col'>
-                          <span className='font-medium'>{member.name}</span>
-                          <span className='text-xs text-muted-foreground'>{member.email}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={member.role === 'Pharmacist' ? 'default' : 'secondary'}>
-                          {member.role}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className='whitespace-nowrap'>{member.branch}</TableCell>
-                      <TableCell>
-                        <Badge variant='outline' className={
-                          member.status === 'Active' ? 'text-green-600 border-green-600' : 'text-yellow-600 border-yellow-600'
-                        }>
-                          {member.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className='flex items-center gap-2'>
-                          <div className={`h-2 w-2 rounded-full ${member.isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
-                          <span className='text-sm'>
-                            {member.isOnline ? 'Online' : 'Offline'}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className='text-sm text-muted-foreground'>
-                        <div className='flex items-center gap-1'>
-                          <Clock className='h-3 w-3' />
-                          {getTimeAgo(member.lastActive)}
-                        </div>
-                      </TableCell>
-                      <TableCell className='text-right'>
-                        <div className='flex justify-end gap-2'>
-                          <Button
-                            variant='ghost'
-                            size='sm'
-                            onClick={() => openActivityLog(member)}
-                            title='View Activity Log'
-                          >
-                            <Activity className='h-4 w-4' />
-                          </Button>
-                          <Button variant='ghost' size='sm' onClick={() => openEditModal(member)}>
-                            <Edit className='h-4 w-4' />
-                          </Button>
-                          <Button variant='ghost' size='sm' className='text-red-600 hover:text-red-700 hover:bg-red-50' onClick={() => handleDelete(member.id)}>
-                            <Trash2 className='h-4 w-4' />
-                          </Button>
-                        </div>
+          <div className='overflow-x-auto -mx-6 md:mx-0'>
+            <div className='min-w-[1000px] md:min-w-0 px-6 md:px-0'>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Branch</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Online Status</TableHead>
+                    <TableHead>Last Active</TableHead>
+                    <TableHead className='text-right'>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredStaff.length > 0 ? (
+                    filteredStaff.map((member) => (
+                      <TableRow key={member.id}>
+                        <TableCell>
+                          <div className='flex flex-col'>
+                            <span className='font-medium'>{member.name}</span>
+                            <span className='text-xs text-muted-foreground'>{member.email}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={member.role === 'Pharmacist' ? 'default' : 'secondary'}>
+                            {member.role}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className='whitespace-nowrap'>{member.branch}</TableCell>
+                        <TableCell>
+                          <Badge variant='outline' className={
+                            member.status === 'Active' ? 'text-green-600 border-green-600' : 'text-yellow-600 border-yellow-600'
+                          }>
+                            {member.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className='flex items-center gap-2'>
+                            <div className={`h-2 w-2 rounded-full ${member.isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
+                            <span className='text-sm'>
+                              {member.isOnline ? 'Online' : 'Offline'}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className='text-sm text-muted-foreground'>
+                          <div className='flex items-center gap-1'>
+                            <Clock className='h-3 w-3' />
+                            {getTimeAgo(member.lastActive)}
+                          </div>
+                        </TableCell>
+                        <TableCell className='text-right'>
+                          <div className='flex justify-end gap-2'>
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              onClick={() => openActivityLog(member)}
+                              title='View Activity Log'
+                            >
+                              <Activity className='h-4 w-4' />
+                            </Button>
+                            <Button variant='ghost' size='sm' onClick={() => openEditModal(member)}>
+                              <Edit className='h-4 w-4' />
+                            </Button>
+                            <Button variant='ghost' size='sm' className='text-red-600 hover:text-red-700 hover:bg-red-50' onClick={() => handleDelete(member.id)}>
+                              <Trash2 className='h-4 w-4' />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={7} className='text-center py-8 text-muted-foreground'>
+                        No staff members found.
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={7} className='text-center py-8 text-muted-foreground'>
-                      No staff members found.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -146,7 +146,7 @@ export function DashboardLayout({ role = 'manager' }) {
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <header className='bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 h-16 flex items-center px-6 justify-between'>
+        <header className='bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 h-16 flex items-center px-4 md:px-6 justify-between sticky top-0 z-10'>
           <div className="flex items-center gap-2">
             <SidebarTrigger />
           </div>

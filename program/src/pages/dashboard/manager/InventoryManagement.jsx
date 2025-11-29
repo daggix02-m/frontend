@@ -80,7 +80,7 @@ export function InventoryManagement({ readOnly = false }) {
                 <CardHeader>
                     <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
                         <CardTitle>Product Catalog</CardTitle>
-                        <div className='flex gap-2'>
+                        <div className='flex flex-col sm:flex-row gap-2 w-full md:w-auto'>
                             <div className='relative w-full md:w-64'>
                                 <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
                                 <Input
@@ -90,7 +90,7 @@ export function InventoryManagement({ readOnly = false }) {
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
-                            <Select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+                            <Select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className="w-full sm:w-[180px]">
                                 {categories.map(cat => (
                                     <option key={cat} value={cat}>{cat}</option>
                                 ))}
@@ -99,54 +99,56 @@ export function InventoryManagement({ readOnly = false }) {
                     </div>
                 </CardHeader>
                 <CardContent>
-                    <div className='overflow-x-auto'>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Product Name</TableHead>
-                                    <TableHead>Category</TableHead>
-                                    <TableHead>Stock Level</TableHead>
-                                    <TableHead>Price</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className='text-right'>Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {filteredProducts.length > 0 ? (
-                                    filteredProducts.map((product) => (
-                                        <TableRow key={product.id}>
-                                            <TableCell className='font-medium'>{product.name}</TableCell>
-                                            <TableCell>{product.category}</TableCell>
-                                            <TableCell>{product.stock}</TableCell>
-                                            <TableCell>{product.price}</TableCell>
-                                            <TableCell>
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.status === 'In Stock' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                                    } `}>
-                                                    {product.status}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className='text-right'>
-                                                {!readOnly && (
-                                                    <Button
-                                                        variant='ghost'
-                                                        size='sm'
-                                                        onClick={() => openEditModal(product)}
-                                                    >
-                                                        Edit
-                                                    </Button>
-                                                )}
+                    <div className='overflow-x-auto -mx-6 md:mx-0'>
+                        <div className='min-w-[800px] md:min-w-0 px-6 md:px-0'>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Product Name</TableHead>
+                                        <TableHead>Category</TableHead>
+                                        <TableHead>Stock Level</TableHead>
+                                        <TableHead>Price</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className='text-right'>Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {filteredProducts.length > 0 ? (
+                                        filteredProducts.map((product) => (
+                                            <TableRow key={product.id}>
+                                                <TableCell className='font-medium'>{product.name}</TableCell>
+                                                <TableCell>{product.category}</TableCell>
+                                                <TableCell>{product.stock}</TableCell>
+                                                <TableCell>{product.price}</TableCell>
+                                                <TableCell>
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.status === 'In Stock' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                                        } `}>
+                                                        {product.status}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className='text-right'>
+                                                    {!readOnly && (
+                                                        <Button
+                                                            variant='ghost'
+                                                            size='sm'
+                                                            onClick={() => openEditModal(product)}
+                                                        >
+                                                            Edit
+                                                        </Button>
+                                                    )}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={6} className='text-center py-8 text-muted-foreground'>
+                                                No products found matching "{searchTerm}"
                                             </TableCell>
                                         </TableRow>
-                                    ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell colSpan={6} className='text-center py-8 text-muted-foreground'>
-                                            No products found matching "{searchTerm}"
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
                     </div>
                 </CardContent>
             </Card>

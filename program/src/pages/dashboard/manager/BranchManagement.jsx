@@ -105,54 +105,56 @@ export function BranchManagement() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className='overflow-x-auto'>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Branch Name</TableHead>
-                  <TableHead>Address</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead className='text-right'>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredBranches.length > 0 ? (
-                  filteredBranches.map((branch) => (
-                    <TableRow key={branch.id}>
-                      <TableCell className='font-medium'>{branch.name}</TableCell>
-                      <TableCell>
-                        <div className='flex items-center text-muted-foreground'>
-                          <MapPin className='mr-2 h-3 w-3' />
-                          <span className='whitespace-nowrap'>{branch.address}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className='flex items-center text-muted-foreground'>
-                          <Phone className='mr-2 h-3 w-3' />
-                          <span className='whitespace-nowrap'>{branch.contact}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className='text-right'>
-                        <div className='flex justify-end gap-2'>
-                          <Button variant='ghost' size='sm' onClick={() => openEditModal(branch)}>
-                            <Edit className='h-4 w-4' />
-                          </Button>
-                          <Button variant='ghost' size='sm' className='text-red-600 hover:text-red-700 hover:bg-red-50' onClick={() => handleDelete(branch.id)}>
-                            <Trash2 className='h-4 w-4' />
-                          </Button>
-                        </div>
+          <div className='overflow-x-auto -mx-6 md:mx-0'>
+            <div className='min-w-[800px] md:min-w-0 px-6 md:px-0'>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Branch Name</TableHead>
+                    <TableHead>Address</TableHead>
+                    <TableHead>Contact</TableHead>
+                    <TableHead className='text-right'>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredBranches.length > 0 ? (
+                    filteredBranches.map((branch) => (
+                      <TableRow key={branch.id}>
+                        <TableCell className='font-medium'>{branch.name}</TableCell>
+                        <TableCell>
+                          <div className='flex items-center text-muted-foreground'>
+                            <MapPin className='mr-2 h-3 w-3' />
+                            <span className='whitespace-nowrap'>{branch.address}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className='flex items-center text-muted-foreground'>
+                            <Phone className='mr-2 h-3 w-3' />
+                            <span className='whitespace-nowrap'>{branch.contact}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className='text-right'>
+                          <div className='flex justify-end gap-2'>
+                            <Button variant='ghost' size='sm' onClick={() => openEditModal(branch)}>
+                              <Edit className='h-4 w-4' />
+                            </Button>
+                            <Button variant='ghost' size='sm' className='text-red-600 hover:text-red-700 hover:bg-red-50' onClick={() => handleDelete(branch.id)}>
+                              <Trash2 className='h-4 w-4' />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={4} className='text-center py-8 text-muted-foreground'>
+                        No branches found.
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={4} className='text-center py-8 text-muted-foreground'>
-                      No branches found.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </CardContent>
       </Card>
