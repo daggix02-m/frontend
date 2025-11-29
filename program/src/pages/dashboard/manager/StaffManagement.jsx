@@ -172,10 +172,10 @@ export function StaffManagement() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Role</TableHead>
-                    <TableHead>Branch</TableHead>
+                    <TableHead className="hidden md:table-cell">Branch</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Online Status</TableHead>
-                    <TableHead>Last Active</TableHead>
+                    <TableHead className="hidden lg:table-cell">Online Status</TableHead>
+                    <TableHead className="hidden xl:table-cell">Last Active</TableHead>
                     <TableHead className='text-right'>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -186,7 +186,7 @@ export function StaffManagement() {
                         <TableCell>
                           <div className='flex flex-col'>
                             <span className='font-medium'>{member.name}</span>
-                            <span className='text-xs text-muted-foreground'>{member.email}</span>
+                            <span className='text-xs text-muted-foreground hidden sm:inline'>{member.email}</span>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -194,7 +194,7 @@ export function StaffManagement() {
                             {member.role}
                           </Badge>
                         </TableCell>
-                        <TableCell className='whitespace-nowrap'>{member.branch}</TableCell>
+                        <TableCell className='whitespace-nowrap hidden md:table-cell'>{member.branch}</TableCell>
                         <TableCell>
                           <Badge variant='outline' className={
                             member.status === 'Active' ? 'text-green-600 border-green-600' : 'text-yellow-600 border-yellow-600'
@@ -202,7 +202,7 @@ export function StaffManagement() {
                             {member.status}
                           </Badge>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="hidden lg:table-cell">
                           <div className='flex items-center gap-2'>
                             <div className={`h-2 w-2 rounded-full ${member.isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
                             <span className='text-sm'>
@@ -210,7 +210,7 @@ export function StaffManagement() {
                             </span>
                           </div>
                         </TableCell>
-                        <TableCell className='text-sm text-muted-foreground'>
+                        <TableCell className='text-sm text-muted-foreground hidden xl:table-cell'>
                           <div className='flex items-center gap-1'>
                             <Clock className='h-3 w-3' />
                             {getTimeAgo(member.lastActive)}
