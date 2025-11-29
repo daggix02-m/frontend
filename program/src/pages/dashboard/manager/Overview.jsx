@@ -6,7 +6,7 @@ export function Overview() {
   const stats = [
     {
       title: 'Total Revenue',
-      value: '$45,231.89',
+      value: 'ETB 45,231.89',
       change: '+20.1% from last month',
       icon: DollarSign,
     },
@@ -62,21 +62,21 @@ export function Overview() {
                   <p className='text-sm font-medium leading-none'>Kidist Haile</p>
                   <p className='text-sm text-muted-foreground'>kidist.haile@email.com</p>
                 </div>
-                <div className='ml-auto font-medium'>+$1,999.00</div>
+                <div className='ml-auto font-medium'>+ETB 1,999.00</div>
               </div>
               <div className='flex items-center'>
                 <div className='ml-4 space-y-1'>
                   <p className='text-sm font-medium leading-none'>Yonas Gebre</p>
                   <p className='text-sm text-muted-foreground'>yonas.gebre@email.com</p>
                 </div>
-                <div className='ml-auto font-medium'>+$39.00</div>
+                <div className='ml-auto font-medium'>+ETB 39.00</div>
               </div>
               <div className='flex items-center'>
                 <div className='ml-4 space-y-1'>
                   <p className='text-sm font-medium leading-none'>Meseret Tadesse</p>
                   <p className='text-sm text-muted-foreground'>meseret.tadesse@email.com</p>
                 </div>
-                <div className='ml-auto font-medium'>+$299.00</div>
+                <div className='ml-auto font-medium'>+ETB 299.00</div>
               </div>
             </div>
           </CardContent>
@@ -92,14 +92,14 @@ export function Overview() {
                   <p className='text-sm font-medium leading-none'>Paracetamol 500mg</p>
                   <p className='text-sm text-muted-foreground'>120 units sold</p>
                 </div>
-                <div className='ml-auto font-medium'>$600.00</div>
+                <div className='ml-auto font-medium'>ETB 600.00</div>
               </div>
               <div className='flex items-center'>
                 <div className='ml-4 space-y-1'>
                   <p className='text-sm font-medium leading-none'>Amoxicillin 250mg</p>
                   <p className='text-sm text-muted-foreground'>85 units sold</p>
                 </div>
-                <div className='ml-auto font-medium'>$425.00</div>
+                <div className='ml-auto font-medium'>ETB 425.00</div>
               </div>
             </div>
           </CardContent>

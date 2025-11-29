@@ -4,9 +4,9 @@ import { Package, CheckCircle, Clock, Truck } from 'lucide-react';
 
 export function StockReceiving() {
     const [deliveries, setDeliveries] = useState([
-        { id: 'DEL-001', supplier: 'MedSupply Co.', poNumber: 'PO-12345', items: 15, status: 'pending', expectedDate: '2025-11-28', value: '$2,450' },
-        { id: 'DEL-002', supplier: 'PharmaDirect', poNumber: 'PO-12346', items: 8, status: 'in-transit', expectedDate: '2025-11-29', value: '$1,230' },
-        { id: 'DEL-003', supplier: 'HealthWholesale', poNumber: 'PO-12347', items: 22, status: 'received', expectedDate: '2025-11-27', value: '$3,890' },
+        { id: 'DEL-001', supplier: 'MedSupply Co.', poNumber: 'PO-12345', items: 15, status: 'pending', expectedDate: '2025-11-28', value: 'ETB 2,450' },
+        { id: 'DEL-002', supplier: 'PharmaDirect', poNumber: 'PO-12346', items: 8, status: 'in-transit', expectedDate: '2025-11-29', value: 'ETB 1,230' },
+        { id: 'DEL-003', supplier: 'HealthWholesale', poNumber: 'PO-12347', items: 22, status: 'received', expectedDate: '2025-11-27', value: 'ETB 3,890' },
     ]);
 
     const [receivingItems] = useState([
@@ -39,7 +39,7 @@ export function StockReceiving() {
         { title: 'Pending Deliveries', value: deliveries.filter(d => d.status === 'pending').length, icon: Clock, color: 'text-orange-600' },
         { title: 'In Transit', value: deliveries.filter(d => d.status === 'in-transit').length, icon: Truck, color: 'text-blue-600' },
         { title: 'Received Today', value: deliveries.filter(d => d.status === 'received').length, icon: CheckCircle, color: 'text-green-600' },
-        { title: 'Total Value', value: '$7,570', icon: Package, color: 'text-purple-600' },
+        { title: 'Total Value', value: 'ETB 7,570', icon: Package, color: 'text-purple-600' },
     ];
 
     const handleReceiveDelivery = (id) => {
@@ -187,9 +187,9 @@ export function StockReceiving() {
                 <CardContent>
                     <div className='space-y-3'>
                         {[
-                            { id: 'DEL-003', supplier: 'HealthWholesale', items: 22, date: '2025-11-27', value: '$3,890' },
-                            { id: 'DEL-002', supplier: 'PharmaDirect', items: 18, date: '2025-11-26', value: '$2,340' },
-                            { id: 'DEL-001', supplier: 'MedSupply Co.', items: 15, date: '2025-11-25', value: '$1,890' },
+                            { id: 'DEL-003', supplier: 'HealthWholesale', items: 22, date: '2025-11-27', value: 'ETB 3,890' },
+                            { id: 'DEL-002', supplier: 'PharmaDirect', items: 18, date: '2025-11-26', value: 'ETB 2,340' },
+                            { id: 'DEL-001', supplier: 'MedSupply Co.', items: 15, date: '2025-11-25', value: 'ETB 1,890' },
                         ].map((receipt, index) => (
                             <div key={index} className='flex items-center justify-between border-b pb-2 last:border-0'>
                                 <div>

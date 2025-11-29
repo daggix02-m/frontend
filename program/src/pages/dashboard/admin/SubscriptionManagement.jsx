@@ -6,18 +6,18 @@ export function SubscriptionManagement() {
     const plans = [
         {
             name: 'Basic',
-            price: '$29',
+            price: 'ETB 29',
             features: ['1 Branch', '2 Staff Members', 'Basic Reporting', 'Email Support'],
         },
         {
             name: 'Pro',
-            price: '$79',
+            price: 'ETB 79',
             features: ['3 Branches', '10 Staff Members', 'Advanced Reporting', 'Priority Support', 'Inventory Management'],
             popular: true,
         },
         {
             name: 'Enterprise',
-            price: '$199',
+            price: 'ETB 199',
             features: ['Unlimited Branches', 'Unlimited Staff', 'Custom Reporting', '24/7 Dedicated Support', 'API Access'],
         },
     ];

@@ -18,9 +18,9 @@ import { Plus, Search, MapPin, Phone, Edit, Trash2, X } from 'lucide-react';
 
 export function BranchManagement() {
   const [branches, setBranches] = useState([
-    { id: 1, name: 'Main Branch', address: '123 Main St, New York, NY', contact: '555-0101' },
-    { id: 2, name: 'Downtown Branch', address: '456 Market St, San Francisco, CA', contact: '555-0102' },
-    { id: 3, name: 'Westside Branch', address: '789 Sunset Blvd, Los Angeles, CA', contact: '555-0103' },
+    { id: 1, name: 'Main Branch', address: 'Bole Road, Near Edna Mall, Addis Ababa', contact: '+251-11-662-3456' },
+    { id: 2, name: 'Downtown Branch', address: 'Tana Avenue, Kebele 03, Bahir Dar', contact: '+251-58-220-1234' },
+    { id: 3, name: 'Westside Branch', address: 'Hawassa Road, Piazza Area, Hawassa', contact: '+251-46-220-5678' },
   ]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);

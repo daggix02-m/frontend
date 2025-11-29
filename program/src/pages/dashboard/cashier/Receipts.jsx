@@ -70,7 +70,7 @@ export function Receipts() {
                         <Download className='h-4 w-4 text-muted-foreground' />
                     </CardHeader>
                     <CardContent className='px-6 pb-6'>
-                        <div className='text-2xl font-bold'>$2,345</div>
+                        <div className='text-2xl font-bold'>ETB 2,345</div>
                     </CardContent>
                 </Card>
             </div>
@@ -137,29 +137,29 @@ export function Receipts() {
                         <div className='space-y-1 mb-3'>
                             <div className='flex justify-between text-sm'>
                                 <span>Paracetamol 500mg x2</span>
-                                <span>$11.98</span>
+                                <span>ETB 11.98</span>
                             </div>
                             <div className='flex justify-between text-sm'>
                                 <span>Ciprofloxacin 500mg x1</span>
-                                <span>$12.50</span>
+                                <span>ETB 12.50</span>
                             </div>
                             <div className='flex justify-between text-sm'>
                                 <span>Multivitamin Complex x1</span>
-                                <span>$15.99</span>
+                                <span>ETB 15.99</span>
                             </div>
                         </div>
                         <div className='border-t pt-2 space-y-1'>
                             <div className='flex justify-between text-sm'>
                                 <span>Subtotal:</span>
-                                <span>$40.47</span>
+                                <span>ETB 40.47</span>
                             </div>
                             <div className='flex justify-between text-sm'>
                                 <span>Discount (10%):</span>
-                                <span>-$4.05</span>
+                                <span>-ETB 4.05</span>
                             </div>
                             <div className='flex justify-between font-bold'>
                                 <span>Total:</span>
-                                <span>$36.42</span>
+                                <span>ETB 36.42</span>
                             </div>
                             <div className='flex justify-between text-sm'>
                                 <span>Payment Method:</span>

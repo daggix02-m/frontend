@@ -17,7 +17,7 @@ export function Reports() {
                         <DollarSign className='h-4 w-4 text-muted-foreground' />
                     </CardHeader>
                     <CardContent className='px-6 pb-6'>
-                        <div className='text-2xl font-bold'>$45,231.89</div>
+                        <div className='text-2xl font-bold'>ETB 45,231.89</div>
                         <p className='text-xs text-muted-foreground'>+20.1% from last month</p>
                     </CardContent>
                 </Card>
@@ -37,7 +37,7 @@ export function Reports() {
                         <TrendingUp className='h-4 w-4 text-muted-foreground' />
                     </CardHeader>
                     <CardContent className='px-6 pb-6'>
-                        <div className='text-2xl font-bold'>$24.50</div>
+                        <div className='text-2xl font-bold'>ETB 24.50</div>
                         <p className='text-xs text-muted-foreground'>+19% from last month</p>
                     </CardContent>
                 </Card>

@@ -4,28 +4,28 @@ import { TrendingUp, Package, FileText, DollarSign, ShoppingCart, Users } from '
 
 export function BranchReports() {
     const stats = [
-        { title: 'Daily Sales', value: '$2,450', icon: DollarSign, trend: '+12.5%', color: 'text-green-600' },
+        { title: 'Daily Sales', value: 'ETB 2,450', icon: DollarSign, trend: '+12.5%', color: 'text-green-600' },
         { title: 'Transactions', value: '145', icon: ShoppingCart, trend: '+8.2%', color: 'text-blue-600' },
         { title: 'Prescriptions Filled', value: '89', icon: FileText, trend: '+15.3%', color: 'text-purple-600' },
         { title: 'Products Sold', value: '456', icon: Package, trend: '+10.1%', color: 'text-orange-600' },
         { title: 'Customers Served', value: '132', icon: Users, trend: '+7.8%', color: 'text-cyan-600' },
-        { title: 'Avg Transaction', value: '$16.90', icon: TrendingUp, trend: '+3.2%', color: 'text-pink-600' },
+        { title: 'Avg Transaction', value: 'ETB 16.90', icon: TrendingUp, trend: '+3.2%', color: 'text-pink-600' },
     ];
 
     const topProducts = [
-        { name: 'Paracetamol 500mg', sold: 145, revenue: '$869.55' },
-        { name: 'Amoxicillin 250mg', sold: 89, revenue: '$1,112.50' },
-        { name: 'Ibuprofen 400mg', sold: 76, revenue: '$683.24' },
-        { name: 'Vitamin C 1000mg', sold: 54, revenue: '$863.46' },
-        { name: 'Aspirin 100mg', sold: 48, revenue: '$216.00' },
+        { name: 'Paracetamol 500mg', sold: 145, revenue: 'ETB 869.55' },
+        { name: 'Amoxicillin 250mg', sold: 89, revenue: 'ETB 1,112.50' },
+        { name: 'Ibuprofen 400mg', sold: 76, revenue: 'ETB 683.24' },
+        { name: 'Vitamin C 1000mg', sold: 54, revenue: 'ETB 863.46' },
+        { name: 'Aspirin 100mg', sold: 48, revenue: 'ETB 216.00' },
     ];
 
     const salesByCategory = [
-        { category: 'Pain Relief', sales: '$1,245', percentage: 28 },
-        { category: 'Antibiotics', sales: '$1,112', percentage: 25 },
-        { category: 'Supplements', sales: '$863', percentage: 19 },
-        { category: 'Cardiovascular', sales: '$654', percentage: 15 },
-        { category: 'Other', sales: '$576', percentage: 13 },
+        { category: 'Pain Relief', sales: 'ETB 1,245', percentage: 28 },
+        { category: 'Antibiotics', sales: 'ETB 1,112', percentage: 25 },
+        { category: 'Supplements', sales: 'ETB 863', percentage: 19 },
+        { category: 'Cardiovascular', sales: 'ETB 654', percentage: 15 },
+        { category: 'Other', sales: 'ETB 576', percentage: 13 },
     ];
 
     return (
@@ -41,7 +41,7 @@ export function BranchReports() {
                     <Card key={index}>
                         <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
                             <CardTitle className='text-sm font-medium'>{stat.title}</CardTitle>
-                            <stat.icon className={`h-5 w-5 ${stat.color}`} />
+                            <stat.icon className={`h - 5 w - 5 ${stat.color} `} />
                         </CardHeader>
                         <CardContent className='px-6 pb-6'>
                             <div className='text-2xl font-bold'>{stat.value}</div>
@@ -90,7 +90,7 @@ export function BranchReports() {
                                     <div className='w-full bg-gray-200 rounded-full h-2'>
                                         <div
                                             className='bg-blue-600 h-2 rounded-full'
-                                            style={{ width: `${item.percentage}%` }}
+                                            style={{ width: `${item.percentage}% ` }}
                                         />
                                     </div>
                                     <p className='text-xs text-muted-foreground'>{item.percentage}% of total sales</p>
@@ -121,7 +121,7 @@ export function BranchReports() {
                             <p className='text-sm text-muted-foreground mt-1'>Expiring Soon</p>
                         </div>
                         <div className='text-center p-4 border rounded-lg'>
-                            <p className='text-2xl font-bold'>$45,678</p>
+                            <p className='text-2xl font-bold'>ETB 45,678</p>
                             <p className='text-sm text-muted-foreground mt-1'>Inventory Value</p>
                         </div>
                     </div>

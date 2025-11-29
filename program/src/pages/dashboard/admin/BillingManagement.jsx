@@ -4,10 +4,10 @@ import { DollarSign, AlertCircle, CheckCircle, Clock } from 'lucide-react';
 
 export function BillingManagement() {
     const [billingIssues] = useState([
-        { id: 1, pharmacy: 'Green Valley Pharmacy', issue: 'Payment Failed', amount: '$299.00', status: 'pending', date: '2025-11-25' },
-        { id: 2, pharmacy: 'City Health Pharmacy', issue: 'Refund Request', amount: '$149.00', status: 'in-progress', date: '2025-11-24' },
-        { id: 3, pharmacy: 'MediCare Plus', issue: 'Billing Dispute', amount: '$499.00', status: 'resolved', date: '2025-11-23' },
-        { id: 4, pharmacy: 'Wellness Pharmacy', issue: 'Card Declined', amount: '$299.00', status: 'pending', date: '2025-11-22' },
+        { id: 1, pharmacy: 'Green Valley Pharmacy', issue: 'Payment Failed', amount: 'ETB 299.00', status: 'pending', date: '2025-11-25' },
+        { id: 2, pharmacy: 'City Health Pharmacy', issue: 'Refund Request', amount: 'ETB 149.00', status: 'in-progress', date: '2025-11-24' },
+        { id: 3, pharmacy: 'MediCare Plus', issue: 'Billing Dispute', amount: 'ETB 499.00', status: 'resolved', date: '2025-11-23' },
+        { id: 4, pharmacy: 'Wellness Pharmacy', issue: 'Card Declined', amount: 'ETB 299.00', status: 'pending', date: '2025-11-22' },
     ]);
 
     const getStatusBadge = (status) => {
@@ -20,7 +20,7 @@ export function BillingManagement() {
     };
 
     const stats = [
-        { title: 'Total Revenue', value: '$45,231', icon: DollarSign, trend: '+12.5%' },
+        { title: 'Total Revenue', value: 'ETB 45,231', icon: DollarSign, trend: '+12.5%' },
         { title: 'Pending Issues', value: '8', icon: AlertCircle, trend: '-3' },
         { title: 'Resolved Today', value: '12', icon: CheckCircle, trend: '+5' },
         { title: 'Avg Resolution Time', value: '2.3 hrs', icon: Clock, trend: '-0.5 hrs' },
@@ -102,7 +102,7 @@ export function BillingManagement() {
                                     <p className='text-sm text-muted-foreground'>Subscription - Pro Plan</p>
                                 </div>
                                 <div className='text-right'>
-                                    <p className='font-bold text-green-600'>+$299.00</p>
+                                    <p className='font-bold text-green-600'>+ETB 299.00</p>
                                     <p className='text-xs text-muted-foreground'>Nov {28 - i}, 2025</p>
                                 </div>
                             </div>

@@ -11,16 +11,38 @@ export function RefundsDiscounts() {
         requireApproval: true,
     });
 
-    const [discountRules] = useState([
+    const [discountRules, setDiscountRules] = useState([
         { id: 1, name: 'Senior Citizen Discount', type: 'percentage', value: 10, active: true },
         { id: 2, name: 'Bulk Purchase (10+ items)', type: 'percentage', value: 5, active: true },
         { id: 3, name: 'Loyalty Program', type: 'percentage', value: 15, active: true },
         { id: 4, name: 'Seasonal Promotion', type: 'fixed', value: 50, active: false },
     ]);
 
+    const [newDiscount, setNewDiscount] = useState({
+        name: '',
+        type: 'percentage',
+        value: '',
+        appliesTo: 'all'
+    });
+
+    const handleCreateDiscount = () => {
+        if (!newDiscount.name || !newDiscount.value) return;
+
+        const discount = {
+            id: discountRules.length + 1,
+            name: newDiscount.name,
+            type: newDiscount.type,
+            value: Number(newDiscount.value),
+            active: true
+        };
+
+        setDiscountRules([...discountRules, discount]);
+        setNewDiscount({ name: '', type: 'percentage', value: '', appliesTo: 'all' });
+    };
+
     const stats = [
         { title: 'Active Discounts', value: '12', icon: Tag, color: 'text-blue-600' },
-        { title: 'Total Savings', value: '$8,450', icon: DollarSign, color: 'text-green-600' },
+        { title: 'Total Savings', value: 'ETB 8,450', icon: DollarSign, color: 'text-green-600' },
         { title: 'Avg Discount', value: '8.5%', icon: Percent, color: 'text-purple-600' },
         { title: 'Refunds This Month', value: '23', icon: Settings, color: 'text-orange-600' },
     ];
@@ -103,28 +125,43 @@ export function RefundsDiscounts() {
                     <CardContent className='space-y-4'>
                         <div className='space-y-2'>
                             <label className='text-sm font-medium'>Discount Name</label>
-                            <Input placeholder='e.g., Student Discount' />
+                            <Input
+                                placeholder='e.g., Student Discount'
+                                value={newDiscount.name}
+                                onChange={(e) => setNewDiscount({ ...newDiscount, name: e.target.value })}
+                            />
                         </div>
                         <div className='space-y-2'>
                             <label className='text-sm font-medium'>Discount Type</label>
-                            <Select>
+                            <Select
+                                value={newDiscount.type}
+                                onChange={(e) => setNewDiscount({ ...newDiscount, type: e.target.value })}
+                            >
                                 <option value='percentage'>Percentage</option>
                                 <option value='fixed'>Fixed Amount</option>
                             </Select>
                         </div>
                         <div className='space-y-2'>
                             <label className='text-sm font-medium'>Discount Value</label>
-                            <Input type='number' placeholder='10' />
+                            <Input
+                                type='number'
+                                placeholder='10'
+                                value={newDiscount.value}
+                                onChange={(e) => setNewDiscount({ ...newDiscount, value: e.target.value })}
+                            />
                         </div>
                         <div className='space-y-2'>
                             <label className='text-sm font-medium'>Applies To</label>
-                            <Select>
+                            <Select
+                                value={newDiscount.appliesTo}
+                                onChange={(e) => setNewDiscount({ ...newDiscount, appliesTo: e.target.value })}
+                            >
                                 <option value='all'>All Products</option>
                                 <option value='category'>Specific Category</option>
                                 <option value='product'>Specific Product</option>
                             </Select>
                         </div>
-                        <Button className='w-full'>Create Discount</Button>
+                        <Button className='w-full' onClick={handleCreateDiscount}>Create Discount</Button>
                     </CardContent>
                 </Card>
             </div>
@@ -141,7 +178,7 @@ export function RefundsDiscounts() {
                                 <div>
                                     <p className='font-medium'>{rule.name}</p>
                                     <p className='text-sm text-muted-foreground'>
-                                        {rule.type === 'percentage' ? `${rule.value}% off` : `$${rule.value} off`}
+                                        {rule.type === 'percentage' ? `${rule.value}% off` : `ETB ${rule.value} off`}
                                     </p>
                                 </div>
                                 <div className='flex items-center gap-2'>

@@ -60,7 +60,7 @@ export function Sessions() {
                                     <p className='text-xs text-muted-foreground'>08:00 AM - 05:00 PM</p>
                                 </div>
                                 <div className='text-right'>
-                                    <p className='font-medium'>$1,245.50</p>
+                                    <p className='font-medium'>ETB 1,245.50</p>
                                     <p className='text-xs text-green-600'>Balanced</p>
                                 </div>
                             </div>
@@ -70,7 +70,7 @@ export function Sessions() {
                                     <p className='text-xs text-muted-foreground'>08:00 AM - 05:00 PM</p>
                                 </div>
                                 <div className='text-right'>
-                                    <p className='font-medium'>$980.00</p>
+                                    <p className='font-medium'>ETB 980.00</p>
                                     <p className='text-xs text-green-600'>Balanced</p>
                                 </div>
                             </div>

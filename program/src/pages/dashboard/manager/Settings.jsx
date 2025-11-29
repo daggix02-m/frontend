@@ -37,7 +37,7 @@ export function Settings() {
                         <div className='flex items-center justify-between p-4 border rounded-lg'>
                             <div>
                                 <p className='font-medium'>Pro Plan</p>
-                                <p className='text-sm text-muted-foreground'>$79/month</p>
+                                <p className='text-sm text-muted-foreground'>ETB 79/month</p>
                             </div>
                             <Button variant='outline'>Upgrade</Button>
                         </div>

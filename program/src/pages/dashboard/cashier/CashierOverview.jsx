@@ -13,7 +13,7 @@ export function CashierOverview() {
             <DollarSign className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
           <CardContent className='px-6 pb-6'>
-            <div className='text-2xl font-bold'>$1,245.50</div>
+            <div className='text-2xl font-bold'>ETB 1,245.50</div>
             <p className='text-xs text-muted-foreground'>Today</p>
           </CardContent>
         </Card>
@@ -43,7 +43,7 @@ export function CashierOverview() {
             <TrendingUp className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
           <CardContent className='px-6 pb-6'>
-            <div className='text-2xl font-bold'>$14.82</div>
+            <div className='text-2xl font-bold'>ETB 14.82</div>
             <p className='text-xs text-muted-foreground'>+2% from last week</p>
           </CardContent>
         </Card>

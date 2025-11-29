@@ -6,7 +6,7 @@ export function SystemStatistics() {
     const stats = [
         { title: 'Total Pharmacies', value: '1,234', icon: Building2, trend: '+12.5%', color: 'text-blue-600' },
         { title: 'Active Users', value: '8,456', icon: Users, trend: '+8.2%', color: 'text-green-600' },
-        { title: 'Monthly Revenue', value: '$368,940', icon: DollarSign, trend: '+15.3%', color: 'text-purple-600' },
+        { title: 'Monthly Revenue', value: 'ETB 368,940', icon: DollarSign, trend: '+15.3%', color: 'text-purple-600' },
         { title: 'Growth Rate', value: '23.5%', icon: TrendingUp, trend: '+2.1%', color: 'text-orange-600' },
         { title: 'System Uptime', value: '99.98%', icon: Activity, trend: '+0.02%', color: 'text-cyan-600' },
         { title: 'Countries', value: '45', icon: Globe, trend: '+3', color: 'text-pink-600' },
@@ -21,11 +21,11 @@ export function SystemStatistics() {
     ];
 
     const topPharmacies = [
-        { name: 'Green Valley Pharmacy', revenue: '$12,450', users: 45, growth: '+18%' },
-        { name: 'City Health Pharmacy', revenue: '$10,230', users: 38, growth: '+15%' },
-        { name: 'MediCare Plus', revenue: '$9,870', users: 32, growth: '+22%' },
-        { name: 'Wellness Pharmacy', revenue: '$8,560', users: 28, growth: '+12%' },
-        { name: 'HealthFirst Pharmacy', revenue: '$7,890', users: 25, growth: '+10%' },
+        { name: 'Green Valley Pharmacy', revenue: 'ETB 12,450', users: 45, growth: '+18%' },
+        { name: 'City Health Pharmacy', revenue: 'ETB 10,230', users: 38, growth: '+15%' },
+        { name: 'MediCare Plus', revenue: 'ETB 9,870', users: 32, growth: '+22%' },
+        { name: 'Wellness Pharmacy', revenue: 'ETB 8,560', users: 28, growth: '+12%' },
+        { name: 'HealthFirst Pharmacy', revenue: 'ETB 7,890', users: 25, growth: '+10%' },
     ];
 
     return (

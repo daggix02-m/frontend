@@ -5,9 +5,9 @@ import { Search } from 'lucide-react';
 export function StockCheck() {
     const [searchTerm, setSearchTerm] = useState('');
     const products = [
-        { id: 1, name: 'Paracetamol 500mg', stock: 1200, price: '$5.00', location: 'Shelf A1' },
-        { id: 2, name: 'Amoxicillin 250mg', stock: 85, price: '$12.50', location: 'Shelf B3' },
-        { id: 3, name: 'Vitamin C 1000mg', stock: 500, price: '$8.00', location: 'Aisle 2' },
+        { id: 1, name: 'Paracetamol 500mg', stock: 1200, price: 'ETB 5.00', location: 'Shelf A1' },
+        { id: 2, name: 'Amoxicillin 250mg', stock: 85, price: 'ETB 12.50', location: 'Shelf B3' },
+        { id: 3, name: 'Vitamin C 1000mg', stock: 500, price: 'ETB 8.00', location: 'Aisle 2' },
     ];
 
     const filteredProducts = products.filter(product =>
