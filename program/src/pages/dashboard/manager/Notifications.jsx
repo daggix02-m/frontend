@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 export function Notifications() {
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [searchTerm, setSearchTerm] = useState('');
+    const [activeFilter, setActiveFilter] = useState('Total'); // New state for stat filter
     const [notifications, setNotifications] = useState([
         // Transactions
         { id: 1, type: 'transaction', title: 'High-Value Sale Completed', description: 'Sale of ETB 5,450 - Receipt #RCP-1234', time: '5 minutes ago', read: false, priority: 'high' },
@@ -66,7 +67,19 @@ export function Notifications() {
             notification.type === categories.find(c => c.name === selectedCategory)?.type;
         const matchesSearch = notification.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             notification.description.toLowerCase().includes(searchTerm.toLowerCase());
-        return matchesCategory && matchesSearch;
+
+        // Apply stat filter
+        let matchesStatFilter = true;
+        if (activeFilter === 'Unread') {
+            matchesStatFilter = !notification.read;
+        } else if (activeFilter === 'High Priority') {
+            matchesStatFilter = notification.priority === 'high' && !notification.read;
+        } else if (activeFilter === 'Today') {
+            matchesStatFilter = !notification.time.includes('Yesterday');
+        }
+        // 'Total' shows all, so no additional filter needed
+
+        return matchesCategory && matchesSearch && matchesStatFilter;
     });
 
     const getNotificationIcon = (type) => {
@@ -188,13 +201,21 @@ export function Notifications() {
             {/* Stats Grid */}
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
-                    <Card key={index}>
+                    <Card
+                        key={index}
+                        className={`cursor-pointer transition-all hover:shadow-md ${activeFilter === stat.title ? 'ring-2 ring-primary shadow-md' : ''
+                            }`}
+                        onClick={() => setActiveFilter(stat.title)}
+                    >
                         <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
                             <CardTitle className='text-sm font-medium'>{stat.title}</CardTitle>
                             <stat.icon className={`h-4 w-4 ${stat.color}`} />
                         </CardHeader>
                         <CardContent className='px-6 pb-6'>
                             <div className='text-2xl font-bold'>{stat.value}</div>
+                            {activeFilter === stat.title && (
+                                <p className="text-xs text-muted-foreground mt-1">Active filter</p>
+                            )}
                         </CardContent>
                     </Card>
                 ))}

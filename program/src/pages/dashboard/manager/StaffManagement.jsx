@@ -149,7 +149,7 @@ export function StaffManagement() {
         </Button>
       </div>
 
-      <Card>
+      <Card className="overflow-hidden">
         <CardHeader>
           <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
             <CardTitle>All Staff Members</CardTitle>
@@ -164,88 +164,86 @@ export function StaffManagement() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className='overflow-x-auto -mx-4 sm:-mx-6 md:mx-0'>
-            <div className='px-4 sm:px-6 md:px-0'>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead className="hidden md:table-cell">Branch</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="hidden lg:table-cell">Online Status</TableHead>
-                    <TableHead className="hidden xl:table-cell">Last Active</TableHead>
-                    <TableHead className='text-right'>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredStaff.length > 0 ? (
-                    filteredStaff.map((member) => (
-                      <TableRow key={member.id}>
-                        <TableCell>
-                          <div className='flex flex-col'>
-                            <span className='font-medium'>{member.name}</span>
-                            <span className='text-xs text-muted-foreground hidden sm:inline'>{member.email}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={member.role === 'Pharmacist' ? 'default' : 'secondary'}>
-                            {member.role}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className='whitespace-nowrap hidden md:table-cell'>{member.branch}</TableCell>
-                        <TableCell>
-                          <Badge variant='outline' className={
-                            member.status === 'Active' ? 'text-green-600 border-green-600' : 'text-yellow-600 border-yellow-600'
-                          }>
-                            {member.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="hidden lg:table-cell">
-                          <div className='flex items-center gap-2'>
-                            <div className={`h-2 w-2 rounded-full ${member.isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
-                            <span className='text-sm'>
-                              {member.isOnline ? 'Online' : 'Offline'}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className='text-sm text-muted-foreground hidden xl:table-cell'>
-                          <div className='flex items-center gap-1'>
-                            <Clock className='h-3 w-3' />
-                            {getTimeAgo(member.lastActive)}
-                          </div>
-                        </TableCell>
-                        <TableCell className='text-right'>
-                          <div className='flex justify-end gap-2'>
-                            <Button
-                              variant='ghost'
-                              size='sm'
-                              onClick={() => openActivityLog(member)}
-                              title='View Activity Log'
-                            >
-                              <Activity className='h-4 w-4' />
-                            </Button>
-                            <Button variant='ghost' size='sm' onClick={() => openEditModal(member)}>
-                              <Edit className='h-4 w-4' />
-                            </Button>
-                            <Button variant='ghost' size='sm' className='text-red-600 hover:text-red-700 hover:bg-red-50' onClick={() => handleDelete(member.id)}>
-                              <Trash2 className='h-4 w-4' />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={7} className='text-center py-8 text-muted-foreground'>
-                        No staff members found.
+        <CardContent className="p-0">
+          <div className='overflow-x-auto'>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead className="hidden md:table-cell">Branch</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="hidden lg:table-cell">Online Status</TableHead>
+                  <TableHead className="hidden xl:table-cell">Last Active</TableHead>
+                  <TableHead className='text-right'>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredStaff.length > 0 ? (
+                  filteredStaff.map((member) => (
+                    <TableRow key={member.id}>
+                      <TableCell>
+                        <div className='flex flex-col'>
+                          <span className='font-medium'>{member.name}</span>
+                          <span className='text-xs text-muted-foreground hidden sm:inline'>{member.email}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={member.role === 'Pharmacist' ? 'default' : 'secondary'}>
+                          {member.role}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className='whitespace-nowrap hidden md:table-cell'>{member.branch}</TableCell>
+                      <TableCell>
+                        <Badge variant='outline' className={
+                          member.status === 'Active' ? 'text-green-600 border-green-600' : 'text-yellow-600 border-yellow-600'
+                        }>
+                          {member.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        <div className='flex items-center gap-2'>
+                          <div className={`h-2 w-2 rounded-full ${member.isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
+                          <span className='text-sm'>
+                            {member.isOnline ? 'Online' : 'Offline'}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className='text-sm text-muted-foreground hidden xl:table-cell'>
+                        <div className='flex items-center gap-1'>
+                          <Clock className='h-3 w-3' />
+                          {getTimeAgo(member.lastActive)}
+                        </div>
+                      </TableCell>
+                      <TableCell className='text-right'>
+                        <div className='flex justify-end gap-2'>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => openActivityLog(member)}
+                            title='View Activity Log'
+                          >
+                            <Activity className='h-4 w-4' />
+                          </Button>
+                          <Button variant='ghost' size='sm' onClick={() => openEditModal(member)}>
+                            <Edit className='h-4 w-4' />
+                          </Button>
+                          <Button variant='ghost' size='sm' className='text-red-600 hover:text-red-700 hover:bg-red-50' onClick={() => handleDelete(member.id)}>
+                            <Trash2 className='h-4 w-4' />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={7} className='text-center py-8 text-muted-foreground'>
+                      No staff members found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </div>
         </CardContent>
       </Card>
@@ -280,6 +278,6 @@ export function StaffManagement() {
         onClose={() => setIsActivityLogOpen(false)}
         staffMember={selectedStaffForLog}
       />
-    </div>
+    </div >
   );
 }
