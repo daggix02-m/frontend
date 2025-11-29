@@ -95,7 +95,6 @@ export function SignupPage() {
     setErrors(newErrors);
 
     if (isValid) {
-      console.log('Form Submitted:', formData);
       // Add submission logic here
     }
   };

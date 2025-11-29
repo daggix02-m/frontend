@@ -4,20 +4,18 @@ import { Printer, Mail, Download, FileText } from 'lucide-react';
 
 export function Receipts() {
     const [recentReceipts] = useState([
-        { id: 'RCP-001', customer: 'John Doe', amount: 45.50, items: 5, date: '2025-11-28 10:30 AM', method: 'Cash' },
-        { id: 'RCP-002', customer: 'Jane Smith', amount: 78.90, items: 8, date: '2025-11-28 10:15 AM', method: 'Card' },
-        { id: 'RCP-003', customer: 'Mike Johnson', amount: 23.40, items: 3, date: '2025-11-28 09:45 AM', method: 'Cash' },
-        { id: 'RCP-004', customer: 'Sarah Williams', amount: 156.20, items: 12, date: '2025-11-28 09:20 AM', method: 'Card' },
+        { id: 'RCP-001', customer: 'Kidist Haile', amount: 45.50, items: 5, date: '2025-11-28 10:30 AM', method: 'Cash' },
+        { id: 'RCP-002', customer: 'Yonas Gebre', amount: 78.90, items: 8, date: '2025-11-28 10:15 AM', method: 'Card' },
+        { id: 'RCP-003', customer: 'Meseret Tadesse', amount: 23.40, items: 3, date: '2025-11-28 09:45 AM', method: 'Cash' },
+        { id: 'RCP-004', customer: 'Tesfaye Negash', amount: 156.20, items: 12, date: '2025-11-28 09:20 AM', method: 'Card' },
     ]);
 
     const handlePrint = (receiptId) => {
-        console.log('Printing receipt:', receiptId);
         // Backend integration needed
         alert(`Printing receipt ${receiptId}...`);
     };
 
     const handleEmail = (receiptId) => {
-        console.log('Emailing receipt:', receiptId);
         // Backend integration needed
         const email = prompt('Enter customer email:');
         if (email) {
@@ -26,7 +24,6 @@ export function Receipts() {
     };
 
     const handleDownload = (receiptId) => {
-        console.log('Downloading receipt:', receiptId);
         // Backend integration needed
         alert(`Downloading receipt ${receiptId} as PDF...`);
     };
@@ -143,11 +140,11 @@ export function Receipts() {
                                 <span>$11.98</span>
                             </div>
                             <div className='flex justify-between text-sm'>
-                                <span>Amoxicillin 250mg x1</span>
+                                <span>Ciprofloxacin 500mg x1</span>
                                 <span>$12.50</span>
                             </div>
                             <div className='flex justify-between text-sm'>
-                                <span>Vitamin C 1000mg x1</span>
+                                <span>Multivitamin Complex x1</span>
                                 <span>$15.99</span>
                             </div>
                         </div>

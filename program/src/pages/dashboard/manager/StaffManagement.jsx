@@ -22,24 +22,24 @@ export function StaffManagement() {
   const [staff, setStaff] = useState([
     {
       id: 1,
-      name: 'John Doe',
-      email: 'john@example.com',
+      name: 'Alemayehu Desta',
+      email: 'alemayehu@example.com',
       role: 'Pharmacist',
       branch: 'Main Branch',
       status: 'Active',
     },
     {
       id: 2,
-      name: 'Jane Smith',
-      email: 'jane@example.com',
+      name: 'Selamawit Mekonnen',
+      email: 'selamawit@example.com',
       role: 'Cashier',
       branch: 'Downtown Branch',
       status: 'Active',
     },
     {
       id: 3,
-      name: 'Mike Johnson',
-      email: 'mike@example.com',
+      name: 'Berhanu Wolde',
+      email: 'berhanu@example.com',
       role: 'Pharmacist',
       branch: 'Westside Branch',
       status: 'On Leave',
@@ -217,7 +217,7 @@ export function StaffManagement() {
                     name='name'
                     value={formData.name}
                     onChange={handleInputChange}
-                    placeholder='e.g. John Doe'
+                    placeholder='e.g. Abebe Kebede'
                     required
                   />
                 </div>

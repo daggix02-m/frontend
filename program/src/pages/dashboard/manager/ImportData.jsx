@@ -7,7 +7,6 @@ export function ImportData() {
     const [importedData, setImportedData] = useState([]);
 
     const handleImport = (data) => {
-        console.log('Imported Data:', data);
         setImportedData(data);
         // Here you would typically send this data to your backend API
     };

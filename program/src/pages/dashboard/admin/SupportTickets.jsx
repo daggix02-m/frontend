@@ -6,10 +6,10 @@ import { Ticket, MessageSquare, User, Clock } from 'lucide-react';
 export function SupportTickets() {
     const [tickets] = useState([
         { id: 'TKT-001', pharmacy: 'Green Valley Pharmacy', subject: 'Cannot access inventory', priority: 'high', status: 'open', assignee: 'Unassigned', created: '2 hours ago' },
-        { id: 'TKT-002', pharmacy: 'City Health Pharmacy', subject: 'Payment integration issue', priority: 'urgent', status: 'in-progress', assignee: 'John Doe', created: '5 hours ago' },
+        { id: 'TKT-002', pharmacy: 'City Health Pharmacy', subject: 'Payment integration issue', priority: 'urgent', status: 'in-progress', assignee: 'Mulugeta Assefa', created: '5 hours ago' },
         { id: 'TKT-003', pharmacy: 'MediCare Plus', subject: 'Report generation error', priority: 'medium', status: 'open', assignee: 'Unassigned', created: '1 day ago' },
-        { id: 'TKT-004', pharmacy: 'Wellness Pharmacy', subject: 'User account locked', priority: 'high', status: 'in-progress', assignee: 'Jane Smith', created: '3 hours ago' },
-        { id: 'TKT-005', pharmacy: 'HealthFirst Pharmacy', subject: 'Feature request: Export to PDF', priority: 'low', status: 'resolved', assignee: 'John Doe', created: '2 days ago' },
+        { id: 'TKT-004', pharmacy: 'Wellness Pharmacy', subject: 'User account locked', priority: 'high', status: 'in-progress', assignee: 'Bethlehem Yilma', created: '3 hours ago' },
+        { id: 'TKT-005', pharmacy: 'HealthFirst Pharmacy', subject: 'Feature request: Export to PDF', priority: 'low', status: 'resolved', assignee: 'Mulugeta Assefa', created: '2 days ago' },
     ]);
 
     const getPriorityBadge = (priority) => {
@@ -80,8 +80,8 @@ export function SupportTickets() {
                         <Select className='w-48'>
                             <option value='all'>All Assignees</option>
                             <option value='unassigned'>Unassigned</option>
-                            <option value='john'>John Doe</option>
-                            <option value='jane'>Jane Smith</option>
+                            <option value='mulugeta'>Mulugeta Assefa</option>
+                            <option value='bethlehem'>Bethlehem Yilma</option>
                         </Select>
                     </div>
                 </CardContent>

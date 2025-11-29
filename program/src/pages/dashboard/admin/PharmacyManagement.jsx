@@ -5,11 +5,11 @@ import { Check, X, Ban, Search, Filter, MoreHorizontal } from 'lucide-react';
 export function PharmacyManagement() {
     // Generate initial realistic data
     const initialPharmacies = [
-        { id: 1, name: 'City Pharmacy', owner: 'John Doe', location: 'New York', status: 'Active', plan: 'Pro', phone: '555-0101', joined: '2023-01-15' },
-        { id: 2, name: 'HealthPlus', owner: 'Jane Smith', location: 'Los Angeles', status: 'Pending', plan: 'Basic', phone: '555-0102', joined: '2023-02-20' },
-        { id: 3, name: 'MediCare', owner: 'Bob Wilson', location: 'Chicago', status: 'Suspended', plan: 'Enterprise', phone: '555-0103', joined: '2023-03-10' },
-        { id: 4, name: 'Wellness Drug Store', owner: 'Alice Brown', location: 'Houston', status: 'Active', plan: 'Pro', phone: '555-0104', joined: '2023-04-05' },
-        { id: 5, name: 'Community Rx', owner: 'Charlie Davis', location: 'Phoenix', status: 'Pending', plan: 'Basic', phone: '555-0105', joined: '2023-05-12' },
+        { id: 1, name: 'City Pharmacy', owner: 'Yohannes Tadesse', location: 'Addis Ababa', status: 'Active', plan: 'Pro', phone: '555-0101', joined: '2023-01-15' },
+        { id: 2, name: 'HealthPlus', owner: 'Almaz Worku', location: 'Bahir Dar', status: 'Pending', plan: 'Basic', phone: '555-0102', joined: '2023-02-20' },
+        { id: 3, name: 'MediCare', owner: 'Tewodros Alemu', location: 'Hawassa', status: 'Suspended', plan: 'Enterprise', phone: '555-0103', joined: '2023-03-10' },
+        { id: 4, name: 'Wellness Drug Store', owner: 'Senait Gebremedhin', location: 'Mekelle', status: 'Active', plan: 'Pro', phone: '555-0104', joined: '2023-04-05' },
+        { id: 5, name: 'Community Rx', owner: 'Fekadu Mengistu', location: 'Dire Dawa', status: 'Pending', plan: 'Basic', phone: '555-0105', joined: '2023-05-12' },
     ];
 
     const [pharmacies, setPharmacies] = useState(initialPharmacies);

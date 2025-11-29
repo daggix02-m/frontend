@@ -3,8 +3,6 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
 
-console.log('main.jsx: Starting execution');
-
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -35,7 +33,6 @@ class ErrorBoundary extends React.Component {
 
 try {
   const root = ReactDOM.createRoot(document.getElementById('root'));
-  console.log('main.jsx: Root created');
   root.render(
     <React.StrictMode>
       <ErrorBoundary>
@@ -43,7 +40,6 @@ try {
       </ErrorBoundary>
     </React.StrictMode>
   );
-  console.log('main.jsx: Render called');
 } catch (e) {
   console.error('main.jsx: Error creating root or rendering', e);
 }

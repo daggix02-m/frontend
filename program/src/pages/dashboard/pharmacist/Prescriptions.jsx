@@ -4,10 +4,10 @@ import { FileText, AlertCircle, CheckCircle, Clock, Search } from 'lucide-react'
 
 export function Prescriptions() {
     const [prescriptions, setPrescriptions] = useState([
-        { id: 'RX-001', patient: 'John Doe', doctor: 'Dr. Smith', medication: 'Amoxicillin 500mg', dosage: '3x daily', duration: '7 days', status: 'pending', date: '2025-11-28' },
-        { id: 'RX-002', patient: 'Jane Smith', doctor: 'Dr. Johnson', medication: 'Lisinopril 10mg', dosage: '1x daily', duration: '30 days', status: 'validated', date: '2025-11-28' },
-        { id: 'RX-003', patient: 'Mike Brown', doctor: 'Dr. Williams', medication: 'Metformin 850mg', dosage: '2x daily', duration: '90 days', status: 'dispensed', date: '2025-11-27' },
-        { id: 'RX-004', patient: 'Sarah Davis', doctor: 'Dr. Anderson', medication: 'Atorvastatin 20mg', dosage: '1x daily', duration: '30 days', status: 'pending', date: '2025-11-27' },
+        { id: 'RX-001', patient: 'Abebe Kebede', doctor: 'Dr. Yohannes Tadesse', medication: 'Amoxicillin 500mg', dosage: '3x daily', duration: '7 days', status: 'pending', date: '2025-11-28' },
+        { id: 'RX-002', patient: 'Tigist Alemayehu', doctor: 'Dr. Mekdes Hailu', medication: 'Lisinopril 10mg', dosage: '1x daily', duration: '30 days', status: 'validated', date: '2025-11-28' },
+        { id: 'RX-003', patient: 'Dawit Tesfaye', doctor: 'Dr. Solomon Bekele', medication: 'Metformin 850mg', dosage: '2x daily', duration: '90 days', status: 'dispensed', date: '2025-11-27' },
+        { id: 'RX-004', patient: 'Hanna Girma', doctor: 'Dr. Mulugeta Assefa', medication: 'Atorvastatin 20mg', dosage: '1x daily', duration: '30 days', status: 'pending', date: '2025-11-27' },
     ]);
 
     const getStatusBadge = (status) => {
@@ -155,13 +155,13 @@ export function Prescriptions() {
                 <CardContent>
                     <div className='space-y-3'>
                         <div className='border-l-4 border-red-600 pl-4 py-2'>
-                            <p className='font-medium'>Patient: John Doe (RX-001)</p>
+                            <p className='font-medium'>Patient: Abebe Kebede (RX-001)</p>
                             <p className='text-sm text-muted-foreground'>
                                 Potential interaction between Amoxicillin and current medication (Warfarin). Consult with doctor before dispensing.
                             </p>
                         </div>
                         <div className='border-l-4 border-yellow-600 pl-4 py-2'>
-                            <p className='font-medium'>Patient: Sarah Davis (RX-004)</p>
+                            <p className='font-medium'>Patient: Hanna Girma (RX-004)</p>
                             <p className='text-sm text-muted-foreground'>
                                 Patient has reported allergy to statins. Verify prescription with prescribing doctor.
                             </p>

@@ -48,7 +48,6 @@ export function ExcelImport({ onImport }) {
                 }
             } catch (err) {
                 setError('Failed to parse Excel file. Please ensure it is formatted correctly.');
-                console.error(err);
             }
         };
         reader.readAsBinaryString(file);

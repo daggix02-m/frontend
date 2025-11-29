@@ -4,11 +4,11 @@ import { UserPlus, Shield, Activity, Users } from 'lucide-react';
 
 export function PlatformUsers() {
     const [users] = useState([
-        { id: 1, name: 'John Doe', email: 'john@pharmacare.com', role: 'Super Admin', status: 'active', lastActive: '2 hours ago' },
-        { id: 2, name: 'Jane Smith', email: 'jane@pharmacare.com', role: 'Support Admin', status: 'active', lastActive: '5 minutes ago' },
-        { id: 3, name: 'Mike Johnson', email: 'mike@pharmacare.com', role: 'Billing Admin', status: 'active', lastActive: '1 day ago' },
-        { id: 4, name: 'Sarah Williams', email: 'sarah@pharmacare.com', role: 'Support Admin', status: 'inactive', lastActive: '3 days ago' },
-        { id: 5, name: 'Tom Brown', email: 'tom@pharmacare.com', role: 'Analytics Admin', status: 'active', lastActive: '30 minutes ago' },
+        { id: 1, name: 'Getachew Mamo', email: 'getachew@pharmacare.com', role: 'Super Admin', status: 'active', lastActive: '2 hours ago' },
+        { id: 2, name: 'Rahel Bekele', email: 'rahel@pharmacare.com', role: 'Support Admin', status: 'active', lastActive: '5 minutes ago' },
+        { id: 3, name: 'Elias Tesfaye', email: 'elias@pharmacare.com', role: 'Billing Admin', status: 'active', lastActive: '1 day ago' },
+        { id: 4, name: 'Meron Hailu', email: 'meron@pharmacare.com', role: 'Support Admin', status: 'inactive', lastActive: '3 days ago' },
+        { id: 5, name: 'Daniel Kebede', email: 'daniel@pharmacare.com', role: 'Analytics Admin', status: 'active', lastActive: '30 minutes ago' },
     ]);
 
     const getStatusBadge = (status) => {
@@ -127,10 +127,10 @@ export function PlatformUsers() {
                 <CardContent>
                     <div className='space-y-3'>
                         {[
-                            { user: 'John Doe', action: 'Approved pharmacy registration', time: '10 minutes ago' },
-                            { user: 'Jane Smith', action: 'Resolved support ticket #TKT-045', time: '25 minutes ago' },
-                            { user: 'Tom Brown', action: 'Generated system report', time: '1 hour ago' },
-                            { user: 'Mike Johnson', action: 'Processed refund for Pharmacy #123', time: '2 hours ago' },
+                            { user: 'Getachew Mamo', action: 'Approved pharmacy registration', time: '10 minutes ago' },
+                            { user: 'Rahel Bekele', action: 'Resolved support ticket #TKT-045', time: '25 minutes ago' },
+                            { user: 'Daniel Kebede', action: 'Generated system report', time: '1 hour ago' },
+                            { user: 'Elias Tesfaye', action: 'Processed refund for Pharmacy #123', time: '2 hours ago' },
                         ].map((activity, index) => (
                             <div key={index} className='flex items-center justify-between border-b pb-2 last:border-0'>
                                 <div>

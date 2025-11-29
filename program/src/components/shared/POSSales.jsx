@@ -46,7 +46,6 @@ export function POSSales({ role = 'cashier' }) {
     const handleCheckout = () => {
         if (cart.length === 0) return;
         if (window.confirm(`Process payment of $${total.toFixed(2)} via ${paymentMethod}?`)) {
-            console.log('Processing checkout:', { cart, total, discount, paymentMethod });
             // Backend integration needed
             alert('Sale processed successfully!');
             setCart([]);

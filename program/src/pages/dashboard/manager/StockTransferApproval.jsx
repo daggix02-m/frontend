@@ -4,10 +4,10 @@ import { Package, CheckCircle, XCircle, Clock, TrendingUp } from 'lucide-react';
 
 export function StockTransferApproval() {
     const [transfers] = useState([
-        { id: 'ST-001', from: 'Main Branch', to: 'Downtown Branch', product: 'Paracetamol 500mg', quantity: 500, requestedBy: 'John Pharmacist', status: 'pending', date: '2025-11-28' },
-        { id: 'ST-002', from: 'Downtown Branch', to: 'Westside Branch', product: 'Amoxicillin 250mg', quantity: 200, requestedBy: 'Sarah Pharmacist', status: 'pending', date: '2025-11-27' },
-        { id: 'ST-003', from: 'Main Branch', to: 'Eastside Branch', product: 'Ibuprofen 400mg', quantity: 300, requestedBy: 'Mike Pharmacist', status: 'approved', date: '2025-11-26' },
-        { id: 'ST-004', from: 'Westside Branch', to: 'Main Branch', product: 'Aspirin 100mg', quantity: 150, requestedBy: 'Jane Pharmacist', status: 'rejected', date: '2025-11-25' },
+        { id: 'ST-001', from: 'Main Branch', to: 'Downtown Branch', product: 'Paracetamol 500mg', quantity: 500, requestedBy: 'Alemayehu Desta', status: 'pending', date: '2025-11-28' },
+        { id: 'ST-002', from: 'Downtown Branch', to: 'Westside Branch', product: 'Amoxicillin 250mg', quantity: 200, requestedBy: 'Selamawit Mekonnen', status: 'pending', date: '2025-11-27' },
+        { id: 'ST-003', from: 'Main Branch', to: 'Eastside Branch', product: 'Ibuprofen 400mg', quantity: 300, requestedBy: 'Berhanu Wolde', status: 'approved', date: '2025-11-26' },
+        { id: 'ST-004', from: 'Westside Branch', to: 'Main Branch', product: 'Aspirin 100mg', quantity: 150, requestedBy: 'Tigist Alemayehu', status: 'rejected', date: '2025-11-25' },
     ]);
 
     const getStatusBadge = (status) => {
@@ -38,12 +38,10 @@ export function StockTransferApproval() {
     ];
 
     const handleApprove = (id) => {
-        console.log('Approving transfer:', id);
         // Backend integration needed
     };
 
     const handleReject = (id) => {
-        console.log('Rejecting transfer:', id);
         // Backend integration needed
     };
 

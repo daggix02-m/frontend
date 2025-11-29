@@ -28,7 +28,6 @@ export function ForgotPasswordPage() {
       return;
     }
 
-    console.log('Forgot Password Submitted:', { email });
     // Add submission logic here
   };
 

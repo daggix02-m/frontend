@@ -45,8 +45,6 @@ export function LoginPage() {
       localStorage.setItem('accessToken', 'test-token-' + Date.now());
       localStorage.setItem('userRole', role);
 
-      console.log('Login successful (mock):', { email, role });
-
       // Redirect based on role
       if (role === 'admin') navigate('/admin/overview');
       else if (role === 'manager') navigate('/manager/overview');
@@ -57,7 +55,6 @@ export function LoginPage() {
       // Uncomment below when backend is ready
       // const response = await login(email, password);
       // if (response.success) {
-      //     console.log('Login successful:', response);
       //     const role = response.role || 'manager';
       //     if (role === 'admin') navigate('/admin/overview');
       //     else if (role === 'manager') navigate('/manager/overview');
@@ -69,7 +66,6 @@ export function LoginPage() {
       // }
     } catch (err) {
       setError('An error occurred. Please try again.');
-      console.error(err);
     }
   };
 
@@ -89,7 +85,7 @@ export function LoginPage() {
               instead of paperwork.&rdquo;
             </p>
             <footer className='font-mono text-sm font-semibold'>
-              ~ Dr. Sarah Ahmed, Pharmacy Manager
+              ~ Dr. Mekdes Hailu, Pharmacy Manager
             </footer>
           </blockquote>
         </div>

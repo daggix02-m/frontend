@@ -39,19 +39,15 @@ import { Receipts } from './pages/dashboard/cashier/Receipts';
 // Role Protected Route component
 const RoleProtectedRoute = ({ children, allowedRoles }) => {
   const token = localStorage.getItem('accessToken');
-  const userRole = localStorage.getItem('userRole'); // Assuming we store role in localStorage on login
-
-  console.log('RoleProtectedRoute Check:', { path: window.location.pathname, token: !!token, userRole, allowedRoles });
+  const userRole = localStorage.getItem('userRole');
 
   if (!token) {
-    console.log('No token, redirecting to login');
     return <Navigate to='/auth/login' replace />;
   }
 
   const normalizedUserRole = userRole ? userRole.toLowerCase() : '';
 
   if (allowedRoles && !allowedRoles.includes(normalizedUserRole)) {
-    console.log(`Role mismatch. User: ${normalizedUserRole}, Allowed: ${allowedRoles}. Redirecting...`);
     // Redirect to appropriate dashboard based on actual role
     if (normalizedUserRole === 'admin') return <Navigate to='/admin/overview' replace />;
     if (normalizedUserRole === 'manager') return <Navigate to='/manager/overview' replace />;
@@ -64,7 +60,6 @@ const RoleProtectedRoute = ({ children, allowedRoles }) => {
 };
 
 function App() {
-  console.log('App.jsx: Rendering App component');
   return (
     <Router>
       <Routes>
