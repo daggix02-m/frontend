@@ -166,7 +166,7 @@ export function StaffManagement() {
         </CardHeader>
         <CardContent>
           <div className='overflow-x-auto -mx-4 sm:-mx-6 md:mx-0'>
-            <div className='min-w-[1000px] md:min-w-0 px-4 sm:px-6 md:px-0'>
+            <div className='px-4 sm:px-6 md:px-0'>
               <Table>
                 <TableHeader>
                   <TableRow>
