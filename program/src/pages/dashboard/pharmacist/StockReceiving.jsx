@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Button, Input } from '@/components/ui/ui';
 import { Package, CheckCircle, Clock, Truck } from 'lucide-react';
+import { toast } from 'sonner';
 
 export function StockReceiving() {
     const [deliveries, setDeliveries] = useState([
@@ -47,6 +48,7 @@ export function StockReceiving() {
             setDeliveries(deliveries.map(d =>
                 d.id === id ? { ...d, status: 'received' } : d
             ));
+            toast.success('Delivery marked as received!');
         }
     };
 
@@ -171,9 +173,9 @@ export function StockReceiving() {
                         </div>
 
                         <div className='flex gap-2'>
-                            <Button>Complete Receiving</Button>
-                            <Button variant='outline'>Save as Draft</Button>
-                            <Button variant='outline'>Print Receiving Report</Button>
+                            <Button onClick={() => toast.success('Receiving completed!')}>Complete Receiving</Button>
+                            <Button variant='outline' onClick={() => toast.info('Saved as draft')}>Save as Draft</Button>
+                            <Button variant='outline' onClick={() => toast.info('Printing report...')}>Print Receiving Report</Button>
                         </div>
                     </div>
                 </CardContent>

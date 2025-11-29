@@ -4,6 +4,7 @@ import { LoginPage } from './pages/auth/login';
 import { SignupPage } from './pages/auth/signup';
 import { ForgotPasswordPage } from './pages/auth/forgot-password';
 import { ResetPasswordPage } from './pages/auth/reset-password';
+import { ChangePasswordPage } from './pages/auth/change-password';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { Overview } from './pages/dashboard/manager/Overview';
 import { BranchManagement } from './pages/dashboard/manager/BranchManagement';
@@ -12,6 +13,8 @@ import { ImportData } from './pages/dashboard/manager/ImportData';
 import { InventoryManagement } from './pages/dashboard/manager/InventoryManagement';
 import { Reports } from './pages/dashboard/manager/Reports';
 import { Settings } from './pages/dashboard/manager/Settings';
+import { Settings as PharmacistSettings } from './pages/dashboard/pharmacist/Settings';
+import { Settings as CashierSettings } from './pages/dashboard/cashier/Settings';
 import { AdminOverview } from './pages/dashboard/admin/AdminOverview';
 import { PharmacyManagement } from './pages/dashboard/admin/PharmacyManagement';
 import { SubscriptionManagement } from './pages/dashboard/admin/SubscriptionManagement';
@@ -35,6 +38,7 @@ import { BranchReports } from './pages/dashboard/pharmacist/BranchReports';
 import { StockReceiving } from './pages/dashboard/pharmacist/StockReceiving';
 import { CashierPOSSales } from './pages/dashboard/cashier/POSSales';
 import { Receipts } from './pages/dashboard/cashier/Receipts';
+import { Notifications } from './pages/dashboard/manager/Notifications';
 
 // Role Protected Route component
 const RoleProtectedRoute = ({ children, allowedRoles }) => {
@@ -69,6 +73,7 @@ function App() {
         <Route path='/auth/signup' element={<SignupPage />} />
         <Route path='/auth/forgot-password' element={<ForgotPasswordPage />} />
         <Route path='/auth/reset-password' element={<ResetPasswordPage />} />
+        <Route path='/auth/change-password' element={<ChangePasswordPage />} />
 
         {/* Admin Routes */}
         <Route
@@ -110,6 +115,7 @@ function App() {
           <Route path='import' element={<ImportData />} />
           <Route path='stock-transfers' element={<StockTransferApproval />} />
           <Route path='refunds-discounts' element={<RefundsDiscounts />} />
+          <Route path='notifications' element={<Notifications />} />
           <Route path='pos-sales' element={<ManagerPOSSales />} />
         </Route>
 
@@ -129,6 +135,7 @@ function App() {
           <Route path='prescriptions' element={<Prescriptions />} />
           <Route path='reports' element={<BranchReports />} />
           <Route path='stock-receiving' element={<StockReceiving />} />
+          <Route path='settings' element={<PharmacistSettings />} />
         </Route>
 
         {/* Cashier Routes */}
@@ -146,6 +153,7 @@ function App() {
           <Route path='stock' element={<StockCheck />} />
           <Route path='pos-sales' element={<CashierPOSSales />} />
           <Route path='receipts' element={<Receipts />} />
+          <Route path='settings' element={<CashierSettings />} />
         </Route>
 
         {/* Fallback */}

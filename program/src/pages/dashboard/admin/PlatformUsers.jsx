@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Button, Input } from '@/components/ui/ui';
+import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Button, Input, Dialog, DialogContent } from '@/components/ui/ui';
 import { Select } from '@/components/ui/select';
-import { UserPlus, Shield, Activity, Users, X } from 'lucide-react';
+import { UserPlus, Shield, Activity, Users } from 'lucide-react';
+import { UserForm } from './components/UserForm';
 
 export function PlatformUsers() {
     const [users, setUsers] = useState([
@@ -13,23 +14,23 @@ export function PlatformUsers() {
     ]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterRole, setFilterRole] = useState('All');
     const [newUser, setNewUser] = useState({
         name: '',
         email: '',
         role: 'Support Admin'
     });
 
-    const handleAddUser = (e) => {
-        e.preventDefault();
+    const handleAddUser = (data) => {
         const user = {
             id: users.length + 1,
-            ...newUser,
+            ...data,
             status: 'active',
             lastActive: 'Just now'
         };
         setUsers([...users, user]);
         setIsModalOpen(false);
-        setNewUser({ name: '', email: '', role: 'Support Admin' });
     };
 
     const getStatusBadge = (status) => {
@@ -49,6 +50,15 @@ export function PlatformUsers() {
         };
         return <Badge variant={variants[role]}>{role}</Badge>;
     };
+
+    const filteredUsers = users.filter(user => {
+        const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesFilter = filterRole === 'All' || user.role === filterRole;
+        return matchesSearch && matchesFilter;
+    });
+
+    const roles = ['All', 'Super Admin', 'Support Admin', 'Billing Admin', 'Analytics Admin'];
 
     const stats = [
         { title: 'Total Admins', value: '12', icon: Users, color: 'text-blue-600' },
@@ -89,9 +99,17 @@ export function PlatformUsers() {
             <Card>
                 <CardContent className='pt-6'>
                     <div className='flex flex-col sm:flex-row gap-4'>
-                        <Input placeholder='Search users...' className='max-w-sm' />
-                        <Button variant='outline'>Filter by Role</Button>
-                        <Button variant='outline'>Filter by Status</Button>
+                        <Input
+                            placeholder='Search users...'
+                            className='max-w-sm'
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <Select value={filterRole} onChange={(e) => setFilterRole(e.target.value)}>
+                            {roles.map(role => (
+                                <option key={role} value={role}>{role}</option>
+                            ))}
+                        </Select>
                     </div>
                 </CardContent>
             </Card>
@@ -115,25 +133,26 @@ export function PlatformUsers() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {users.map((user) => (
-                                    <TableRow key={user.id}>
-                                        <TableCell className='font-medium'>{user.name}</TableCell>
-                                        <TableCell>{user.email}</TableCell>
-                                        <TableCell>{getRoleBadge(user.role)}</TableCell>
-                                        <TableCell>{getStatusBadge(user.status)}</TableCell>
-                                        <TableCell>{user.lastActive}</TableCell>
-                                        <TableCell>
-                                            <div className='flex gap-2'>
-                                                <Button size='sm' variant='outline'>
-                                                    Edit
-                                                </Button>
-                                                <Button size='sm' variant='outline'>
-                                                    Logs
-                                                </Button>
-                                            </div>
+                                {filteredUsers.length > 0 ? (
+                                    filteredUsers.map((user) => (
+                                        <TableRow key={user.id}>
+                                            <TableCell className='font-medium'>{user.name}</TableCell>
+                                            <TableCell>{user.email}</TableCell>
+                                            <TableCell>{getRoleBadge(user.role)}</TableCell>
+                                            <TableCell>{getStatusBadge(user.status)}</TableCell>
+                                            <TableCell className='text-sm text-muted-foreground'>{user.lastActive}</TableCell>
+                                            <TableCell className='text-right'>
+                                                <Button variant='ghost' size='sm'>Edit</Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={6} className='text-center py-8 text-muted-foreground'>
+                                            No users found matching "{searchTerm}"
                                         </TableCell>
                                     </TableRow>
-                                ))}
+                                )}
                             </TableBody>
                         </Table>
                     </div>
@@ -166,64 +185,14 @@ export function PlatformUsers() {
             </Card>
 
             {/* Add User Modal */}
-            {isModalOpen && (
-                <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
-                    <Card className='w-full max-w-md relative'>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="absolute right-2 top-2"
-                            onClick={() => setIsModalOpen(false)}
-                        >
-                            <X className="h-4 w-4" />
-                        </Button>
-                        <CardHeader>
-                            <CardTitle>Add New Admin User</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <form onSubmit={handleAddUser} className='space-y-4'>
-                                <div className='space-y-2'>
-                                    <label className='text-sm font-medium'>Full Name</label>
-                                    <Input
-                                        placeholder='e.g., Abebe Bikila'
-                                        value={newUser.name}
-                                        onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                <div className='space-y-2'>
-                                    <label className='text-sm font-medium'>Email Address</label>
-                                    <Input
-                                        type='email'
-                                        placeholder='e.g., abebe@pharmacare.com'
-                                        value={newUser.email}
-                                        onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                <div className='space-y-2'>
-                                    <label className='text-sm font-medium'>Role</label>
-                                    <Select
-                                        value={newUser.role}
-                                        onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
-                                    >
-                                        <option value='Support Admin'>Support Admin</option>
-                                        <option value='Billing Admin'>Billing Admin</option>
-                                        <option value='Analytics Admin'>Analytics Admin</option>
-                                        <option value='Super Admin'>Super Admin</option>
-                                    </Select>
-                                </div>
-                                <div className='flex justify-end gap-2 pt-4'>
-                                    <Button type='button' variant='outline' onClick={() => setIsModalOpen(false)}>
-                                        Cancel
-                                    </Button>
-                                    <Button type='submit'>Add User</Button>
-                                </div>
-                            </form>
-                        </CardContent>
-                    </Card>
-                </div>
-            )}
+            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DialogContent className="p-0 bg-transparent border-none shadow-none w-full max-w-lg">
+                    <UserForm
+                        onSubmit={handleAddUser}
+                        onCancel={() => setIsModalOpen(false)}
+                    />
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

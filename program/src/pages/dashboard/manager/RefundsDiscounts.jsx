@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, Button, Input } from '@/components/ui/ui';
 import { Select } from '@/components/ui/select';
 import { Percent, DollarSign, Tag, Settings } from 'lucide-react';
+import { toast } from 'sonner';
 
 export function RefundsDiscounts() {
     const [refundPolicy, setRefundPolicy] = useState({
@@ -38,6 +39,24 @@ export function RefundsDiscounts() {
 
         setDiscountRules([...discountRules, discount]);
         setNewDiscount({ name: '', type: 'percentage', value: '', appliesTo: 'all' });
+        toast.success('Discount created successfully!');
+    };
+
+    const handleToggleDiscount = (id) => {
+        setDiscountRules(discountRules.map(rule =>
+            rule.id === id ? { ...rule, active: !rule.active } : rule
+        ));
+        toast.success('Discount status updated!');
+    };
+
+    const handleEditDiscount = (rule) => {
+        setNewDiscount({
+            name: rule.name,
+            type: rule.type,
+            value: rule.value.toString(),
+            appliesTo: 'all'
+        });
+        toast.info('Edit discount details and click Create to update');
     };
 
     const stats = [
@@ -112,7 +131,7 @@ export function RefundsDiscounts() {
                                 className='h-4 w-4'
                             />
                         </div>
-                        <Button className='w-full'>Save Refund Policy</Button>
+                        <Button className='w-full' onClick={() => toast.success('Refund policy saved!')}>Save Refund Policy</Button>
                     </CardContent>
                 </Card>
 
@@ -185,10 +204,10 @@ export function RefundsDiscounts() {
                                     <span className={`text-sm ${rule.active ? 'text-green-600' : 'text-gray-400'}`}>
                                         {rule.active ? 'Active' : 'Inactive'}
                                     </span>
-                                    <Button size='sm' variant='outline'>
+                                    <Button size='sm' variant='outline' onClick={() => handleEditDiscount(rule)}>
                                         Edit
                                     </Button>
-                                    <Button size='sm' variant='outline'>
+                                    <Button size='sm' variant='outline' onClick={() => handleToggleDiscount(rule.id)}>
                                         {rule.active ? 'Deactivate' : 'Activate'}
                                     </Button>
                                 </div>
@@ -215,7 +234,7 @@ export function RefundsDiscounts() {
                             <Input type='number' placeholder='20' />
                         </div>
                     </div>
-                    <Button>Update Thresholds</Button>
+                    <Button onClick={() => toast.success('Thresholds updated!')}>Update Thresholds</Button>
                 </CardContent>
             </Card>
         </div>

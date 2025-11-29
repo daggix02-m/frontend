@@ -1,14 +1,19 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, Button, Input } from '@/components/ui/ui';
+import { ProfileSettings } from '@/components/shared/ProfileSettings';
 
 export function Settings() {
     return (
-        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
+        <div className='space-y-6 p-4 sm:p-6'>
             <div>
                 <h2 className='text-3xl font-bold tracking-tight'>Settings</h2>
-                <p className='text-muted-foreground'>Manage pharmacy configuration and subscription.</p>
+                <p className='text-muted-foreground'>Manage your account, pharmacy configuration and subscription.</p>
             </div>
 
+            {/* Profile Settings */}
+            <ProfileSettings userRole="Manager" />
+
+            {/* Pharmacy-Specific Settings */}
             <div className='grid gap-6 grid-cols-1'>
                 <Card>
                     <CardHeader>

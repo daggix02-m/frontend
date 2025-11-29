@@ -1,14 +1,19 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, Button, Input } from '@/components/ui/ui';
+import { ProfileSettings } from '@/components/shared/ProfileSettings';
 
 export function AdminSettings() {
     return (
-        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
+        <div className='space-y-6 p-4 sm:p-6'>
             <div>
                 <h2 className='text-3xl font-bold tracking-tight'>Global Settings</h2>
-                <p className='text-muted-foreground'>Manage system-wide configurations.</p>
+                <p className='text-muted-foreground'>Manage your account and system-wide configurations.</p>
             </div>
 
+            {/* Profile Settings */}
+            <ProfileSettings userRole="Admin" />
+
+            {/* System-Wide Settings */}
             <div className='grid gap-6 grid-cols-1'>
                 <Card>
                     <CardHeader>

@@ -9,6 +9,7 @@ export function Receipts() {
         { id: 'RCP-003', customer: 'Meseret Tadesse', amount: 23.40, items: 3, date: '2025-11-28 09:45 AM', method: 'Cash' },
         { id: 'RCP-004', customer: 'Tesfaye Negash', amount: 156.20, items: 12, date: '2025-11-28 09:20 AM', method: 'Card' },
     ]);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const handlePrint = (receiptId) => {
         // Backend integration needed
@@ -27,6 +28,11 @@ export function Receipts() {
         // Backend integration needed
         alert(`Downloading receipt ${receiptId} as PDF...`);
     };
+
+    const filteredReceipts = recentReceipts.filter(receipt =>
+        receipt.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        receipt.customer.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
@@ -78,40 +84,54 @@ export function Receipts() {
             {/* Recent Receipts */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Recent Receipts</CardTitle>
+                    <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
+                        <CardTitle>Recent Receipts</CardTitle>
+                        <Input
+                            placeholder='Search receipts...'
+                            className='max-w-sm'
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <div className='space-y-4'>
-                        {recentReceipts.map((receipt) => (
-                            <div key={receipt.id} className='border rounded-lg p-4'>
-                                <div className='flex items-start justify-between mb-3'>
-                                    <div>
-                                        <p className='font-bold text-lg'>{receipt.id}</p>
-                                        <p className='text-sm text-muted-foreground'>{receipt.customer}</p>
-                                        <p className='text-xs text-muted-foreground'>{receipt.date}</p>
+                        {filteredReceipts.length > 0 ? (
+                            filteredReceipts.map((receipt) => (
+                                <div key={receipt.id} className='border rounded-lg p-4'>
+                                    <div className='flex items-start justify-between mb-3'>
+                                        <div>
+                                            <p className='font-bold text-lg'>{receipt.id}</p>
+                                            <p className='text-sm text-muted-foreground'>{receipt.customer}</p>
+                                            <p className='text-xs text-muted-foreground'>{receipt.date}</p>
+                                        </div>
+                                        <div className='text-right'>
+                                            <p className='font-bold text-xl'>${receipt.amount.toFixed(2)}</p>
+                                            <p className='text-sm text-muted-foreground'>{receipt.items} items</p>
+                                            <p className='text-xs text-muted-foreground'>{receipt.method}</p>
+                                        </div>
                                     </div>
-                                    <div className='text-right'>
-                                        <p className='font-bold text-xl'>${receipt.amount.toFixed(2)}</p>
-                                        <p className='text-sm text-muted-foreground'>{receipt.items} items</p>
-                                        <p className='text-xs text-muted-foreground'>{receipt.method}</p>
+                                    <div className='flex gap-2'>
+                                        <Button size='sm' variant='outline' onClick={() => handlePrint(receipt.id)}>
+                                            <Printer className='mr-2 h-3 w-3' />
+                                            Print
+                                        </Button>
+                                        <Button size='sm' variant='outline' onClick={() => handleEmail(receipt.id)}>
+                                            <Mail className='mr-2 h-3 w-3' />
+                                            Email
+                                        </Button>
+                                        <Button size='sm' variant='outline' onClick={() => handleDownload(receipt.id)}>
+                                            <Download className='mr-2 h-3 w-3' />
+                                            Download
+                                        </Button>
                                     </div>
                                 </div>
-                                <div className='flex gap-2'>
-                                    <Button size='sm' variant='outline' onClick={() => handlePrint(receipt.id)}>
-                                        <Printer className='mr-2 h-3 w-3' />
-                                        Print
-                                    </Button>
-                                    <Button size='sm' variant='outline' onClick={() => handleEmail(receipt.id)}>
-                                        <Mail className='mr-2 h-3 w-3' />
-                                        Email
-                                    </Button>
-                                    <Button size='sm' variant='outline' onClick={() => handleDownload(receipt.id)}>
-                                        <Download className='mr-2 h-3 w-3' />
-                                        Download
-                                    </Button>
-                                </div>
+                            ))
+                        ) : (
+                            <div className='text-center py-8 text-muted-foreground'>
+                                No receipts found matching "{searchTerm}"
                             </div>
-                        ))}
+                        )}
                     </div>
                 </CardContent>
             </Card>

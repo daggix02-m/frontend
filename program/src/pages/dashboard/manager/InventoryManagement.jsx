@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Button, Input } from '@/components/ui/ui';
+import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Button, Input, Dialog, DialogContent } from '@/components/ui/ui';
 import { Select } from '@/components/ui/select';
-import { Plus, Search, Filter, X } from 'lucide-react';
+import { Plus, Search, Filter } from 'lucide-react';
+import { ProductForm } from './components/ProductForm';
 
 export function InventoryManagement({ readOnly = false }) {
     const [products, setProducts] = useState([
@@ -11,6 +12,9 @@ export function InventoryManagement({ readOnly = false }) {
     ]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingProduct, setEditingProduct] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterCategory, setFilterCategory] = useState('All');
     const [newProduct, setNewProduct] = useState({
         name: '',
         category: 'Pain Relief',
@@ -19,17 +23,44 @@ export function InventoryManagement({ readOnly = false }) {
         status: 'In Stock'
     });
 
-    const handleAddProduct = (e) => {
-        e.preventDefault();
+    const handleAddProduct = (data) => {
         const product = {
             id: products.length + 1,
-            ...newProduct,
-            price: `ETB ${newProduct.price}`
+            ...data,
+            price: `ETB ${data.price}`
         };
         setProducts([...products, product]);
         setIsModalOpen(false);
-        setNewProduct({ name: '', category: 'Pain Relief', stock: '', price: '', status: 'In Stock' });
     };
+
+    const handleEditProduct = (data) => {
+        setProducts(products.map(p =>
+            p.id === editingProduct.id
+                ? { ...data, id: p.id, price: `ETB ${data.price}` }
+                : p
+        ));
+        setIsModalOpen(false);
+        setEditingProduct(null);
+    };
+
+    const openAddModal = () => {
+        setEditingProduct(null);
+        setIsModalOpen(true);
+    };
+
+    const openEditModal = (product) => {
+        setEditingProduct(product);
+        setIsModalOpen(true);
+    };
+
+    const filteredProducts = products.filter(product => {
+        const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            product.category.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesFilter = filterCategory === 'All' || product.category === filterCategory;
+        return matchesSearch && matchesFilter;
+    });
+
+    const categories = ['All', ...new Set(products.map(p => p.category))];
 
     return (
         <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
@@ -39,7 +70,7 @@ export function InventoryManagement({ readOnly = false }) {
                     <p className='text-muted-foreground'>Manage your product catalog and stock levels.</p>
                 </div>
                 {!readOnly && (
-                    <Button onClick={() => setIsModalOpen(true)}>
+                    <Button onClick={openAddModal}>
                         <Plus className='mr-2 h-4 w-4' /> Add Product
                     </Button>
                 )}
@@ -50,13 +81,20 @@ export function InventoryManagement({ readOnly = false }) {
                     <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
                         <CardTitle>Product Catalog</CardTitle>
                         <div className='flex gap-2'>
-                            <div className='relative w-full'>
+                            <div className='relative w-full md:w-64'>
                                 <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
-                                <Input placeholder='Search products...' className='pl-8' />
+                                <Input
+                                    placeholder='Search products...'
+                                    className='pl-8'
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
                             </div>
-                            <Button variant='outline' size='icon'>
-                                <Filter className='h-4 w-4' />
-                            </Button>
+                            <Select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+                                {categories.map(cat => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                            </Select>
                         </div>
                     </div>
                 </CardHeader>
@@ -74,111 +112,58 @@ export function InventoryManagement({ readOnly = false }) {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {products.map((product) => (
-                                    <TableRow key={product.id}>
-                                        <TableCell className='font-medium'>{product.name}</TableCell>
-                                        <TableCell>{product.category}</TableCell>
-                                        <TableCell>{product.stock}</TableCell>
-                                        <TableCell>{product.price}</TableCell>
-                                        <TableCell>
-                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.status === 'In Stock' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                                } `}>
-                                                {product.status}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell className='text-right'>
-                                            {!readOnly && <Button variant='ghost' size='sm'>Edit</Button>}
+                                {filteredProducts.length > 0 ? (
+                                    filteredProducts.map((product) => (
+                                        <TableRow key={product.id}>
+                                            <TableCell className='font-medium'>{product.name}</TableCell>
+                                            <TableCell>{product.category}</TableCell>
+                                            <TableCell>{product.stock}</TableCell>
+                                            <TableCell>{product.price}</TableCell>
+                                            <TableCell>
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.status === 'In Stock' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                                    } `}>
+                                                    {product.status}
+                                                </span>
+                                            </TableCell>
+                                            <TableCell className='text-right'>
+                                                {!readOnly && (
+                                                    <Button
+                                                        variant='ghost'
+                                                        size='sm'
+                                                        onClick={() => openEditModal(product)}
+                                                    >
+                                                        Edit
+                                                    </Button>
+                                                )}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={6} className='text-center py-8 text-muted-foreground'>
+                                            No products found matching "{searchTerm}"
                                         </TableCell>
                                     </TableRow>
-                                ))}
+                                )}
                             </TableBody>
                         </Table>
                     </div>
                 </CardContent>
             </Card>
 
-            {/* Add Product Modal */}
-            {isModalOpen && (
-                <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
-                    <Card className='w-full max-w-md relative'>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="absolute right-2 top-2"
-                            onClick={() => setIsModalOpen(false)}
-                        >
-                            <X className="h-4 w-4" />
-                        </Button>
-                        <CardHeader>
-                            <CardTitle>Add New Product</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <form onSubmit={handleAddProduct} className='space-y-4'>
-                                <div className='space-y-2'>
-                                    <label className='text-sm font-medium'>Product Name</label>
-                                    <Input
-                                        placeholder='e.g., Ibuprofen 200mg'
-                                        value={newProduct.name}
-                                        onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                <div className='space-y-2'>
-                                    <label className='text-sm font-medium'>Category</label>
-                                    <Select
-                                        value={newProduct.category}
-                                        onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
-                                    >
-                                        <option value='Pain Relief'>Pain Relief</option>
-                                        <option value='Antibiotics'>Antibiotics</option>
-                                        <option value='Supplements'>Supplements</option>
-                                        <option value='Cardiovascular'>Cardiovascular</option>
-                                    </Select>
-                                </div>
-                                <div className='grid grid-cols-2 gap-4'>
-                                    <div className='space-y-2'>
-                                        <label className='text-sm font-medium'>Stock Level</label>
-                                        <Input
-                                            type='number'
-                                            placeholder='0'
-                                            value={newProduct.stock}
-                                            onChange={(e) => setNewProduct({ ...newProduct, stock: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div className='space-y-2'>
-                                        <label className='text-sm font-medium'>Price (ETB)</label>
-                                        <Input
-                                            type='number'
-                                            placeholder='0.00'
-                                            value={newProduct.price}
-                                            onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                                <div className='space-y-2'>
-                                    <label className='text-sm font-medium'>Status</label>
-                                    <Select
-                                        value={newProduct.status}
-                                        onChange={(e) => setNewProduct({ ...newProduct, status: e.target.value })}
-                                    >
-                                        <option value='In Stock'>In Stock</option>
-                                        <option value='Low Stock'>Low Stock</option>
-                                        <option value='Out of Stock'>Out of Stock</option>
-                                    </Select>
-                                </div>
-                                <div className='flex justify-end gap-2 pt-4'>
-                                    <Button type='button' variant='outline' onClick={() => setIsModalOpen(false)}>
-                                        Cancel
-                                    </Button>
-                                    <Button type='submit'>Add Product</Button>
-                                </div>
-                            </form>
-                        </CardContent>
-                    </Card>
-                </div>
-            )}
+            {/* Add/Edit Product Modal */}
+            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DialogContent className="p-0 bg-transparent border-none shadow-none w-full max-w-lg">
+                    <ProductForm
+                        initialData={editingProduct}
+                        onSubmit={editingProduct ? handleEditProduct : handleAddProduct}
+                        onCancel={() => {
+                            setIsModalOpen(false);
+                            setEditingProduct(null);
+                        }}
+                    />
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

@@ -13,8 +13,11 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
+  Dialog,
+  DialogContent,
 } from '@/components/ui/ui';
-import { Plus, Search, MapPin, Phone, Edit, Trash2, X } from 'lucide-react';
+import { Plus, Search, MapPin, Phone, Edit, Trash2 } from 'lucide-react';
+import { BranchForm } from './components/BranchForm';
 
 export function BranchManagement() {
   const [branches, setBranches] = useState([
@@ -155,64 +158,23 @@ export function BranchManagement() {
       </Card>
 
       {/* Add/Edit Branch Modal */}
-      {isModalOpen && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
-          <Card className='w-full max-w-md relative'>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-2 top-2"
-              onClick={() => setIsModalOpen(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-            <CardHeader>
-              <CardTitle>{editingBranch ? 'Edit Branch' : 'Add New Branch'}</CardTitle>
-              <CardDescription>Enter the details for the pharmacy branch.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className='space-y-4'>
-                <div className='space-y-2'>
-                  <label className='text-sm font-medium'>Branch Name</label>
-                  <Input
-                    name='name'
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder='e.g. Westside Branch'
-                    required
-                  />
-                </div>
-                <div className='space-y-2'>
-                  <label className='text-sm font-medium'>Address</label>
-                  <Input
-                    name='address'
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    placeholder='Full Address'
-                    required
-                  />
-                </div>
-                <div className='space-y-2'>
-                  <label className='text-sm font-medium'>Contact Number</label>
-                  <Input
-                    name='contact'
-                    value={formData.contact}
-                    onChange={handleInputChange}
-                    placeholder='Phone Number'
-                    required
-                  />
-                </div>
-                <div className='flex justify-end gap-2 pt-4'>
-                  <Button type='button' variant='outline' onClick={() => setIsModalOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button type='submit'>{editingBranch ? 'Save Changes' : 'Create Branch'}</Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="p-0 bg-transparent border-none shadow-none w-full max-w-lg">
+          <BranchForm
+            initialData={editingBranch}
+            onSubmit={(data) => {
+              if (editingBranch) {
+                setBranches(branches.map(b => b.id === editingBranch.id ? { ...data, id: b.id } : b));
+              } else {
+                const newBranch = { ...data, id: branches.length + 1 };
+                setBranches([...branches, newBranch]);
+              }
+              setIsModalOpen(false);
+            }}
+            onCancel={() => setIsModalOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

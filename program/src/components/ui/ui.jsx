@@ -4,80 +4,27 @@ import { cn } from '@/lib/utils';
 // Re-export components from separate files
 export { Button } from './button';
 export { Input } from './input';
+export { Label } from './label';
+export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+} from './dialog';
+export { Avatar, AvatarFallback, AvatarImage } from './avatar';
+export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
+export { Select } from './select';
 
-export const Label = React.forwardRef(({ className, ...props }, ref) => {
-  return (
-    <label
-      className={cn(
-        'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
-        className
-      )}
-      ref={ref}
-      {...props}
-    />
-  );
-});
-Label.displayName = 'Label';
-
-export const Card = React.forwardRef(({ className, ...props }, ref) => {
-  return (
-    <div
-      ref={ref}
-      className={cn('rounded-lg border bg-card text-card-foreground shadow-sm', className)}
-      {...props}
-    />
-  );
-});
-Card.displayName = 'Card';
-
-export const CardHeader = React.forwardRef(({ className, ...props }, ref) => {
-  return <div ref={ref} className={cn('flex flex-col space-y-1.5 p-6', className)} {...props} />;
-});
-CardHeader.displayName = 'CardHeader';
-
-export const CardTitle = React.forwardRef(({ className, children, ...props }, ref) => {
-  return (
-    <h3
-      ref={ref}
-      className={cn('text-2xl font-semibold leading-none tracking-tight', className)}
-      {...props}
-    >
-      {children}
-    </h3>
-  );
-});
-CardTitle.displayName = 'CardTitle';
-
-export const CardDescription = React.forwardRef(({ className, ...props }, ref) => {
-  return <p ref={ref} className={cn('text-sm text-muted-foreground', className)} {...props} />;
-});
-CardDescription.displayName = 'CardDescription';
-
-export const CardContent = React.forwardRef(({ className, ...props }, ref) => {
-  return <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />;
-});
-CardContent.displayName = 'CardContent';
-
-export const CardFooter = React.forwardRef(({ className, ...props }, ref) => {
-  return <div ref={ref} className={cn('flex items-center p-6 pt-0', className)} {...props} />;
-});
-CardFooter.displayName = 'CardFooter';
-
-export const Select = React.forwardRef(({ className, children, ...props }, ref) => {
-  return (
-    <select
-      className={cn(
-        'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-        className
-      )}
-      ref={ref}
-      {...props}
-    >
-      {children}
-    </select>
-  );
-});
-Select.displayName = 'Select';
+export { ScrollArea, ScrollBar } from './scroll-area';
+export { Separator } from './separator';
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './card';
+export { Badge, badgeVariants } from './badge';
 
 export const Alert = ({ type = 'default', className, ...props }) => {
   const typeClasses = {
@@ -175,25 +122,3 @@ export const TableCell = React.forwardRef(({ className, ...props }, ref) => {
 });
 TableCell.displayName = 'TableCell';
 
-export const Badge = React.forwardRef(({ className, variant = 'default', ...props }, ref) => {
-  const variants = {
-    default: 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80',
-    secondary: 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
-    destructive:
-      'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
-    outline: 'text-foreground',
-  };
-
-  return (
-    <div
-      ref={ref}
-      className={cn(
-        'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-        variants[variant],
-        className
-      )}
-      {...props}
-    />
-  );
-});
-Badge.displayName = 'Badge';

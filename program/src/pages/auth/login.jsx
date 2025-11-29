@@ -45,6 +45,16 @@ export function LoginPage() {
       localStorage.setItem('accessToken', 'test-token-' + Date.now());
       localStorage.setItem('userRole', role);
 
+      // Simulate first-time login detection
+      // In production, this flag would come from the API response
+      const isFirstTimeLogin = email.includes('new') || email.includes('first');
+
+      if (isFirstTimeLogin) {
+        localStorage.setItem('requiresPasswordChange', 'true');
+        navigate('/auth/change-password');
+        return;
+      }
+
       // Redirect based on role
       if (role === 'admin') navigate('/admin/overview');
       else if (role === 'manager') navigate('/manager/overview');
@@ -56,6 +66,14 @@ export function LoginPage() {
       // const response = await login(email, password);
       // if (response.success) {
       //     const role = response.role || 'manager';
+      //     const requiresPasswordChange = response.requiresPasswordChange || false;
+      //     
+      //     if (requiresPasswordChange) {
+      //         localStorage.setItem('requiresPasswordChange', 'true');
+      //         navigate('/auth/change-password');
+      //         return;
+      //     }
+      //     
       //     if (role === 'admin') navigate('/admin/overview');
       //     else if (role === 'manager') navigate('/manager/overview');
       //     else if (role === 'pharmacist') navigate('/pharmacist/overview');

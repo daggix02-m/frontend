@@ -15,8 +15,12 @@ import {
   CardTitle,
   CardDescription,
   Badge,
+  Dialog,
+  DialogContent,
 } from '@/components/ui/ui';
-import { Plus, Search, Edit, Trash2, X } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Clock, Activity } from 'lucide-react';
+import { StaffForm } from './components/StaffForm';
+import { ActivityLogDialog } from './components/ActivityLogDialog';
 
 export function StaffManagement() {
   const [staff, setStaff] = useState([
@@ -27,6 +31,8 @@ export function StaffManagement() {
       role: 'Pharmacist',
       branch: 'Main Branch',
       status: 'Active',
+      isOnline: true,
+      lastActive: new Date().toISOString(),
     },
     {
       id: 2,
@@ -35,6 +41,8 @@ export function StaffManagement() {
       role: 'Cashier',
       branch: 'Downtown Branch',
       status: 'Active',
+      isOnline: false,
+      lastActive: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
     },
     {
       id: 3,
@@ -43,12 +51,16 @@ export function StaffManagement() {
       role: 'Pharmacist',
       branch: 'Westside Branch',
       status: 'On Leave',
+      isOnline: false,
+      lastActive: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
     },
   ]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedStaffForLog, setSelectedStaffForLog] = useState(null);
+  const [isActivityLogOpen, setIsActivityLogOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -81,6 +93,11 @@ export function StaffManagement() {
     setIsModalOpen(true);
   };
 
+  const openActivityLog = (member) => {
+    setSelectedStaffForLog(member);
+    setIsActivityLogOpen(true);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (editingStaff) {
@@ -105,6 +122,20 @@ export function StaffManagement() {
     member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     member.branch.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const getTimeAgo = (timestamp) => {
+    const now = new Date();
+    const then = new Date(timestamp);
+    const diffMs = now - then;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${diffDays}d ago`;
+  };
 
   return (
     <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
@@ -142,6 +173,8 @@ export function StaffManagement() {
                   <TableHead>Role</TableHead>
                   <TableHead>Branch</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Online Status</TableHead>
+                  <TableHead>Last Active</TableHead>
                   <TableHead className='text-right'>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -168,8 +201,30 @@ export function StaffManagement() {
                           {member.status}
                         </Badge>
                       </TableCell>
+                      <TableCell>
+                        <div className='flex items-center gap-2'>
+                          <div className={`h-2 w-2 rounded-full ${member.isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
+                          <span className='text-sm'>
+                            {member.isOnline ? 'Online' : 'Offline'}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className='text-sm text-muted-foreground'>
+                        <div className='flex items-center gap-1'>
+                          <Clock className='h-3 w-3' />
+                          {getTimeAgo(member.lastActive)}
+                        </div>
+                      </TableCell>
                       <TableCell className='text-right'>
                         <div className='flex justify-end gap-2'>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => openActivityLog(member)}
+                            title='View Activity Log'
+                          >
+                            <Activity className='h-4 w-4' />
+                          </Button>
                           <Button variant='ghost' size='sm' onClick={() => openEditModal(member)}>
                             <Edit className='h-4 w-4' />
                           </Button>
@@ -182,7 +237,7 @@ export function StaffManagement() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className='text-center py-8 text-muted-foreground'>
+                    <TableCell colSpan={7} className='text-center py-8 text-muted-foreground'>
                       No staff members found.
                     </TableCell>
                   </TableRow>
@@ -194,92 +249,35 @@ export function StaffManagement() {
       </Card>
 
       {/* Add/Edit Staff Modal */}
-      {isModalOpen && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
-          <Card className='w-full max-w-md relative'>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-2 top-2"
-              onClick={() => setIsModalOpen(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-            <CardHeader>
-              <CardTitle>{editingStaff ? 'Edit Staff Member' : 'Add New Staff Member'}</CardTitle>
-              <CardDescription>Enter the details for the employee.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className='space-y-4'>
-                <div className='space-y-2'>
-                  <label className='text-sm font-medium'>Full Name</label>
-                  <Input
-                    name='name'
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder='e.g. Abebe Kebede'
-                    required
-                  />
-                </div>
-                <div className='space-y-2'>
-                  <label className='text-sm font-medium'>Email Address</label>
-                  <Input
-                    name='email'
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder='name@example.com'
-                    type='email'
-                    required
-                  />
-                </div>
-                <div className='space-y-2'>
-                  <label className='text-sm font-medium'>Role</label>
-                  <Select
-                    name='role'
-                    value={formData.role}
-                    onChange={handleInputChange}
-                  >
-                    <option value='Pharmacist'>Pharmacist</option>
-                    <option value='Cashier'>Cashier</option>
-                  </Select>
-                </div>
-                <div className='space-y-2'>
-                  <label className='text-sm font-medium'>Assign Branch</label>
-                  <Select
-                    name='branch'
-                    value={formData.branch}
-                    onChange={handleInputChange}
-                  >
-                    <option value='Main Branch'>Main Branch</option>
-                    <option value='Downtown Branch'>Downtown Branch</option>
-                    <option value='Westside Branch'>Westside Branch</option>
-                  </Select>
-                </div>
-                {editingStaff && (
-                  <div className='space-y-2'>
-                    <label className='text-sm font-medium'>Status</label>
-                    <Select
-                      name='status'
-                      value={formData.status}
-                      onChange={handleInputChange}
-                    >
-                      <option value='Active'>Active</option>
-                      <option value='On Leave'>On Leave</option>
-                      <option value='Inactive'>Inactive</option>
-                    </Select>
-                  </div>
-                )}
-                <div className='flex justify-end gap-2 pt-4'>
-                  <Button type='button' variant='outline' onClick={() => setIsModalOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button type='submit'>{editingStaff ? 'Save Changes' : 'Create Account'}</Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="p-0 bg-transparent border-none shadow-none w-full max-w-lg">
+          <StaffForm
+            initialData={editingStaff}
+            onSubmit={(data) => {
+              if (editingStaff) {
+                setStaff(staff.map(s => s.id === editingStaff.id ? { ...data, id: s.id, isOnline: s.isOnline, lastActive: s.lastActive } : s));
+              } else {
+                const newStaff = {
+                  ...data,
+                  id: staff.length + 1,
+                  isOnline: false,
+                  lastActive: new Date().toISOString()
+                };
+                setStaff([...staff, newStaff]);
+              }
+              setIsModalOpen(false);
+            }}
+            onCancel={() => setIsModalOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Activity Log Modal */}
+      <ActivityLogDialog
+        isOpen={isActivityLogOpen}
+        onClose={() => setIsActivityLogOpen(false)}
+        staffMember={selectedStaffForLog}
+      />
     </div>
   );
 }

@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Button } from '@/components/ui/ui';
+import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Button, Dialog, DialogContent } from '@/components/ui/ui';
 import { Package, CheckCircle, XCircle, Clock, TrendingUp } from 'lucide-react';
+import { toast } from 'sonner';
 
 export function StockTransferApproval() {
-    const [transfers] = useState([
+    const [transfers, setTransfers] = useState([
         { id: 'ST-001', from: 'Main Branch', to: 'Downtown Branch', product: 'Paracetamol 500mg', quantity: 500, requestedBy: 'Alemayehu Desta', status: 'pending', date: '2025-11-28' },
         { id: 'ST-002', from: 'Downtown Branch', to: 'Westside Branch', product: 'Amoxicillin 250mg', quantity: 200, requestedBy: 'Selamawit Mekonnen', status: 'pending', date: '2025-11-27' },
         { id: 'ST-003', from: 'Main Branch', to: 'Eastside Branch', product: 'Ibuprofen 400mg', quantity: 300, requestedBy: 'Berhanu Wolde', status: 'approved', date: '2025-11-26' },
         { id: 'ST-004', from: 'Westside Branch', to: 'Main Branch', product: 'Aspirin 100mg', quantity: 150, requestedBy: 'Tigist Alemayehu', status: 'rejected', date: '2025-11-25' },
     ]);
+
+    const [selectedTransfer, setSelectedTransfer] = useState(null);
+    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
     const getStatusBadge = (status) => {
         const variants = {
@@ -31,18 +35,33 @@ export function StockTransferApproval() {
     };
 
     const stats = [
-        { title: 'Pending Approvals', value: '8', icon: Clock, color: 'text-orange-600' },
-        { title: 'Approved Today', value: '12', icon: CheckCircle, color: 'text-green-600' },
-        { title: 'Rejected', value: '2', icon: XCircle, color: 'text-red-600' },
-        { title: 'Total This Month', value: '145', icon: TrendingUp, color: 'text-blue-600' },
+        { title: 'Pending Approvals', value: transfers.filter(t => t.status === 'pending').length, icon: Clock, color: 'text-orange-600' },
+        { title: 'Approved Today', value: transfers.filter(t => t.status === 'approved').length, icon: CheckCircle, color: 'text-green-600' },
+        { title: 'Rejected', value: transfers.filter(t => t.status === 'rejected').length, icon: XCircle, color: 'text-red-600' },
+        { title: 'Total This Month', value: transfers.length, icon: TrendingUp, color: 'text-blue-600' },
     ];
 
     const handleApprove = (id) => {
-        // Backend integration needed
+        if (window.confirm('Are you sure you want to approve this transfer?')) {
+            setTransfers(transfers.map(t =>
+                t.id === id ? { ...t, status: 'approved' } : t
+            ));
+            toast.success('Transfer approved successfully!');
+        }
     };
 
     const handleReject = (id) => {
-        // Backend integration needed
+        if (window.confirm('Are you sure you want to reject this transfer?')) {
+            setTransfers(transfers.map(t =>
+                t.id === id ? { ...t, status: 'rejected' } : t
+            ));
+            toast.error('Transfer rejected');
+        }
+    };
+
+    const handleViewDetails = (transfer) => {
+        setSelectedTransfer(transfer);
+        setIsDetailsOpen(true);
     };
 
     return (
@@ -102,15 +121,15 @@ export function StockTransferApproval() {
                                         <TableCell>
                                             {transfer.status === 'pending' ? (
                                                 <div className='flex gap-2'>
-                                                    <Button size='sm' variant='outline' onClick={() => handleApprove(transfer.id)}>
+                                                    <Button size='sm' variant='outline' className='text-green-600 hover:text-green-700 hover:bg-green-50' onClick={() => handleApprove(transfer.id)}>
                                                         Approve
                                                     </Button>
-                                                    <Button size='sm' variant='outline' onClick={() => handleReject(transfer.id)}>
+                                                    <Button size='sm' variant='outline' className='text-red-600 hover:text-red-700 hover:bg-red-50' onClick={() => handleReject(transfer.id)}>
                                                         Reject
                                                     </Button>
                                                 </div>
                                             ) : (
-                                                <Button size='sm' variant='outline'>
+                                                <Button size='sm' variant='outline' onClick={() => handleViewDetails(transfer)}>
                                                     View Details
                                                 </Button>
                                             )}
@@ -148,6 +167,55 @@ export function StockTransferApproval() {
                     </div>
                 </CardContent>
             </Card>
+
+            {/* Details Dialog */}
+            <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+                <DialogContent className="max-w-2xl">
+                    {selectedTransfer && (
+                        <div className="space-y-4">
+                            <div>
+                                <h2 className="text-2xl font-bold">Transfer Details</h2>
+                                <p className="text-sm text-muted-foreground">Transfer ID: {selectedTransfer.id}</p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">From Branch</p>
+                                    <p className="text-lg font-semibold">{selectedTransfer.from}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">To Branch</p>
+                                    <p className="text-lg font-semibold">{selectedTransfer.to}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">Product</p>
+                                    <p className="text-lg font-semibold">{selectedTransfer.product}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">Quantity</p>
+                                    <p className="text-lg font-semibold">{selectedTransfer.quantity} units</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">Requested By</p>
+                                    <p className="text-lg font-semibold">{selectedTransfer.requestedBy}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">Request Date</p>
+                                    <p className="text-lg font-semibold">{selectedTransfer.date}</p>
+                                </div>
+                                <div className="col-span-2">
+                                    <p className="text-sm font-medium text-muted-foreground">Status</p>
+                                    <div className="mt-1">{getStatusBadge(selectedTransfer.status)}</div>
+                                </div>
+                            </div>
+
+                            <div className="pt-4 border-t">
+                                <Button onClick={() => setIsDetailsOpen(false)}>Close</Button>
+                            </div>
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
