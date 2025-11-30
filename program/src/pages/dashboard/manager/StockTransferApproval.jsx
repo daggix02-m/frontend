@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Button, Dialog, DialogContent } from '@/components/ui/ui';
-import { Package, CheckCircle, XCircle, Clock, TrendingUp } from 'lucide-react';
+import { Package, CheckCircle, XCircle, Clock, TrendingUp, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function StockTransferApproval() {
@@ -65,10 +65,10 @@ export function StockTransferApproval() {
     };
 
     return (
-        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
+        <div className='space-y-4 sm:space-y-6'>
             <div>
-                <h1 className='text-3xl font-bold tracking-tight'>Stock Transfer Approval</h1>
-                <p className='text-muted-foreground mt-2'>Review and approve stock transfers between branches</p>
+                <h1 className='text-2xl sm:text-3xl font-bold tracking-tight'>Stock Transfer Approval</h1>
+                <p className='text-sm text-muted-foreground mt-1'>Review and approve stock transfers between branches</p>
             </div>
 
             {/* Stats Grid */}
@@ -86,13 +86,91 @@ export function StockTransferApproval() {
                 ))}
             </div>
 
-            {/* Transfer Requests Table */}
+            {/* Transfer Requests */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Transfer Requests</CardTitle>
+                    <CardTitle className="text-lg sm:text-xl">Transfer Requests</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <div className='overflow-x-auto'>
+                <CardContent className="p-0">
+                    {/* Mobile Card View */}
+                    <div className='lg:hidden space-y-3 p-4'>
+                        {transfers.map((transfer) => (
+                            <Card key={transfer.id} className="overflow-hidden">
+                                <CardContent className="p-4">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <span className="font-semibold text-sm">{transfer.id}</span>
+                                        {getStatusBadge(transfer.status)}
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <p className="text-xs text-muted-foreground mb-1">Transfer Route</p>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm font-medium">{transfer.from}</span>
+                                            <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+                                            <span className="text-sm font-medium">{transfer.to}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3 mb-3">
+                                        <div>
+                                            <p className="text-xs text-muted-foreground mb-1">Product</p>
+                                            <p className="text-sm font-medium">{transfer.product}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-muted-foreground mb-1">Quantity</p>
+                                            <p className="text-sm font-medium">{transfer.quantity} units</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3 mb-3">
+                                        <div>
+                                            <p className="text-xs text-muted-foreground mb-1">Requested By</p>
+                                            <p className="text-sm">{transfer.requestedBy}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-muted-foreground mb-1">Date</p>
+                                            <p className="text-sm">{transfer.date}</p>
+                                        </div>
+                                    </div>
+
+                                    {transfer.status === 'pending' ? (
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="flex-1 text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                onClick={() => handleApprove(transfer.id)}
+                                            >
+                                                <CheckCircle className="h-4 w-4 mr-2" />
+                                                Approve
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                onClick={() => handleReject(transfer.id)}
+                                            >
+                                                <XCircle className="h-4 w-4 mr-2" />
+                                                Reject
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="w-full"
+                                            onClick={() => handleViewDetails(transfer)}
+                                        >
+                                            View Details
+                                        </Button>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+
+                    {/* Desktop Table View */}
+                    <div className='hidden lg:block overflow-x-auto'>
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -145,7 +223,7 @@ export function StockTransferApproval() {
             {/* Recent Transfer History */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Recent Transfer History</CardTitle>
+                    <CardTitle className="text-lg sm:text-xl">Recent Transfer History</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className='space-y-3'>
@@ -154,7 +232,7 @@ export function StockTransferApproval() {
                             { product: 'Amoxicillin 250mg', from: 'Downtown', to: 'Westside', qty: 200, status: 'in-transit' },
                             { product: 'Ibuprofen 400mg', from: 'Main', to: 'Eastside', qty: 300, status: 'completed' },
                         ].map((item, index) => (
-                            <div key={index} className='flex items-center justify-between border-b pb-2 last:border-0'>
+                            <div key={index} className='flex flex-col sm:flex-row sm:items-center justify-between border-b pb-2 last:border-0 gap-2'>
                                 <div>
                                     <p className='font-medium'>{item.product}</p>
                                     <p className='text-sm text-muted-foreground'>

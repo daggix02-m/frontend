@@ -16,7 +16,7 @@ import {
   Dialog,
   DialogContent,
 } from '@/components/ui/ui';
-import { Plus, Search, MapPin, Phone, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, MapPin, Phone, Edit, Trash2, Building2 } from 'lucide-react';
 import { BranchForm } from './components/BranchForm';
 
 export function BranchManagement() {
@@ -78,83 +78,133 @@ export function BranchManagement() {
   );
 
   return (
-    <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
-      <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
+    <div className='space-y-4 sm:space-y-6'>
+      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4'>
         <div>
-          <h2 className='text-3xl font-bold tracking-tight'>Branch Management</h2>
-          <p className='text-muted-foreground'>Manage your pharmacy branches across Ethiopia.</p>
+          <h2 className='text-2xl sm:text-3xl font-bold tracking-tight'>Branch Management</h2>
+          <p className='text-sm text-muted-foreground mt-1'>Manage your pharmacy branches across Ethiopia.</p>
         </div>
-        <Button onClick={openAddModal}>
+        <Button onClick={openAddModal} className="w-full sm:w-auto">
           <Plus className='mr-2 h-4 w-4' /> Add Branch
         </Button>
       </div>
 
       <Card>
-        <CardHeader>
-          <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
-            <CardTitle>All Branches</CardTitle>
-            <div className='relative w-full md:max-w-md'>
-              <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
-              <Input
-                placeholder='Search branches...'
-                className='pl-8'
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
+        <CardHeader className="space-y-4">
+          <CardTitle className="text-lg sm:text-xl">All Branches</CardTitle>
+          <div className='relative w-full'>
+            <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+            <Input
+              placeholder='Search branches...'
+              className='pl-9'
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
         </CardHeader>
-        <CardContent>
-          <div className='overflow-x-auto -mx-4 sm:-mx-6 md:mx-0'>
-            <div className='min-w-[800px] md:min-w-0 px-4 sm:px-6 md:px-0'>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Branch Name</TableHead>
-                    <TableHead>Address</TableHead>
-                    <TableHead>Contact</TableHead>
-                    <TableHead className='text-right'>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredBranches.length > 0 ? (
-                    filteredBranches.map((branch) => (
-                      <TableRow key={branch.id}>
-                        <TableCell className='font-medium'>{branch.name}</TableCell>
-                        <TableCell>
-                          <div className='flex items-center text-muted-foreground'>
-                            <MapPin className='mr-2 h-3 w-3' />
-                            <span className='whitespace-nowrap'>{branch.address}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className='flex items-center text-muted-foreground'>
-                            <Phone className='mr-2 h-3 w-3' />
-                            <span className='whitespace-nowrap'>{branch.contact}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className='text-right'>
-                          <div className='flex justify-end gap-2'>
-                            <Button variant='ghost' size='sm' onClick={() => openEditModal(branch)}>
-                              <Edit className='h-4 w-4' />
-                            </Button>
-                            <Button variant='ghost' size='sm' className='text-red-600 hover:text-red-700 hover:bg-red-50' onClick={() => handleDelete(branch.id)}>
-                              <Trash2 className='h-4 w-4' />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={4} className='text-center py-8 text-muted-foreground'>
-                        No branches found.
+        <CardContent className="p-0">
+          {/* Mobile Card View */}
+          <div className='md:hidden space-y-3 p-4'>
+            {filteredBranches.length > 0 ? (
+              filteredBranches.map((branch) => (
+                <Card key={branch.id} className="overflow-hidden">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Building2 className="h-4 w-4 text-muted-foreground" />
+                          <h3 className="font-semibold text-base">{branch.name}</h3>
+                        </div>
+                        <div className="flex items-start gap-2 mb-2">
+                          <MapPin className="h-3.5 w-3.5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                          <p className="text-sm text-muted-foreground">{branch.address}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Phone className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">{branch.contact}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className='flex gap-2'>
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        className="flex-1"
+                        onClick={() => openEditModal(branch)}
+                      >
+                        <Edit className='h-4 w-4 mr-2' />
+                        Edit
+                      </Button>
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        className='text-red-600 hover:text-red-700 hover:bg-red-50'
+                        onClick={() => handleDelete(branch.id)}
+                      >
+                        <Trash2 className='h-4 w-4' />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className='text-center py-12 text-muted-foreground'>
+                <Building2 className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <p>No branches found.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className='hidden md:block overflow-x-auto'>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Branch Name</TableHead>
+                  <TableHead>Address</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead className='text-right'>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredBranches.length > 0 ? (
+                  filteredBranches.map((branch) => (
+                    <TableRow key={branch.id}>
+                      <TableCell className='font-medium'>{branch.name}</TableCell>
+                      <TableCell>
+                        <div className='flex items-center text-muted-foreground'>
+                          <MapPin className='mr-2 h-3 w-3' />
+                          <span className='whitespace-nowrap'>{branch.address}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className='flex items-center text-muted-foreground'>
+                          <Phone className='mr-2 h-3 w-3' />
+                          <span className='whitespace-nowrap'>{branch.contact}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className='text-right'>
+                        <div className='flex justify-end gap-2'>
+                          <Button variant='ghost' size='sm' onClick={() => openEditModal(branch)}>
+                            <Edit className='h-4 w-4' />
+                          </Button>
+                          <Button variant='ghost' size='sm' className='text-red-600 hover:text-red-700 hover:bg-red-50' onClick={() => handleDelete(branch.id)}>
+                            <Trash2 className='h-4 w-4' />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className='text-center py-8 text-muted-foreground'>
+                      No branches found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </div>
         </CardContent>
       </Card>

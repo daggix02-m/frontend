@@ -67,10 +67,10 @@ export function RefundsDiscounts() {
     ];
 
     return (
-        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
+        <div className='space-y-4 sm:space-y-6'>
             <div>
-                <h1 className='text-3xl font-bold tracking-tight'>Refunds & Discounts</h1>
-                <p className='text-muted-foreground mt-2'>Configure refund policies and discount rules</p>
+                <h1 className='text-2xl sm:text-3xl font-bold tracking-tight'>Refunds & Discounts</h1>
+                <p className='text-sm text-muted-foreground mt-1'>Configure refund policies and discount rules</p>
             </div>
 
             {/* Stats Grid */}
@@ -188,26 +188,26 @@ export function RefundsDiscounts() {
             {/* Active Discount Rules */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Active Discount Rules</CardTitle>
+                    <CardTitle className="text-lg sm:text-xl">Active Discount Rules</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className='space-y-3'>
                         {discountRules.map((rule) => (
-                            <div key={rule.id} className='flex items-center justify-between border-b pb-3 last:border-0'>
-                                <div>
+                            <div key={rule.id} className='flex flex-col sm:flex-row sm:items-center justify-between border-b pb-3 last:border-0 gap-3'>
+                                <div className="flex-1">
                                     <p className='font-medium'>{rule.name}</p>
                                     <p className='text-sm text-muted-foreground'>
                                         {rule.type === 'percentage' ? `${rule.value}% off` : `ETB ${rule.value} off`}
                                     </p>
                                 </div>
-                                <div className='flex items-center gap-2'>
+                                <div className='flex items-center gap-2 sm:flex-shrink-0'>
                                     <span className={`text-sm ${rule.active ? 'text-green-600' : 'text-gray-400'}`}>
                                         {rule.active ? 'Active' : 'Inactive'}
                                     </span>
-                                    <Button size='sm' variant='outline' onClick={() => handleEditDiscount(rule)}>
+                                    <Button size='sm' variant='outline' className="flex-1 sm:flex-none" onClick={() => handleEditDiscount(rule)}>
                                         Edit
                                     </Button>
-                                    <Button size='sm' variant='outline' onClick={() => handleToggleDiscount(rule.id)}>
+                                    <Button size='sm' variant='outline' className="flex-1 sm:flex-none" onClick={() => handleToggleDiscount(rule.id)}>
                                         {rule.active ? 'Deactivate' : 'Activate'}
                                     </Button>
                                 </div>
@@ -220,7 +220,7 @@ export function RefundsDiscounts() {
             {/* Approval Thresholds */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Approval Thresholds</CardTitle>
+                    <CardTitle className="text-lg sm:text-xl">Approval Thresholds</CardTitle>
                     <CardDescription>Set limits for automatic approval</CardDescription>
                 </CardHeader>
                 <CardContent className='space-y-4'>
