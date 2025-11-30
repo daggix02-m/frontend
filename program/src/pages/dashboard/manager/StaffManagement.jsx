@@ -18,7 +18,7 @@ import {
   Dialog,
   DialogContent,
 } from '@/components/ui/ui';
-import { Plus, Search, Edit, Trash2, Clock, Activity } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Clock, Activity, User, Mail, MapPin } from 'lucide-react';
 import { StaffForm } from './components/StaffForm';
 import { ActivityLogDialog } from './components/ActivityLogDialog';
 
@@ -138,43 +138,122 @@ export function StaffManagement() {
   };
 
   return (
-    <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
-      <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
+    <div className='space-y-4 sm:space-y-6'>
+      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4'>
         <div>
-          <h2 className='text-3xl font-bold tracking-tight'>Staff Management</h2>
-          <p className='text-muted-foreground'>Manage your pharmacists and cashiers.</p>
+          <h2 className='text-2xl sm:text-3xl font-bold tracking-tight'>Staff Management</h2>
+          <p className='text-sm text-muted-foreground mt-1'>Manage your pharmacists and cashiers.</p>
         </div>
-        <Button onClick={openAddModal}>
+        <Button onClick={openAddModal} className="w-full sm:w-auto">
           <Plus className='mr-2 h-4 w-4' /> Add Staff
         </Button>
       </div>
 
       <Card className="overflow-hidden">
-        <CardHeader>
-          <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
-            <CardTitle>All Staff Members</CardTitle>
-            <div className='relative w-full md:max-w-md'>
-              <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
-              <Input
-                placeholder='Search staff...'
-                className='pl-8'
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
+        <CardHeader className="space-y-4">
+          <CardTitle className="text-lg sm:text-xl">All Staff Members</CardTitle>
+          <div className='relative w-full'>
+            <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+            <Input
+              placeholder='Search staff...'
+              className='pl-9'
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <div className='overflow-x-auto'>
+          {/* Mobile Card View */}
+          <div className='lg:hidden space-y-3 p-4'>
+            {filteredStaff.length > 0 ? (
+              filteredStaff.map((member) => (
+                <Card key={member.id} className="overflow-hidden">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <User className="h-4 w-4 text-muted-foreground" />
+                          <h3 className="font-semibold text-base">{member.name}</h3>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
+                          <Mail className="h-3.5 w-3.5" />
+                          <span>{member.email}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                          <MapPin className="h-3.5 w-3.5" />
+                          <span>{member.branch}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className={`h-2 w-2 rounded-full ${member.isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 mb-3">
+                      <Badge variant={member.role === 'Pharmacist' ? 'default' : 'secondary'}>
+                        {member.role}
+                      </Badge>
+                      <Badge variant='outline' className={
+                        member.status === 'Active' ? 'text-green-600 border-green-600' : 'text-yellow-600 border-yellow-600'
+                      }>
+                        {member.status}
+                      </Badge>
+                      <div className='flex items-center gap-1 text-xs text-muted-foreground ml-auto'>
+                        <Clock className='h-3 w-3' />
+                        {getTimeAgo(member.lastActive)}
+                      </div>
+                    </div>
+
+                    <div className='flex gap-2'>
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        className="flex-1"
+                        onClick={() => openActivityLog(member)}
+                      >
+                        <Activity className='h-4 w-4 mr-2' />
+                        Activity
+                      </Button>
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        className="flex-1"
+                        onClick={() => openEditModal(member)}
+                      >
+                        <Edit className='h-4 w-4 mr-2' />
+                        Edit
+                      </Button>
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        className='text-red-600 hover:text-red-700 hover:bg-red-50'
+                        onClick={() => handleDelete(member.id)}
+                      >
+                        <Trash2 className='h-4 w-4' />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className='text-center py-12 text-muted-foreground'>
+                <User className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <p>No staff members found.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className='hidden lg:block overflow-x-auto'>
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Role</TableHead>
-                  <TableHead className="hidden md:table-cell">Branch</TableHead>
+                  <TableHead>Branch</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="hidden lg:table-cell">Online Status</TableHead>
-                  <TableHead className="hidden xl:table-cell">Last Active</TableHead>
+                  <TableHead>Online Status</TableHead>
+                  <TableHead>Last Active</TableHead>
                   <TableHead className='text-right'>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -185,7 +264,7 @@ export function StaffManagement() {
                       <TableCell>
                         <div className='flex flex-col'>
                           <span className='font-medium'>{member.name}</span>
-                          <span className='text-xs text-muted-foreground hidden sm:inline'>{member.email}</span>
+                          <span className='text-xs text-muted-foreground'>{member.email}</span>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -193,7 +272,7 @@ export function StaffManagement() {
                           {member.role}
                         </Badge>
                       </TableCell>
-                      <TableCell className='whitespace-nowrap hidden md:table-cell'>{member.branch}</TableCell>
+                      <TableCell className='whitespace-nowrap'>{member.branch}</TableCell>
                       <TableCell>
                         <Badge variant='outline' className={
                           member.status === 'Active' ? 'text-green-600 border-green-600' : 'text-yellow-600 border-yellow-600'
@@ -201,7 +280,7 @@ export function StaffManagement() {
                           {member.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="hidden lg:table-cell">
+                      <TableCell>
                         <div className='flex items-center gap-2'>
                           <div className={`h-2 w-2 rounded-full ${member.isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
                           <span className='text-sm'>
@@ -209,7 +288,7 @@ export function StaffManagement() {
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell className='text-sm text-muted-foreground hidden xl:table-cell'>
+                      <TableCell className='text-sm text-muted-foreground'>
                         <div className='flex items-center gap-1'>
                           <Clock className='h-3 w-3' />
                           {getTimeAgo(member.lastActive)}

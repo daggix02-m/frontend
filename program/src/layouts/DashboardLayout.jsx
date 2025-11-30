@@ -36,16 +36,23 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar"
 
-export function DashboardLayout({ role = 'manager' }) {
-  // Default to manager for now, but should be passed or retrieved
+// Inner component that has access to sidebar context
+function DashboardContent({ role }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { setOpenMobile } = useSidebar();
 
   const handleLogout = async () => {
     await logout();
     navigate('/auth/login');
+  };
+
+  // Handler to close mobile sidebar on navigation
+  const handleNavClick = () => {
+    setOpenMobile(false);
   };
 
   // Define navigation items for each role
@@ -96,7 +103,7 @@ export function DashboardLayout({ role = 'manager' }) {
   const navItems = roleNavItems[role] || roleNavItems.manager;
 
   return (
-    <SidebarProvider>
+    <>
       <Sidebar collapsible="icon">
         <SidebarHeader>
           <div className='flex items-center gap-2'>
@@ -119,7 +126,7 @@ export function DashboardLayout({ role = 'manager' }) {
                         isActive={isActive}
                         tooltip={item.label}
                       >
-                        <Link to={item.path}>
+                        <Link to={item.path} onClick={handleNavClick}>
                           <Icon />
                           <span>{item.label}</span>
                         </Link>
@@ -168,6 +175,15 @@ export function DashboardLayout({ role = 'manager' }) {
           <Outlet />
         </main>
       </SidebarInset>
+    </>
+  );
+}
+
+export function DashboardLayout({ role = 'manager' }) {
+  // Default to manager for now, but should be passed or retrieved
+  return (
+    <SidebarProvider>
+      <DashboardContent role={role} />
     </SidebarProvider>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Button, Input, Dialog, DialogContent } from '@/components/ui/ui';
+import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Button, Input, Dialog, DialogContent, Badge } from '@/components/ui/ui';
 import { Select } from '@/components/ui/select';
-import { Plus, Search, Filter } from 'lucide-react';
+import { Plus, Search, Filter, Edit, Package } from 'lucide-react';
 import { ProductForm } from './components/ProductForm';
 
 export function InventoryManagement({ readOnly = false }) {
@@ -63,92 +63,141 @@ export function InventoryManagement({ readOnly = false }) {
     const categories = ['All', ...new Set(products.map(p => p.category))];
 
     return (
-        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
-            <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
+        <div className='space-y-4 sm:space-y-6'>
+            <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4'>
                 <div>
-                    <h2 className='text-3xl font-bold tracking-tight'>Inventory & Products</h2>
-                    <p className='text-muted-foreground'>Manage your product catalog and stock levels.</p>
+                    <h2 className='text-2xl sm:text-3xl font-bold tracking-tight'>Inventory & Products</h2>
+                    <p className='text-sm text-muted-foreground mt-1'>Manage your product catalog and stock levels.</p>
                 </div>
                 {!readOnly && (
-                    <Button onClick={openAddModal}>
+                    <Button onClick={openAddModal} className="w-full sm:w-auto">
                         <Plus className='mr-2 h-4 w-4' /> Add Product
                     </Button>
                 )}
             </div>
 
             <Card>
-                <CardHeader>
-                    <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
-                        <CardTitle>Product Catalog</CardTitle>
-                        <div className='flex flex-col sm:flex-row gap-2 w-full md:w-auto'>
-                            <div className='relative w-full md:w-64'>
-                                <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
-                                <Input
-                                    placeholder='Search products...'
-                                    className='pl-8'
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                            </div>
-                            <Select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className="w-full sm:w-[180px]">
-                                {categories.map(cat => (
-                                    <option key={cat} value={cat}>{cat}</option>
-                                ))}
-                            </Select>
+                <CardHeader className="space-y-4">
+                    <CardTitle className="text-lg sm:text-xl">Product Catalog</CardTitle>
+                    <div className='flex flex-col sm:flex-row gap-3'>
+                        <div className='relative flex-1'>
+                            <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                            <Input
+                                placeholder='Search products...'
+                                className='pl-9'
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
+                        <Select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className="w-full sm:w-[180px]">
+                            {categories.map(cat => (
+                                <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                        </Select>
                     </div>
                 </CardHeader>
-                <CardContent>
-                    <div className='overflow-x-auto -mx-4 sm:-mx-6 md:mx-0'>
-                        <div className='min-w-[800px] md:min-w-0 px-4 sm:px-6 md:px-0'>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Product Name</TableHead>
-                                        <TableHead>Category</TableHead>
-                                        <TableHead>Stock Level</TableHead>
-                                        <TableHead>Price</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className='text-right'>Actions</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {filteredProducts.length > 0 ? (
-                                        filteredProducts.map((product) => (
-                                            <TableRow key={product.id}>
-                                                <TableCell className='font-medium'>{product.name}</TableCell>
-                                                <TableCell>{product.category}</TableCell>
-                                                <TableCell>{product.stock}</TableCell>
-                                                <TableCell>{product.price}</TableCell>
-                                                <TableCell>
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.status === 'In Stock' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                                        } `}>
-                                                        {product.status}
-                                                    </span>
-                                                </TableCell>
-                                                <TableCell className='text-right'>
-                                                    {!readOnly && (
-                                                        <Button
-                                                            variant='ghost'
-                                                            size='sm'
-                                                            onClick={() => openEditModal(product)}
-                                                        >
-                                                            Edit
-                                                        </Button>
-                                                    )}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                    ) : (
-                                        <TableRow>
-                                            <TableCell colSpan={6} className='text-center py-8 text-muted-foreground'>
-                                                No products found matching "{searchTerm}"
+                <CardContent className="p-0">
+                    {/* Mobile Card View */}
+                    <div className='md:hidden space-y-3 p-4'>
+                        {filteredProducts.length > 0 ? (
+                            filteredProducts.map((product) => (
+                                <Card key={product.id} className="overflow-hidden">
+                                    <CardContent className="p-4">
+                                        <div className="flex items-start justify-between mb-3">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <Package className="h-4 w-4 text-muted-foreground" />
+                                                    <h3 className="font-semibold text-base">{product.name}</h3>
+                                                </div>
+                                                <p className="text-sm text-muted-foreground">{product.category}</p>
+                                            </div>
+                                            <Badge className={`${product.status === 'In Stock' ? 'bg-green-100 text-green-800 hover:bg-green-100' : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100'}`}>
+                                                {product.status}
+                                            </Badge>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-3 mb-3">
+                                            <div>
+                                                <p className="text-xs text-muted-foreground mb-1">Stock Level</p>
+                                                <p className="font-medium">{product.stock}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-muted-foreground mb-1">Price</p>
+                                                <p className="font-medium">{product.price}</p>
+                                            </div>
+                                        </div>
+
+                                        {!readOnly && (
+                                            <Button
+                                                variant='outline'
+                                                size='sm'
+                                                className="w-full"
+                                                onClick={() => openEditModal(product)}
+                                            >
+                                                <Edit className="h-4 w-4 mr-2" />
+                                                Edit Product
+                                            </Button>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            ))
+                        ) : (
+                            <div className='text-center py-12 text-muted-foreground'>
+                                <Package className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                                <p>No products found matching "{searchTerm}"</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Desktop Table View */}
+                    <div className='hidden md:block overflow-x-auto'>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Product Name</TableHead>
+                                    <TableHead>Category</TableHead>
+                                    <TableHead>Stock Level</TableHead>
+                                    <TableHead>Price</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead className='text-right'>Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {filteredProducts.length > 0 ? (
+                                    filteredProducts.map((product) => (
+                                        <TableRow key={product.id}>
+                                            <TableCell className='font-medium'>{product.name}</TableCell>
+                                            <TableCell>{product.category}</TableCell>
+                                            <TableCell>{product.stock}</TableCell>
+                                            <TableCell>{product.price}</TableCell>
+                                            <TableCell>
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.status === 'In Stock' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                                    } `}>
+                                                    {product.status}
+                                                </span>
+                                            </TableCell>
+                                            <TableCell className='text-right'>
+                                                {!readOnly && (
+                                                    <Button
+                                                        variant='ghost'
+                                                        size='sm'
+                                                        onClick={() => openEditModal(product)}
+                                                    >
+                                                        Edit
+                                                    </Button>
+                                                )}
                                             </TableCell>
                                         </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </div>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={6} className='text-center py-8 text-muted-foreground'>
+                                            No products found matching "{searchTerm}"
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
                     </div>
                 </CardContent>
             </Card>
