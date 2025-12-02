@@ -74,7 +74,7 @@ export function POSSales({ role = 'cashier' }) {
     const canApplyDiscount = role === 'manager' || discount <= 10; // Cashiers limited to 10%
 
     return (
-        <div className='space-y-6 p-6'>
+        <div className='space-y-6 p-4 md:p-8'>
             <div>
                 <h1 className='text-3xl font-bold tracking-tight'>POS Sales</h1>
                 <p className='text-muted-foreground mt-2'>Process sales transactions and manage checkout</p>
