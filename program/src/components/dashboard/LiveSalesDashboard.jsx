@@ -18,7 +18,7 @@ const formatCurrency = (amount) => {
 };
 
 const MetricCard = ({ title, value, unit = '', icon, description, valueClassName }) => (
-    <Card className="flex-1 min-w-[250px]">
+    <Card className="flex-1">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{title}</CardTitle>
             {icon}
@@ -78,7 +78,7 @@ const RealtimeChart = React.memo(({ data, title, dataKey, lineColor, tooltipForm
     };
 
     return (
-        <Card className="flex-1 min-w-[300px] max-w-full lg:max-w-[calc(50%-16px)]">
+        <Card className="w-full lg:w-[calc(50%-12px)]">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <BarChart className="h-5 w-5 text-blue-600" />{title}
@@ -90,7 +90,7 @@ const RealtimeChart = React.memo(({ data, title, dataKey, lineColor, tooltipForm
                         <LineChart
                             key={chartKey}
                             data={chartData}
-                            margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                            margin={{ top: 20, right: 10, left: 0, bottom: 20 }}
                         >
                             <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} strokeOpacity={0.5} />
                             <XAxis
@@ -200,7 +200,7 @@ export const LiveSalesDashboard = () => {
                     description="Average value per transaction"
                     valueClassName="text-blue-400"
                 />
-                <Card className="flex-1 min-w-[250px]">
+                <Card className="flex-1">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Activity Status</CardTitle>
                         <Clock className="h-4 w-4 text-muted-foreground animate-pulse" />
@@ -219,7 +219,7 @@ export const LiveSalesDashboard = () => {
             </div>
 
             {/* Charts Section */}
-            <div className="flex flex-wrap gap-4 justify-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <RealtimeChart
                     data={safeSalesChartData}
                     title="Sales per Second"
