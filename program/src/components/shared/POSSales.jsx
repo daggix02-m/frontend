@@ -112,15 +112,17 @@ export function POSSales({ role = 'cashier' }) {
                                     .map((product) => (
                                         <div
                                             key={product.id}
-                                            className='flex items-center justify-between border rounded-lg p-3 hover:bg-muted/50 cursor-pointer'
+                                            className='flex items-center justify-between gap-3 border rounded-lg p-3 hover:bg-muted/50 cursor-pointer'
                                             onClick={() => addToCart(product)}
                                         >
-                                            <div>
-                                                <p className='font-medium'>{product.name}</p>
+                                            <div className='flex-1 min-w-0'>
+                                                <p className='font-medium truncate'>{product.name}</p>
                                                 <p className='text-sm text-muted-foreground'>Stock: {product.stock}</p>
                                             </div>
-                                            <div className='text-right'>
-                                                <p className='font-bold'>${product.price.toFixed(2)}</p>
+                                            <div className='text-right flex-shrink-0 flex items-center gap-2'>
+                                                <div>
+                                                    <p className='font-bold whitespace-nowrap'>${product.price.toFixed(2)}</p>
+                                                </div>
                                                 <Button size='sm' variant='outline'>
                                                     <Plus className='h-3 w-3' />
                                                 </Button>
