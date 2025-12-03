@@ -7,16 +7,13 @@ import * as XLSX from 'xlsx';
  * @param {string} sheetName - Name of the worksheet
  */
 export const exportToExcel = (data, filename, sheetName = 'Sheet1') => {
-    // Create a new workbook
+
     const wb = XLSX.utils.book_new();
 
-    // Convert data to worksheet
     const ws = XLSX.utils.json_to_sheet(data);
 
-    // Add worksheet to workbook
     XLSX.utils.book_append_sheet(wb, ws, sheetName);
 
-    // Generate Excel file and trigger download
     XLSX.writeFile(wb, `${filename}.xlsx`);
 };
 
@@ -29,7 +26,7 @@ export const generateSalesReport = (period) => {
     const today = new Date();
 
     if (period === 'daily') {
-        // Generate hourly data for today
+
         return Array.from({ length: 24 }, (_, i) => ({
             Hour: `${i}:00 - ${i + 1}:00`,
             Sales: Math.floor(Math.random() * 50) + 10,
@@ -37,7 +34,7 @@ export const generateSalesReport = (period) => {
             Transactions: Math.floor(Math.random() * 30) + 5,
         }));
     } else if (period === 'monthly') {
-        // Generate daily data for the current month
+
         const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
         return Array.from({ length: daysInMonth }, (_, i) => ({
             Date: `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(i + 1).padStart(2, '0')}`,
@@ -46,7 +43,7 @@ export const generateSalesReport = (period) => {
             Transactions: Math.floor(Math.random() * 100) + 20,
         }));
     } else if (period === 'yearly') {
-        // Generate monthly data for the current year
+
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         return months.map((month, i) => ({
             Month: `${month} ${today.getFullYear()}`,
@@ -59,9 +56,7 @@ export const generateSalesReport = (period) => {
     return [];
 };
 
-/**
- * Generate mock inventory report data
- */
+ 
 export const generateInventoryReport = () => {
     const products = [
         'Paracetamol 500mg',
@@ -84,9 +79,7 @@ export const generateInventoryReport = () => {
     }));
 };
 
-/**
- * Generate mock staff activity report
- */
+ 
 export const generateStaffActivityReport = () => {
     const staff = [
         'Alemayehu Desta',

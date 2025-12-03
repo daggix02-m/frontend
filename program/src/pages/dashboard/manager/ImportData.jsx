@@ -35,7 +35,6 @@ export function ImportData() {
 
         if (!data || data.length === 0) return;
 
-        // Validate headers
         const fileHeaders = Object.keys(data[0]);
         const requiredHeaders = DATA_TYPES[selectedType].schema;
 
@@ -59,7 +58,7 @@ export function ImportData() {
             const result = await apiFunction(importedData);
 
             toast.success(result.message);
-            setImportedData([]); // Clear data after successful import
+            setImportedData([]);
         } catch (error) {
             toast.error(error.message || 'Failed to import data.');
         } finally {
@@ -93,7 +92,7 @@ export function ImportData() {
                                     value={selectedType}
                                     onChange={(e) => {
                                         setSelectedType(e.target.value);
-                                        setImportedData([]); // Clear data when type changes
+                                        setImportedData([]);
                                         setValidationError('');
                                     }}
                                 >

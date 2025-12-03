@@ -35,7 +35,7 @@ export function SystemStatistics() {
                 <p className='text-muted-foreground mt-2'>Platform-wide metrics and analytics</p>
             </div>
 
-            {/* Main Stats Grid */}
+            {}
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
@@ -54,7 +54,7 @@ export function SystemStatistics() {
             </div>
 
             <div className='grid gap-6 grid-cols-1 md:grid-cols-2'>
-                {/* Recent Activity */}
+                {}
                 <Card>
                     <CardHeader>
                         <CardTitle>Recent Activity</CardTitle>
@@ -74,7 +74,7 @@ export function SystemStatistics() {
                     </CardContent>
                 </Card>
 
-                {/* Top Performing Pharmacies */}
+                {}
                 <Card>
                     <CardHeader>
                         <CardTitle>Top Performing Pharmacies</CardTitle>
@@ -98,7 +98,7 @@ export function SystemStatistics() {
                 </Card>
             </div>
 
-            {/* Usage Statistics */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle>Platform Usage Statistics</CardTitle>

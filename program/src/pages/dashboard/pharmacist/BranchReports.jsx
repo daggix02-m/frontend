@@ -35,7 +35,7 @@ export function BranchReports() {
                 <p className='text-muted-foreground mt-2'>View branch-level sales and inventory reports</p>
             </div>
 
-            {/* Main Stats Grid */}
+            {}
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
@@ -54,7 +54,7 @@ export function BranchReports() {
             </div>
 
             <div className='grid gap-6 grid-cols-1 md:grid-cols-2'>
-                {/* Top Selling Products */}
+                {}
                 <Card>
                     <CardHeader>
                         <CardTitle>Top Selling Products</CardTitle>
@@ -74,7 +74,7 @@ export function BranchReports() {
                     </CardContent>
                 </Card>
 
-                {/* Sales by Category */}
+                {}
                 <Card>
                     <CardHeader>
                         <CardTitle>Sales by Category</CardTitle>
@@ -101,7 +101,7 @@ export function BranchReports() {
                 </Card>
             </div>
 
-            {/* Inventory Report */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle>Inventory Summary</CardTitle>
@@ -128,7 +128,7 @@ export function BranchReports() {
                 </CardContent>
             </Card>
 
-            {/* Prescription Statistics */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle>Prescription Statistics</CardTitle>

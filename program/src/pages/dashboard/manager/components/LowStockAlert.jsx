@@ -9,7 +9,6 @@ import { useNavigate } from 'react-router-dom';
 export const LowStockAlert = () => {
     const navigate = useNavigate();
 
-    // Mock data for low stock items
     const lowStockItems = [
         { id: 1, name: 'Amoxicillin 500mg', currentStock: 15, minStock: 50, category: 'Antibiotics' },
         { id: 2, name: 'Paracetamol Syrup', currentStock: 8, minStock: 30, category: 'Pain Relief' },

@@ -10,10 +10,10 @@ export function AdminSettings() {
                 <p className='text-muted-foreground'>Manage your account and system-wide configurations.</p>
             </div>
 
-            {/* Profile Settings */}
+            {}
             <ProfileSettings userRole="Admin" />
 
-            {/* System-Wide Settings */}
+            {}
             <div className='grid gap-6 grid-cols-1'>
                 <Card>
                     <CardHeader>

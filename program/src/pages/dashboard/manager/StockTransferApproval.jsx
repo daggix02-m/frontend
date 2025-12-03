@@ -71,7 +71,7 @@ export function StockTransferApproval() {
                 <p className='text-sm text-muted-foreground mt-1'>Review and approve stock transfers between branches</p>
             </div>
 
-            {/* Stats Grid */}
+            {}
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
@@ -86,13 +86,13 @@ export function StockTransferApproval() {
                 ))}
             </div>
 
-            {/* Transfer Requests */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle className="text-lg sm:text-xl">Transfer Requests</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                    {/* Mobile Card View */}
+                    {}
                     <div className='lg:hidden space-y-3 p-4'>
                         {transfers.map((transfer) => (
                             <Card key={transfer.id} className="overflow-hidden">
@@ -169,7 +169,7 @@ export function StockTransferApproval() {
                         ))}
                     </div>
 
-                    {/* Desktop Table View */}
+                    {}
                     <div className='hidden lg:block overflow-x-auto'>
                         <Table>
                             <TableHeader>
@@ -220,7 +220,7 @@ export function StockTransferApproval() {
                 </CardContent>
             </Card>
 
-            {/* Recent Transfer History */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle className="text-lg sm:text-xl">Recent Transfer History</CardTitle>
@@ -246,7 +246,7 @@ export function StockTransferApproval() {
                 </CardContent>
             </Card>
 
-            {/* Details Dialog */}
+            {}
             <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
                 <DialogContent className="max-w-2xl">
                     {selectedTransfer && (

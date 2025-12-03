@@ -1,4 +1,4 @@
-import api from './api';
+import { makeApiCall } from '../api/auth.api';
 
 /**
  * Pharmacist Service
@@ -6,7 +6,6 @@ import api from './api';
  */
 
 export const pharmacistService = {
-    // ============ Inventory Management ============
 
     /**
      * Get branch inventory
@@ -14,7 +13,9 @@ export const pharmacistService = {
      * @returns {Promise}
      */
     async getInventory(params = {}) {
-        return await api.get('/pharmacist/inventory', { params });
+        const queryString = new URLSearchParams(params).toString();
+        const endpoint = queryString ? `/pharmacist/inventory?${queryString}` : '/pharmacist/inventory';
+        return await makeApiCall(endpoint, { method: 'GET' });
     },
 
     /**
@@ -24,7 +25,10 @@ export const pharmacistService = {
      * @returns {Promise}
      */
     async updateStock(id, stock) {
-        return await api.put(`/pharmacist/inventory/${id}`, { stock });
+        return await makeApiCall(`/pharmacist/inventory/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ stock }),
+        });
     },
 
     /**
@@ -34,9 +38,12 @@ export const pharmacistService = {
      * @returns {Promise}
      */
     async requestReplenishment(productIds, quantities) {
-        return await api.post('/pharmacist/inventory/request-replenishment', {
-            productIds,
-            quantities,
+        return await makeApiCall('/pharmacist/inventory/request-replenishment', {
+            method: 'POST',
+            body: JSON.stringify({
+                productIds,
+                quantities,
+            }),
         });
     },
 
@@ -47,13 +54,14 @@ export const pharmacistService = {
      * @returns {Promise}
      */
     async markForReturn(productId, reason) {
-        return await api.post('/pharmacist/inventory/mark-return', {
-            productId,
-            reason,
+        return await makeApiCall('/pharmacist/inventory/mark-return', {
+            method: 'POST',
+            body: JSON.stringify({
+                productId,
+                reason,
+            }),
         });
     },
-
-    // ============ Prescription Management ============
 
     /**
      * Get prescriptions
@@ -61,7 +69,9 @@ export const pharmacistService = {
      * @returns {Promise}
      */
     async getPrescriptions(params = {}) {
-        return await api.get('/pharmacist/prescriptions', { params });
+        const queryString = new URLSearchParams(params).toString();
+        const endpoint = queryString ? `/pharmacist/prescriptions?${queryString}` : '/pharmacist/prescriptions';
+        return await makeApiCall(endpoint, { method: 'GET' });
     },
 
     /**
@@ -70,7 +80,7 @@ export const pharmacistService = {
      * @returns {Promise}
      */
     async validatePrescription(id) {
-        return await api.patch(`/pharmacist/prescriptions/${id}/validate`);
+        return await makeApiCall(`/pharmacist/prescriptions/${id}/validate`, { method: 'PATCH' });
     },
 
     /**
@@ -79,17 +89,15 @@ export const pharmacistService = {
      * @returns {Promise}
      */
     async dispensePrescription(id) {
-        return await api.patch(`/pharmacist/prescriptions/${id}/dispense`);
+        return await makeApiCall(`/pharmacist/prescriptions/${id}/dispense`, { method: 'PATCH' });
     },
-
-    // ============ Stock Receiving ============
 
     /**
      * Get expected deliveries
      * @returns {Promise}
      */
     async getDeliveries() {
-        return await api.get('/pharmacist/deliveries');
+        return await makeApiCall('/pharmacist/deliveries', { method: 'GET' });
     },
 
     /**
@@ -98,10 +106,8 @@ export const pharmacistService = {
      * @returns {Promise}
      */
     async receiveDelivery(id) {
-        return await api.patch(`/pharmacist/deliveries/${id}/receive`);
+        return await makeApiCall(`/pharmacist/deliveries/${id}/receive`, { method: 'PATCH' });
     },
-
-    // ============ Stock Transfers ============
 
     /**
      * Request stock transfer
@@ -109,7 +115,10 @@ export const pharmacistService = {
      * @returns {Promise}
      */
     async requestStockTransfer(transferData) {
-        return await api.post('/pharmacist/stock-transfers', transferData);
+        return await makeApiCall('/pharmacist/stock-transfers', {
+            method: 'POST',
+            body: JSON.stringify(transferData),
+        });
     },
 
     /**
@@ -117,17 +126,15 @@ export const pharmacistService = {
      * @returns {Promise}
      */
     async getStockTransfers() {
-        return await api.get('/pharmacist/stock-transfers');
+        return await makeApiCall('/pharmacist/stock-transfers', { method: 'GET' });
     },
-
-    // ============ Reports ============
 
     /**
      * Get branch reports
      * @returns {Promise}
      */
     async getReports() {
-        return await api.get('/pharmacist/reports');
+        return await makeApiCall('/pharmacist/reports', { method: 'GET' });
     },
 };
 

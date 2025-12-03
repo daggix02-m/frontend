@@ -97,7 +97,7 @@ export function InventoryManagement({ readOnly = false }) {
                     </div>
                 </CardHeader>
                 <CardContent className="p-0">
-                    {/* Mobile Card View */}
+                    {}
                     <div className='md:hidden space-y-3 p-4'>
                         {filteredProducts.length > 0 ? (
                             filteredProducts.map((product) => (
@@ -149,7 +149,7 @@ export function InventoryManagement({ readOnly = false }) {
                         )}
                     </div>
 
-                    {/* Desktop Table View */}
+                    {}
                     <div className='hidden md:block overflow-x-auto'>
                         <Table>
                             <TableHeader>
@@ -202,7 +202,7 @@ export function InventoryManagement({ readOnly = false }) {
                 </CardContent>
             </Card>
 
-            {/* Add/Edit Product Modal */}
+            {}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogContent className="p-0 bg-transparent border-none shadow-none w-full max-w-lg">
                     <ProductForm

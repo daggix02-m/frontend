@@ -46,7 +46,7 @@ export function POSSales({ role = 'cashier' }) {
     const handleCheckout = () => {
         if (cart.length === 0) return;
         if (window.confirm(`Process payment of $${total.toFixed(2)} via ${paymentMethod}?`)) {
-            // Backend integration needed
+
             alert('Sale processed successfully!');
             setCart([]);
             setDiscount(0);
@@ -71,7 +71,7 @@ export function POSSales({ role = 'cashier' }) {
         }
     };
 
-    const canApplyDiscount = role === 'manager' || discount <= 10; // Cashiers limited to 10%
+    const canApplyDiscount = role === 'manager' || discount <= 10;
 
     return (
         <div className='space-y-6 p-4 md:p-8'>
@@ -81,7 +81,7 @@ export function POSSales({ role = 'cashier' }) {
             </div>
 
             <div className='grid gap-6 lg:grid-cols-3'>
-                {/* Product Search & Selection */}
+                {}
                 <div className='lg:col-span-2 space-y-4'>
                     <Card>
                         <CardHeader>
@@ -100,7 +100,7 @@ export function POSSales({ role = 'cashier' }) {
                         </CardContent>
                     </Card>
 
-                    {/* Available Products */}
+                    {}
                     <Card>
                         <CardHeader>
                             <CardTitle>Available Products</CardTitle>
@@ -133,7 +133,7 @@ export function POSSales({ role = 'cashier' }) {
                         </CardContent>
                     </Card>
 
-                    {/* Shopping Cart */}
+                    {}
                     <Card>
                         <CardHeader>
                             <CardTitle>Shopping Cart</CardTitle>
@@ -183,7 +183,7 @@ export function POSSales({ role = 'cashier' }) {
                     </Card>
                 </div>
 
-                {/* Checkout Panel */}
+                {}
                 <div className='space-y-4'>
                     <Card>
                         <CardHeader>
@@ -254,7 +254,7 @@ export function POSSales({ role = 'cashier' }) {
                         </CardContent>
                     </Card>
 
-                    {/* Quick Actions */}
+                    {}
                     <Card>
                         <CardHeader>
                             <CardTitle>Quick Actions</CardTitle>

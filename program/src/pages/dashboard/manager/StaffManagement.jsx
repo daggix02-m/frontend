@@ -42,7 +42,7 @@ export function StaffManagement() {
       branch: 'Downtown Branch',
       status: 'Active',
       isOnline: false,
-      lastActive: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+      lastActive: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     },
     {
       id: 3,
@@ -52,7 +52,7 @@ export function StaffManagement() {
       branch: 'Westside Branch',
       status: 'On Leave',
       isOnline: false,
-      lastActive: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+      lastActive: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
     },
   ]);
 
@@ -101,10 +101,10 @@ export function StaffManagement() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (editingStaff) {
-      // Update existing staff
+
       setStaff(staff.map(s => s.id === editingStaff.id ? { ...formData, id: s.id } : s));
     } else {
-      // Add new staff
+
       const newStaff = { ...formData, id: staff.length + 1 };
       setStaff([...staff, newStaff]);
     }
@@ -163,7 +163,7 @@ export function StaffManagement() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {/* Mobile Card View */}
+          {}
           <div className='lg:hidden space-y-3 p-4'>
             {filteredStaff.length > 0 ? (
               filteredStaff.map((member) => (
@@ -243,7 +243,7 @@ export function StaffManagement() {
             )}
           </div>
 
-          {/* Desktop Table View */}
+          {}
           <div className='hidden lg:block overflow-x-auto'>
             <Table>
               <TableHeader>
@@ -327,7 +327,7 @@ export function StaffManagement() {
         </CardContent>
       </Card>
 
-      {/* Add/Edit Staff Modal */}
+      {}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="p-0 bg-transparent border-none shadow-none w-full max-w-lg">
           <StaffForm
@@ -351,7 +351,7 @@ export function StaffManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Activity Log Modal */}
+      {}
       <ActivityLogDialog
         isOpen={isActivityLogOpen}
         onClose={() => setIsActivityLogOpen(false)}

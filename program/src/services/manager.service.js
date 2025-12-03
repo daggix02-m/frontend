@@ -1,4 +1,4 @@
-import api from './api';
+import { makeApiCall } from '../api/auth.api';
 
 /**
  * Manager Service
@@ -11,10 +11,8 @@ export const managerService = {
      * @returns {Promise}
      */
     async getOverview() {
-        return await api.get('/manager/overview');
+        return await makeApiCall('/manager/overview', { method: 'GET' });
     },
-
-    // ============ Branch Management ============
 
     /**
      * Get all branches
@@ -22,7 +20,9 @@ export const managerService = {
      * @returns {Promise}
      */
     async getBranches(params = {}) {
-        return await api.get('/manager/branches', { params });
+        const queryString = new URLSearchParams(params).toString();
+        const endpoint = queryString ? `/manager/branches?${queryString}` : '/manager/branches';
+        return await makeApiCall(endpoint, { method: 'GET' });
     },
 
     /**
@@ -31,7 +31,10 @@ export const managerService = {
      * @returns {Promise}
      */
     async createBranch(branchData) {
-        return await api.post('/manager/branches', branchData);
+        return await makeApiCall('/manager/branches', {
+            method: 'POST',
+            body: JSON.stringify(branchData),
+        });
     },
 
     /**
@@ -41,7 +44,10 @@ export const managerService = {
      * @returns {Promise}
      */
     async updateBranch(id, branchData) {
-        return await api.put(`/manager/branches/${id}`, branchData);
+        return await makeApiCall(`/manager/branches/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(branchData),
+        });
     },
 
     /**
@@ -50,10 +56,8 @@ export const managerService = {
      * @returns {Promise}
      */
     async deleteBranch(id) {
-        return await api.delete(`/manager/branches/${id}`);
+        return await makeApiCall(`/manager/branches/${id}`, { method: 'DELETE' });
     },
-
-    // ============ Staff Management ============
 
     /**
      * Get all staff members
@@ -61,7 +65,9 @@ export const managerService = {
      * @returns {Promise}
      */
     async getStaff(params = {}) {
-        return await api.get('/manager/staff', { params });
+        const queryString = new URLSearchParams(params).toString();
+        const endpoint = queryString ? `/manager/staff?${queryString}` : '/manager/staff';
+        return await makeApiCall(endpoint, { method: 'GET' });
     },
 
     /**
@@ -70,7 +76,10 @@ export const managerService = {
      * @returns {Promise}
      */
     async createStaff(staffData) {
-        return await api.post('/manager/staff', staffData);
+        return await makeApiCall('/manager/staff', {
+            method: 'POST',
+            body: JSON.stringify(staffData),
+        });
     },
 
     /**
@@ -80,7 +89,10 @@ export const managerService = {
      * @returns {Promise}
      */
     async updateStaff(id, staffData) {
-        return await api.put(`/manager/staff/${id}`, staffData);
+        return await makeApiCall(`/manager/staff/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(staffData),
+        });
     },
 
     /**
@@ -89,17 +101,15 @@ export const managerService = {
      * @returns {Promise}
      */
     async deleteStaff(id) {
-        return await api.delete(`/manager/staff/${id}`);
+        return await makeApiCall(`/manager/staff/${id}`, { method: 'DELETE' });
     },
-
-    // ============ Stock Transfer Approval ============
 
     /**
      * Get pending stock transfers
      * @returns {Promise}
      */
     async getStockTransfers() {
-        return await api.get('/manager/stock-transfers');
+        return await makeApiCall('/manager/stock-transfers', { method: 'GET' });
     },
 
     /**
@@ -108,7 +118,7 @@ export const managerService = {
      * @returns {Promise}
      */
     async approveStockTransfer(id) {
-        return await api.patch(`/manager/stock-transfers/${id}/approve`);
+        return await makeApiCall(`/manager/stock-transfers/${id}/approve`, { method: 'PATCH' });
     },
 
     /**
@@ -117,7 +127,7 @@ export const managerService = {
      * @returns {Promise}
      */
     async rejectStockTransfer(id) {
-        return await api.patch(`/manager/stock-transfers/${id}/reject`);
+        return await makeApiCall(`/manager/stock-transfers/${id}/reject`, { method: 'PATCH' });
     },
 };
 

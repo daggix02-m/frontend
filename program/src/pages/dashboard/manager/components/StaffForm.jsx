@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { User, Briefcase, Eye, EyeOff } from 'lucide-react';
 import { FormCard, FADE_IN_VARIANTS } from '@/components/shared/FormCard';
 
-// --- Required shadcn/ui components ---
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -47,14 +46,13 @@ export const StaffForm = ({
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
 
-        // Clear password error when user types
         if (name === 'initialPassword' || name === 'confirmPassword') {
             setPasswordError('');
         }
     };
 
     const validatePassword = () => {
-        if (!initialData) { // Only validate for new staff
+        if (!initialData) {
             if (!formData.initialPassword) {
                 setPasswordError('Initial password is required');
                 return false;
@@ -88,7 +86,7 @@ export const StaffForm = ({
             className={className}
         >
             <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-8 md:grid-cols-3">
-                {/* --- Icon/Visual Section --- */}
+                {}
                 <motion.div variants={FADE_IN_VARIANTS} className="flex flex-col items-center gap-3 md:col-span-1">
                     <div className="relative">
                         <Avatar className="h-24 w-24 border-2 border-dashed border-border flex items-center justify-center bg-muted/30">
@@ -103,7 +101,7 @@ export const StaffForm = ({
                     </div>
                 </motion.div>
 
-                {/* --- Form Fields Section --- */}
+                {}
                 <div className="flex flex-col gap-4 md:col-span-2">
                     <motion.div variants={FADE_IN_VARIANTS} className="grid w-full items-center gap-1.5">
                         <Label htmlFor="name">Full Name</Label>
@@ -226,7 +224,7 @@ export const StaffForm = ({
                     )}
                 </div>
 
-                {/* --- Form Actions --- */}
+                {}
                 <motion.div variants={FADE_IN_VARIANTS} className="flex justify-end gap-3 md:col-span-3">
                     <Button type="button" variant="ghost" onClick={onCancel}>
                         Cancel

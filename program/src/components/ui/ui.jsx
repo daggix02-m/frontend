@@ -1,7 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
-// Re-export components from separate files
 export { Button } from './button';
 export { Input } from './input';
 export { Label } from './label';

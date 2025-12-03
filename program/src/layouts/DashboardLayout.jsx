@@ -39,7 +39,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
-// Inner component that has access to sidebar context
 function DashboardContent({ role }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -50,12 +49,10 @@ function DashboardContent({ role }) {
     navigate('/auth/login');
   };
 
-  // Handler to close mobile sidebar on navigation
   const handleNavClick = () => {
     setOpenMobile(false);
   };
 
-  // Define navigation items for each role
   const roleNavItems = {
     admin: [
       { label: 'System Overview', path: '/admin/overview', icon: LayoutDashboard },
@@ -180,7 +177,7 @@ function DashboardContent({ role }) {
 }
 
 export function DashboardLayout({ role = 'manager' }) {
-  // Default to manager for now, but should be passed or retrieved
+
   return (
     <SidebarProvider>
       <DashboardContent role={role} />

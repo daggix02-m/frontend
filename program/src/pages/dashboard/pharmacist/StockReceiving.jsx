@@ -59,7 +59,7 @@ export function StockReceiving() {
                 <p className='text-muted-foreground mt-2'>Receive deliveries and update stock quantities</p>
             </div>
 
-            {/* Stats Grid */}
+            {}
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
@@ -74,7 +74,7 @@ export function StockReceiving() {
                 ))}
             </div>
 
-            {/* Expected Deliveries */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle>Expected Deliveries</CardTitle>
@@ -123,7 +123,7 @@ export function StockReceiving() {
                 </CardContent>
             </Card>
 
-            {/* Receiving Form */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle>Receive Delivery: DEL-001</CardTitle>
@@ -181,7 +181,7 @@ export function StockReceiving() {
                 </CardContent>
             </Card>
 
-            {/* Recent Receipts */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle>Recent Receipts</CardTitle>

@@ -34,7 +34,7 @@ function FloatingPaths({ position }) {
               pathOffset: [0, 1, 0],
             }}
             transition={{
-              duration: 20 + path.id * 0.3, // Deterministic duration based on ID
+              duration: 20 + path.id * 0.3,
               repeat: Infinity,
               ease: 'linear',
             }}

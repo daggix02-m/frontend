@@ -40,7 +40,6 @@ import { CashierPOSSales } from './pages/dashboard/cashier/POSSales';
 import { Receipts } from './pages/dashboard/cashier/Receipts';
 import { Notifications } from './pages/dashboard/manager/Notifications';
 
-// Role Protected Route component
 const RoleProtectedRoute = ({ children, allowedRoles }) => {
   const token = localStorage.getItem('accessToken');
   const userRole = localStorage.getItem('userRole');
@@ -52,7 +51,7 @@ const RoleProtectedRoute = ({ children, allowedRoles }) => {
   const normalizedUserRole = userRole ? userRole.toLowerCase() : '';
 
   if (allowedRoles && !allowedRoles.includes(normalizedUserRole)) {
-    // Redirect to appropriate dashboard based on actual role
+
     if (normalizedUserRole === 'admin') return <Navigate to='/admin/overview' replace />;
     if (normalizedUserRole === 'manager') return <Navigate to='/manager/overview' replace />;
     if (normalizedUserRole === 'pharmacist') return <Navigate to='/pharmacist/overview' replace />;
@@ -67,7 +66,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
+        {}
         <Route path='/' element={<LoginPage />} />
         <Route path='/auth/login' element={<LoginPage />} />
         <Route path='/auth/signup' element={<SignupPage />} />
@@ -75,7 +74,7 @@ function App() {
         <Route path='/auth/reset-password' element={<ResetPasswordPage />} />
         <Route path='/auth/change-password' element={<ChangePasswordPage />} />
 
-        {/* Admin Routes */}
+        {}
         <Route
           path='/admin'
           element={
@@ -96,7 +95,7 @@ function App() {
           <Route path='platform-users' element={<PlatformUsers />} />
         </Route>
 
-        {/* Manager Routes */}
+        {}
         <Route
           path='/manager'
           element={
@@ -119,7 +118,7 @@ function App() {
           <Route path='pos-sales' element={<ManagerPOSSales />} />
         </Route>
 
-        {/* Pharmacist Routes */}
+        {}
         <Route
           path='/pharmacist'
           element={
@@ -138,7 +137,7 @@ function App() {
           <Route path='settings' element={<PharmacistSettings />} />
         </Route>
 
-        {/* Cashier Routes */}
+        {}
         <Route
           path='/cashier'
           element={
@@ -156,7 +155,7 @@ function App() {
           <Route path='settings' element={<CashierSettings />} />
         </Route>
 
-        {/* Fallback */}
+        {}
         <Route path='*' element={<Navigate to='/auth/login' replace />} />
       </Routes>
     </Router>

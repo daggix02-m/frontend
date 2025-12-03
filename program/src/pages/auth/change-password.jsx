@@ -48,15 +48,13 @@ export function ChangePasswordPage() {
         setIsSubmitting(true);
 
         try {
-            // Mock API call - replace with actual API when backend is ready
+
             await new Promise((resolve) => setTimeout(resolve, 1500));
 
-            // Clear the requiresPasswordChange flag
             localStorage.removeItem('requiresPasswordChange');
 
             toast.success('Password changed successfully!');
 
-            // Redirect to dashboard based on role
             const role = localStorage.getItem('userRole') || 'manager';
             if (role === 'admin') navigate('/admin/overview');
             else if (role === 'manager') navigate('/manager/overview');

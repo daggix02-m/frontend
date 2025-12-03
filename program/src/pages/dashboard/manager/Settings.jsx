@@ -10,10 +10,10 @@ export function Settings() {
                 <p className='text-muted-foreground'>Manage your account, pharmacy configuration and subscription.</p>
             </div>
 
-            {/* Profile Settings */}
+            {}
             <ProfileSettings userRole="Manager" />
 
-            {/* Pharmacy-Specific Settings */}
+            {}
             <div className='grid gap-6 grid-cols-1'>
                 <Card>
                     <CardHeader>

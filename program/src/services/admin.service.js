@@ -1,4 +1,4 @@
-import api from './api';
+import { makeApiCall } from '../api/auth.api';
 
 /**
  * Admin Service
@@ -11,7 +11,7 @@ export const adminService = {
      * @returns {Promise}
      */
     async getOverview() {
-        return await api.get('/admin/overview');
+        return await makeApiCall('/admin/overview', { method: 'GET' });
     },
 
     /**
@@ -20,7 +20,9 @@ export const adminService = {
      * @returns {Promise}
      */
     async getPharmacies(params = {}) {
-        return await api.get('/admin/pharmacies', { params });
+        const queryString = new URLSearchParams(params).toString();
+        const endpoint = queryString ? `/admin/pharmacies?${queryString}` : '/admin/pharmacies';
+        return await makeApiCall(endpoint, { method: 'GET' });
     },
 
     /**
@@ -29,7 +31,7 @@ export const adminService = {
      * @returns {Promise}
      */
     async approvePharmacy(id) {
-        return await api.patch(`/admin/pharmacies/${id}/approve`);
+        return await makeApiCall(`/admin/pharmacies/${id}/approve`, { method: 'PATCH' });
     },
 
     /**
@@ -38,7 +40,7 @@ export const adminService = {
      * @returns {Promise}
      */
     async rejectPharmacy(id) {
-        return await api.patch(`/admin/pharmacies/${id}/reject`);
+        return await makeApiCall(`/admin/pharmacies/${id}/reject`, { method: 'PATCH' });
     },
 
     /**
@@ -47,7 +49,7 @@ export const adminService = {
      * @returns {Promise}
      */
     async suspendPharmacy(id) {
-        return await api.patch(`/admin/pharmacies/${id}/suspend`);
+        return await makeApiCall(`/admin/pharmacies/${id}/suspend`, { method: 'PATCH' });
     },
 
     /**
@@ -56,7 +58,7 @@ export const adminService = {
      * @returns {Promise}
      */
     async reactivatePharmacy(id) {
-        return await api.patch(`/admin/pharmacies/${id}/reactivate`);
+        return await makeApiCall(`/admin/pharmacies/${id}/reactivate`, { method: 'PATCH' });
     },
 };
 

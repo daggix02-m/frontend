@@ -73,7 +73,7 @@ export function RefundsDiscounts() {
                 <p className='text-sm text-muted-foreground mt-1'>Configure refund policies and discount rules</p>
             </div>
 
-            {/* Stats Grid */}
+            {}
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
@@ -89,7 +89,7 @@ export function RefundsDiscounts() {
             </div>
 
             <div className='grid gap-6 grid-cols-1 md:grid-cols-2'>
-                {/* Refund Policy */}
+                {}
                 <Card>
                     <CardHeader>
                         <CardTitle>Refund Policy Settings</CardTitle>
@@ -135,7 +135,7 @@ export function RefundsDiscounts() {
                     </CardContent>
                 </Card>
 
-                {/* Create Discount */}
+                {}
                 <Card>
                     <CardHeader>
                         <CardTitle>Create New Discount</CardTitle>
@@ -185,7 +185,7 @@ export function RefundsDiscounts() {
                 </Card>
             </div>
 
-            {/* Active Discount Rules */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle className="text-lg sm:text-xl">Active Discount Rules</CardTitle>
@@ -217,7 +217,7 @@ export function RefundsDiscounts() {
                 </CardContent>
             </Card>
 
-            {/* Approval Thresholds */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle className="text-lg sm:text-xl">Approval Thresholds</CardTitle>

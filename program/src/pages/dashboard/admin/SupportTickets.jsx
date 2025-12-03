@@ -45,7 +45,7 @@ export function SupportTickets() {
                 <p className='text-muted-foreground mt-2'>Manage and respond to pharmacy support requests</p>
             </div>
 
-            {/* Stats Grid */}
+            {}
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
@@ -60,7 +60,7 @@ export function SupportTickets() {
                 ))}
             </div>
 
-            {/* Filters */}
+            {}
             <Card>
                 <CardContent className='pt-6'>
                     <div className='flex flex-col sm:flex-row gap-4'>
@@ -87,7 +87,7 @@ export function SupportTickets() {
                 </CardContent>
             </Card>
 
-            {/* Tickets Table */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle>All Tickets</CardTitle>

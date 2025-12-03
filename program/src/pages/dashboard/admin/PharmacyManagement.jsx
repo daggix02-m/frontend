@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody
 import { Check, X, Ban, Search, Filter, MoreHorizontal } from 'lucide-react';
 
 export function PharmacyManagement() {
-    // Generate initial realistic data
+
     const initialPharmacies = [
         { id: 1, name: 'City Pharmacy', owner: 'Yohannes Tadesse', location: 'Addis Ababa', status: 'Active', plan: 'Pro', phone: '+251-11-551-2345', joined: '2023-01-15' },
         { id: 2, name: 'HealthPlus', owner: 'Almaz Worku', location: 'Bahir Dar', status: 'Pending', plan: 'Basic', phone: '+251-58-220-3456', joined: '2023-02-20' },

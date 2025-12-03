@@ -1,4 +1,4 @@
-import api from './api';
+import { makeApiCall } from '../api/auth.api';
 
 /**
  * Cashier Service
@@ -6,7 +6,6 @@ import api from './api';
  */
 
 export const cashierService = {
-    // ============ POS Sales ============
 
     /**
      * Get products for POS
@@ -14,7 +13,9 @@ export const cashierService = {
      * @returns {Promise}
      */
     async getProducts(params = {}) {
-        return await api.get('/cashier/products', { params });
+        const queryString = new URLSearchParams(params).toString();
+        const endpoint = queryString ? `/cashier/products?${queryString}` : '/cashier/products';
+        return await makeApiCall(endpoint, { method: 'GET' });
     },
 
     /**
@@ -23,17 +24,18 @@ export const cashierService = {
      * @returns {Promise}
      */
     async processSale(saleData) {
-        return await api.post('/cashier/sales', saleData);
+        return await makeApiCall('/cashier/sales', {
+            method: 'POST',
+            body: JSON.stringify(saleData),
+        });
     },
-
-    // ============ Receipts ============
 
     /**
      * Get recent receipts
      * @returns {Promise}
      */
     async getReceipts() {
-        return await api.get('/cashier/receipts');
+        return await makeApiCall('/cashier/receipts', { method: 'GET' });
     },
 
     /**
@@ -42,7 +44,7 @@ export const cashierService = {
      * @returns {Promise}
      */
     async getReceipt(id) {
-        return await api.get(`/cashier/receipts/${id}`);
+        return await makeApiCall(`/cashier/receipts/${id}`, { method: 'GET' });
     },
 
     /**
@@ -52,17 +54,18 @@ export const cashierService = {
      * @returns {Promise}
      */
     async emailReceipt(id, email) {
-        return await api.post(`/cashier/receipts/${id}/email`, { email });
+        return await makeApiCall(`/cashier/receipts/${id}/email`, {
+            method: 'POST',
+            body: JSON.stringify({ email }),
+        });
     },
-
-    // ============ Sessions ============
 
     /**
      * Get cash session history
      * @returns {Promise}
      */
     async getSessions() {
-        return await api.get('/cashier/sessions');
+        return await makeApiCall('/cashier/sessions', { method: 'GET' });
     },
 
     /**
@@ -71,10 +74,11 @@ export const cashierService = {
      * @returns {Promise}
      */
     async closeSession(closingCash) {
-        return await api.post('/cashier/sessions/close', { closingCash });
+        return await makeApiCall('/cashier/sessions/close', {
+            method: 'POST',
+            body: JSON.stringify({ closingCash }),
+        });
     },
-
-    // ============ Stock Check ============
 
     /**
      * Quick stock lookup
@@ -82,10 +86,10 @@ export const cashierService = {
      * @returns {Promise}
      */
     async checkStock(params = {}) {
-        return await api.get('/cashier/stock-check', { params });
+        const queryString = new URLSearchParams(params).toString();
+        const endpoint = queryString ? `/cashier/stock-check?${queryString}` : '/cashier/stock-check';
+        return await makeApiCall(endpoint, { method: 'GET' });
     },
-
-    // ============ Transactions ============
 
     /**
      * Hold current transaction
@@ -93,7 +97,10 @@ export const cashierService = {
      * @returns {Promise}
      */
     async holdTransaction(transactionData) {
-        return await api.post('/cashier/transactions/hold', transactionData);
+        return await makeApiCall('/cashier/transactions/hold', {
+            method: 'POST',
+            body: JSON.stringify(transactionData),
+        });
     },
 
     /**
@@ -101,7 +108,7 @@ export const cashierService = {
      * @returns {Promise}
      */
     async getHeldTransactions() {
-        return await api.get('/cashier/transactions/held');
+        return await makeApiCall('/cashier/transactions/held', { method: 'GET' });
     },
 
     /**
@@ -110,7 +117,10 @@ export const cashierService = {
      * @returns {Promise}
      */
     async processReturn(returnData) {
-        return await api.post('/cashier/returns', returnData);
+        return await makeApiCall('/cashier/returns', {
+            method: 'POST',
+            body: JSON.stringify(returnData),
+        });
     },
 };
 

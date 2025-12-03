@@ -33,7 +33,7 @@ export function BillingManagement() {
                 <p className='text-muted-foreground mt-2'>Handle billing issues and payment disputes</p>
             </div>
 
-            {/* Stats Grid */}
+            {}
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
@@ -49,7 +49,7 @@ export function BillingManagement() {
                 ))}
             </div>
 
-            {/* Billing Issues Table */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle>Recent Billing Issues</CardTitle>
@@ -88,7 +88,7 @@ export function BillingManagement() {
                 </CardContent>
             </Card>
 
-            {/* Transaction History */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle>Recent Transactions</CardTitle>

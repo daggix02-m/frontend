@@ -12,12 +12,12 @@ export function Receipts() {
     const [searchTerm, setSearchTerm] = useState('');
 
     const handlePrint = (receiptId) => {
-        // Backend integration needed
+
         alert(`Printing receipt ${receiptId}...`);
     };
 
     const handleEmail = (receiptId) => {
-        // Backend integration needed
+
         const email = prompt('Enter customer email:');
         if (email) {
             alert(`Receipt ${receiptId} sent to ${email}`);
@@ -25,7 +25,7 @@ export function Receipts() {
     };
 
     const handleDownload = (receiptId) => {
-        // Backend integration needed
+
         alert(`Downloading receipt ${receiptId} as PDF...`);
     };
 
@@ -41,7 +41,7 @@ export function Receipts() {
                 <p className='text-muted-foreground mt-2'>Print, email, and manage customer receipts</p>
             </div>
 
-            {/* Quick Stats */}
+            {}
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 <Card>
                     <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
@@ -81,7 +81,7 @@ export function Receipts() {
                 </Card>
             </div>
 
-            {/* Recent Receipts */}
+            {}
             <Card>
                 <CardHeader>
                     <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
@@ -136,7 +136,7 @@ export function Receipts() {
                 </CardContent>
             </Card>
 
-            {/* Receipt Preview */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle>Receipt Preview</CardTitle>

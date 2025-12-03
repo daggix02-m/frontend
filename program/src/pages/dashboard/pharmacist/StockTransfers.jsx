@@ -12,7 +12,6 @@ export function StockTransfers() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-
     const handleNewTransfer = () => {
         setIsModalOpen(true);
     };
@@ -20,7 +19,7 @@ export function StockTransfers() {
     const handleCreateTransfer = (data) => {
         const transfer = {
             id: transfers.length + 1,
-            from: 'Main Branch', // Assuming current user is at Main Branch
+            from: 'Main Branch',
             to: data.to,
             items: data.items,
             status: 'Pending',
@@ -86,7 +85,7 @@ export function StockTransfers() {
                 </CardContent>
             </Card>
 
-            {/* New Transfer Modal */}
+            {}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogContent className="p-0 bg-transparent border-none shadow-none w-full max-w-lg">
                     <StockTransferForm

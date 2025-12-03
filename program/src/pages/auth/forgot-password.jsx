@@ -28,7 +28,6 @@ export function ForgotPasswordPage() {
       return;
     }
 
-    // Add submission logic here
   };
 
   return (

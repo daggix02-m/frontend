@@ -11,12 +11,12 @@ export const useRealtimeSalesData = () => {
     });
 
     useEffect(() => {
-        // Simulate real-time data updates
+
         const interval = setInterval(() => {
             const now = new Date();
             const timeString = now.toLocaleTimeString();
 
-            const newSaleAmount = Math.random() * 100 + 20; // Random sale between 20 and 120
+            const newSaleAmount = Math.random() * 100 + 20;
 
             setData(prev => {
                 const newTotalRevenue = prev.totalRevenue + newSaleAmount;
@@ -44,12 +44,12 @@ export const useRealtimeSalesData = () => {
                     totalRevenue: newTotalRevenue,
                     salesCount: newSalesCount,
                     averageSale: newTotalRevenue / newSalesCount,
-                    salesChartData: [...prev.salesChartData.slice(-19), newChartPoint], // Keep last 20 points
+                    salesChartData: [...prev.salesChartData.slice(-19), newChartPoint],
                     cumulativeRevenueData: [...prev.cumulativeRevenueData.slice(-19), newRevenuePoint],
-                    latestPayments: [newPayment, ...prev.latestPayments].slice(0, 10), // Keep last 10 payments
+                    latestPayments: [newPayment, ...prev.latestPayments].slice(0, 10),
                 };
             });
-        }, 3000); // Update every 3 seconds
+        }, 3000);
 
         return () => clearInterval(interval);
     }, []);

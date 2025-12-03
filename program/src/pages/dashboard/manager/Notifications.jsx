@@ -6,25 +6,22 @@ import { toast } from 'sonner';
 export function Notifications() {
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [searchTerm, setSearchTerm] = useState('');
-    const [activeFilter, setActiveFilter] = useState('Total'); // New state for stat filter
+    const [activeFilter, setActiveFilter] = useState('Total');
     const [notifications, setNotifications] = useState([
-        // Transactions
+
         { id: 1, type: 'transaction', title: 'High-Value Sale Completed', description: 'Sale of ETB 5,450 - Receipt #RCP-1234', time: '5 minutes ago', read: false, priority: 'high' },
         { id: 2, type: 'transaction', title: 'Refund Processed', description: 'Refund of ETB 245 for Receipt #RCP-1189', time: '15 minutes ago', read: false, priority: 'medium' },
         { id: 3, type: 'transaction', title: 'Daily Sales Target Reached', description: 'Congratulations! Daily target of ETB 50,000 achieved', time: '1 hour ago', read: true, priority: 'low' },
 
-        // Stock Requests
         { id: 4, type: 'stock', title: 'Transfer Request Pending', description: 'Paracetamol 500mg (500 units) - From Main to Downtown', time: '10 minutes ago', read: false, priority: 'high' },
         { id: 5, type: 'stock', title: 'Low Stock Alert', description: 'Amoxicillin 250mg below minimum threshold (Current: 45, Min: 100)', time: '30 minutes ago', read: false, priority: 'high' },
         { id: 6, type: 'stock', title: 'Replenishment Request', description: 'Vitamin C 1000mg - Requested by Alemayehu Desta', time: '2 hours ago', read: true, priority: 'medium' },
         { id: 7, type: 'stock', title: 'Stock Transfer Approved', description: 'Transfer #ST-003 approved - Ibuprofen 400mg (300 units)', time: '3 hours ago', read: true, priority: 'low' },
 
-        // Staff Activities
         { id: 8, type: 'staff', title: 'New Staff Member Added', description: 'Tigist Alemayehu joined as Pharmacist', time: '45 minutes ago', read: false, priority: 'medium' },
         { id: 9, type: 'staff', title: 'Staff Login Alert', description: 'Unusual login time: Berhanu Wolde at 2:30 AM', time: '6 hours ago', read: true, priority: 'high' },
         { id: 10, type: 'staff', title: 'Staff Activity Log', description: 'Selamawit Mekonnen completed 8-hour shift', time: 'Yesterday', read: true, priority: 'low' },
 
-        // System Alerts
         { id: 11, type: 'system', title: 'Products Expiring Soon', description: '15 products expiring within 30 days', time: '20 minutes ago', read: false, priority: 'high' },
         { id: 12, type: 'system', title: 'System Update Available', description: 'Version 2.1.0 ready for installation', time: '4 hours ago', read: true, priority: 'medium' },
         { id: 13, type: 'system', title: 'Backup Completed', description: 'Daily backup completed successfully', time: 'Yesterday', read: true, priority: 'low' },
@@ -68,7 +65,6 @@ export function Notifications() {
         const matchesSearch = notification.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             notification.description.toLowerCase().includes(searchTerm.toLowerCase());
 
-        // Apply stat filter
         let matchesStatFilter = true;
         if (activeFilter === 'Unread') {
             matchesStatFilter = !notification.read;
@@ -77,7 +73,6 @@ export function Notifications() {
         } else if (activeFilter === 'Today') {
             matchesStatFilter = !notification.time.includes('Yesterday');
         }
-        // 'Total' shows all, so no additional filter needed
 
         return matchesCategory && matchesSearch && matchesStatFilter;
     });
@@ -198,7 +193,7 @@ export function Notifications() {
                 </Button>
             </div>
 
-            {/* Stats Grid */}
+            {}
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card
@@ -221,7 +216,7 @@ export function Notifications() {
                 ))}
             </div>
 
-            {/* Filters */}
+            {}
             <Card>
                 <CardContent className='pt-6'>
                     <div className='flex flex-col md:flex-row gap-4'>
@@ -254,7 +249,7 @@ export function Notifications() {
                 </CardContent>
             </Card>
 
-            {/* Notifications List */}
+            {}
             <div className='space-y-6'>
                 {renderNotificationGroup('Today', today)}
                 {renderNotificationGroup('Yesterday', yesterday)}

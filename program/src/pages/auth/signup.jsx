@@ -24,7 +24,7 @@ export function SignupPage() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ [name]: value });
-    // Clear error when user types
+
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
@@ -95,7 +95,7 @@ export function SignupPage() {
     setErrors(newErrors);
 
     if (isValid) {
-      // Add submission logic here
+
     }
   };
 

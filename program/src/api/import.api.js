@@ -1,9 +1,9 @@
-// Mock API service for data imports
+
 
 export const importMedications = async (data) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            // Simulate validation or processing error randomly
+
             if (Math.random() > 0.9) {
                 reject(new Error('Failed to process medication data. Duplicate entries found.'));
             } else {

@@ -41,18 +41,14 @@ export const login = async (email, password) => {
       localStorage.setItem('refreshToken', response.refreshToken);
     }
 
-    // MOCK ROLE LOGIC FOR TESTING
-    // In a real app, the role should come from the backend response.user.role
-    let role = 'manager'; // Default
+    let role = 'manager';
     if (email.includes('admin')) role = 'admin';
     else if (email.includes('pharmacist')) role = 'pharmacist';
     else if (email.includes('cashier')) role = 'cashier';
 
-    // If the backend returns a role, use it. Otherwise use the mock.
     const userRole = response.user?.role || role;
     localStorage.setItem('userRole', userRole);
 
-    // Add role to response for the component to use
     response.role = userRole;
   }
 
@@ -74,7 +70,7 @@ export const signup = async (full_name, email, password, pharmacyData) => {
       full_name,
       email,
       password,
-      role_id: 2, // Manager
+      role_id: 2,
       pharmacy: pharmacyData,
     }),
   });

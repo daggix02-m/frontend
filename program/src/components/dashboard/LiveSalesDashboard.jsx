@@ -7,7 +7,6 @@ import {
 } from 'recharts';
 import { DollarSign, Repeat2, TrendingUp, BarChart, Clock } from 'lucide-react';
 
-// Helper for currency formatting
 const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -33,38 +32,31 @@ const MetricCard = ({ title, value, unit = '', icon, description, valueClassName
 );
 
 const RealtimeChart = React.memo(({ data, title, dataKey, lineColor, tooltipFormatter, legendName }) => {
-    // Memoize the chart data and filter to show only last 2 minutes of data
+
     const chartData = useMemo(() => {
         const validData = data || [];
         if (validData.length === 0) return [];
 
-        // Get current time and calculate 2 minutes ago
         const now = new Date();
         const twoMinutesAgo = new Date(now.getTime() - 2 * 60 * 1000);
 
-        // Filter data to show only last 2 minutes
         const filteredData = validData.filter(point => {
             if (!point.time) return false;
 
-            // Parse the time string (assuming format like "HH:MM:SS")
             const timeParts = point.time.split(':');
-            if (timeParts.length !== 3) return true; // Keep if we can't parse
+            if (timeParts.length !== 3) return true;
 
             const pointTime = new Date();
             pointTime.setHours(parseInt(timeParts[0]), parseInt(timeParts[1]), parseInt(timeParts[2]));
 
-            // Handle date rollover if needed, but for simple demo assume same day
-            return true; // Simplified for demo purposes as the hook generates fresh times
+            return true;
         });
 
-        // If no data in last 2 minutes, show last 10 points to ensure something is visible
         return filteredData.length > 0 ? filteredData : validData.slice(-10);
     }, [data]);
 
-    // Create a stable key for the LineChart to prevent complete re-mounting
     const chartKey = useMemo(() => `chart-${title}-${dataKey}`, [title, dataKey]);
 
-    // Theme-aware colors
     const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     const colors = {
@@ -101,7 +93,7 @@ const RealtimeChart = React.memo(({ data, title, dataKey, lineColor, tooltipForm
                                 tick={{ fontSize: 10 }}
                                 tickFormatter={(tick) => {
                                     if (typeof tick === 'string' && tick.includes(':')) {
-                                        // Show only minutes:seconds for better readability
+
                                         const parts = tick.split(':');
                                         return parts.length >= 3 ? `${parts[1]}:${parts[2]}` : tick;
                                     }
@@ -138,7 +130,7 @@ const RealtimeChart = React.memo(({ data, title, dataKey, lineColor, tooltipForm
                                 dot={false}
                                 name={legendName}
                                 connectNulls={false}
-                                isAnimationActive={chartData.length <= 1} // Only animate on first render
+                                isAnimationActive={chartData.length <= 1}
                                 animationBegin={0}
                                 animationDuration={800}
                             />
@@ -160,7 +152,6 @@ export const LiveSalesDashboard = () => {
         latestPayments,
     } = useRealtimeSalesData();
 
-    // Ensure data is valid and has the correct structure
     const safeSalesChartData = Array.isArray(salesChartData) ? salesChartData : [];
     const safeCumulativeRevenueData = Array.isArray(cumulativeRevenueData) ? cumulativeRevenueData : [];
     const safeLatestPayments = Array.isArray(latestPayments) ? latestPayments : [];
@@ -176,7 +167,7 @@ export const LiveSalesDashboard = () => {
                 </p>
             </div>
 
-            {/* Metrics Section */}
+            {}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <MetricCard
                     title="Total Revenue"
@@ -218,7 +209,7 @@ export const LiveSalesDashboard = () => {
                 </Card>
             </div>
 
-            {/* Charts Section */}
+            {}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <RealtimeChart
                     data={safeSalesChartData}
@@ -238,7 +229,7 @@ export const LiveSalesDashboard = () => {
                 />
             </div>
 
-            {/* Latest Payments Section */}
+            {}
             <Card className="col-span-1 md:col-span-2 lg:col-span-4 max-h-[400px] overflow-hidden">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">

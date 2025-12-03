@@ -62,7 +62,7 @@ export function Prescriptions() {
                 <p className='text-muted-foreground mt-2'>Validate and dispense prescriptions</p>
             </div>
 
-            {/* Stats Grid */}
+            {}
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
@@ -77,7 +77,7 @@ export function Prescriptions() {
                 ))}
             </div>
 
-            {/* Search */}
+            {}
             <Card>
                 <CardContent className='pt-6'>
                     <div className='relative w-full md:max-w-md'>
@@ -87,7 +87,7 @@ export function Prescriptions() {
                 </CardContent>
             </Card>
 
-            {/* Prescriptions Table */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle>Active Prescriptions</CardTitle>
@@ -144,7 +144,7 @@ export function Prescriptions() {
                 </CardContent>
             </Card>
 
-            {/* Drug Interaction Alerts */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle className='flex items-center gap-2'>

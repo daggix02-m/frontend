@@ -9,7 +9,6 @@ import { useNavigate } from 'react-router-dom';
 export const NearToExpireAlert = () => {
     const navigate = useNavigate();
 
-    // Mock data for near-to-expire items
     const nearExpireItems = [
         { id: 1, name: 'Aspirin 100mg', expiryDate: '2025-12-15', daysLeft: 16, category: 'Pain Relief', stock: 45 },
         { id: 2, name: 'Cough Syrup', expiryDate: '2025-12-20', daysLeft: 21, category: 'Respiratory', stock: 12 },

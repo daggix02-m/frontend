@@ -56,10 +56,10 @@ export function BranchManagement() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (editingBranch) {
-      // Update existing branch
+
       setBranches(branches.map(b => b.id === editingBranch.id ? { ...formData, id: b.id } : b));
     } else {
-      // Add new branch
+
       const newBranch = { ...formData, id: branches.length + 1 };
       setBranches([...branches, newBranch]);
     }
@@ -103,7 +103,7 @@ export function BranchManagement() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {/* Mobile Card View */}
+          {}
           <div className='md:hidden space-y-3 p-4'>
             {filteredBranches.length > 0 ? (
               filteredBranches.map((branch) => (
@@ -156,7 +156,7 @@ export function BranchManagement() {
             )}
           </div>
 
-          {/* Desktop Table View */}
+          {}
           <div className='hidden md:block overflow-x-auto'>
             <Table>
               <TableHeader>
@@ -209,7 +209,7 @@ export function BranchManagement() {
         </CardContent>
       </Card>
 
-      {/* Add/Edit Branch Modal */}
+      {}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="p-0 bg-transparent border-none shadow-none w-full max-w-lg">
           <BranchForm

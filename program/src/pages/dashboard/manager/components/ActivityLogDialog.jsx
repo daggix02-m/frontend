@@ -8,7 +8,6 @@ import { Clock, LogIn, LogOut, Calendar } from 'lucide-react';
 export const ActivityLogDialog = ({ isOpen, onClose, staffMember }) => {
     if (!staffMember) return null;
 
-    // Mock activity log data
     const activityLogs = [
         {
             date: '2025-11-29',

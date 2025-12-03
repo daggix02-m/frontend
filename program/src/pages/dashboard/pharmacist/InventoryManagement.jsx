@@ -71,7 +71,7 @@ export function InventoryManagement() {
                 </Button>
             </div>
 
-            {/* Stats Grid */}
+            {}
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
@@ -86,7 +86,7 @@ export function InventoryManagement() {
                 ))}
             </div>
 
-            {/* Search and Filters */}
+            {}
             <Card>
                 <CardContent className='pt-6'>
                     <div className='flex flex-col sm:flex-row gap-4'>
@@ -100,7 +100,7 @@ export function InventoryManagement() {
                 </CardContent>
             </Card>
 
-            {/* Inventory Table */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle>Branch Inventory</CardTitle>
@@ -153,7 +153,7 @@ export function InventoryManagement() {
                 </CardContent>
             </Card>
 
-            {/* Quick Actions */}
+            {}
             <div className='grid gap-4 grid-cols-1 md:grid-cols-2'>
                 <Card>
                     <CardHeader>

@@ -19,7 +19,6 @@ import { BranchPerformanceCard } from './components/BranchPerformanceCard';
 export function Overview() {
   const navigate = useNavigate();
 
-  // Mock data - will be replaced with API calls
   const metrics = {
     todayRevenue: 45230.50,
     revenueChange: 12.5,
@@ -113,7 +112,7 @@ export function Overview() {
 
   return (
     <div className="space-y-6 p-4 md:p-8">
-      {/* Page Header */}
+      {}
       <div className="space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Manager Dashboard</h2>
         <p className="text-muted-foreground">
@@ -121,7 +120,7 @@ export function Overview() {
         </p>
       </div>
 
-      {/* Key Performance Metrics */}
+      {}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6">
@@ -171,7 +170,7 @@ export function Overview() {
         </Card>
       </div>
 
-      {/* Quick Actions Section */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <QuickActionsCard
           title="Pending Stock Transfers"
@@ -198,13 +197,13 @@ export function Overview() {
         />
       </div>
 
-      {/* Alerts Section */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <LowStockAlert />
         <NearToExpireAlert />
       </div>
 
-      {/* Branch Performance Overview */}
+      {}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-xl font-semibold">Branch Performance</h3>
@@ -225,7 +224,7 @@ export function Overview() {
         </div>
       </div>
 
-      {/* Live Sales Dashboard */}
+      {}
       <LiveSalesDashboard />
     </div>
   );

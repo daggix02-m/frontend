@@ -11,7 +11,7 @@ export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   const validateEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -26,27 +26,16 @@ export function LoginPage() {
       return;
     }
 
-    // Password is optional for testing (no validation)
-    // if (!password) {
-    //     setError('Please enter your password.');
-    //     return;
-    // }
-
-
-
     try {
-      // Mock login for testing - determine role from email
-      let role = 'manager'; // Default
+
+      let role = 'manager';
       if (email.includes('admin')) role = 'admin';
       else if (email.includes('pharmacist')) role = 'pharmacist';
       else if (email.includes('cashier')) role = 'cashier';
 
-      // Set mock tokens
       localStorage.setItem('accessToken', 'test-token-' + Date.now());
       localStorage.setItem('userRole', role);
 
-      // Simulate first-time login detection
-      // In production, this flag would come from the API response
       const isFirstTimeLogin = email.includes('new') || email.includes('first');
 
       if (isFirstTimeLogin) {
@@ -55,33 +44,12 @@ export function LoginPage() {
         return;
       }
 
-      // Redirect based on role
       if (role === 'admin') navigate('/admin/overview');
       else if (role === 'manager') navigate('/manager/overview');
       else if (role === 'pharmacist') navigate('/pharmacist/overview');
       else if (role === 'cashier') navigate('/cashier/overview');
-      else navigate('/manager/overview'); // Fallback
+      else navigate('/manager/overview');
 
-      // Uncomment below when backend is ready
-      // const response = await login(email, password);
-      // if (response.success) {
-      //     const role = response.role || 'manager';
-      //     const requiresPasswordChange = response.requiresPasswordChange || false;
-      //     
-      //     if (requiresPasswordChange) {
-      //         localStorage.setItem('requiresPasswordChange', 'true');
-      //         navigate('/auth/change-password');
-      //         return;
-      //     }
-      //     
-      //     if (role === 'admin') navigate('/admin/overview');
-      //     else if (role === 'manager') navigate('/manager/overview');
-      //     else if (role === 'pharmacist') navigate('/pharmacist/overview');
-      //     else if (role === 'cashier') navigate('/cashier/overview');
-      //     else navigate('/manager/overview');
-      // } else {
-      //     setError(response.message || 'Login failed. Please check your credentials.');
-      // }
     } catch (err) {
       setError('An error occurred. Please try again.');
     }

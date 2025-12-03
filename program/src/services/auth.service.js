@@ -1,4 +1,4 @@
-import api from './api';
+import { login, logout } from '../api/auth.api';
 
 /**
  * Authentication Service
@@ -13,14 +13,14 @@ export const authService = {
      * @returns {Promise} User data and token
      */
     async login(email, password) {
-        const response = await api.post('/auth/login', { email, password });
+        const response = await login(email, password);
 
-        // Store token and user role in localStorage
-        if (response.success && response.data) {
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('userRole', response.data.user.role);
-            localStorage.setItem('userName', response.data.user.name);
-            localStorage.setItem('userEmail', response.data.user.email);
+        if (response.success) {
+            // The login function from auth.api already handles token storage
+            // but we'll ensure the role is properly stored
+            if (response.role) {
+                localStorage.setItem('userRole', response.role);
+            }
         }
 
         return response;
@@ -31,15 +31,7 @@ export const authService = {
      * @returns {Promise}
      */
     async logout() {
-        try {
-            await api.post('/auth/logout');
-        } finally {
-            // Clear local storage regardless of API response
-            localStorage.removeItem('token');
-            localStorage.removeItem('userRole');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userEmail');
-        }
+        return await logout();
     },
 
     /**
@@ -47,7 +39,7 @@ export const authService = {
      * @returns {Object|null} User object or null if not logged in
      */
     getCurrentUser() {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken'); // Using the new token storage key
         if (!token) return null;
 
         return {
@@ -62,7 +54,7 @@ export const authService = {
      * @returns {boolean}
      */
     isAuthenticated() {
-        return !!localStorage.getItem('token');
+        return !!localStorage.getItem('accessToken'); // Using the new token storage key
     },
 
     /**

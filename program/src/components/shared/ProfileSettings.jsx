@@ -41,7 +41,7 @@ export const ProfileSettings = ({ userRole = 'User' }) => {
         setIsUpdatingProfile(true);
 
         try {
-            // Mock API call
+
             await new Promise(resolve => setTimeout(resolve, 1000));
             toast.success('Profile updated successfully!');
         } catch (error) {
@@ -67,7 +67,7 @@ export const ProfileSettings = ({ userRole = 'User' }) => {
         setIsChangingPassword(true);
 
         try {
-            // Mock API call
+
             await new Promise(resolve => setTimeout(resolve, 1000));
             toast.success('Password changed successfully!');
             setPasswordData({
@@ -84,7 +84,7 @@ export const ProfileSettings = ({ userRole = 'User' }) => {
 
     return (
         <div className="space-y-6">
-            {/* Profile Information */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle>Profile Information</CardTitle>
@@ -158,7 +158,7 @@ export const ProfileSettings = ({ userRole = 'User' }) => {
                 </CardContent>
             </Card>
 
-            {/* Change Password */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle>Change Password</CardTitle>

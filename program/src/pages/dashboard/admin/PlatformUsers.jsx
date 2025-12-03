@@ -80,7 +80,7 @@ export function PlatformUsers() {
                 </Button>
             </div>
 
-            {/* Stats Grid */}
+            {}
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
@@ -95,7 +95,7 @@ export function PlatformUsers() {
                 ))}
             </div>
 
-            {/* Search and Filters */}
+            {}
             <Card>
                 <CardContent className='pt-6'>
                     <div className='flex flex-col sm:flex-row gap-4'>
@@ -114,7 +114,7 @@ export function PlatformUsers() {
                 </CardContent>
             </Card>
 
-            {/* Users Table */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle>Administrator Accounts</CardTitle>
@@ -159,7 +159,7 @@ export function PlatformUsers() {
                 </CardContent>
             </Card>
 
-            {/* Activity Log */}
+            {}
             <Card>
                 <CardHeader>
                     <CardTitle>Recent Admin Activity</CardTitle>
@@ -184,7 +184,7 @@ export function PlatformUsers() {
                 </CardContent>
             </Card>
 
-            {/* Add User Modal */}
+            {}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogContent className="p-0 bg-transparent border-none shadow-none w-full max-w-lg">
                     <UserForm
