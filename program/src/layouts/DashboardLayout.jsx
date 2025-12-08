@@ -22,6 +22,7 @@ import {
   Bell,
 } from 'lucide-react';
 import { logout } from '@/api/auth.api';
+import Breadcrumb from '@/components/shared/Breadcrumb';
 import {
   Sidebar,
   SidebarContent,
@@ -37,7 +38,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
   useSidebar,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 function DashboardContent({ role }) {
   const navigate = useNavigate();
@@ -169,6 +170,24 @@ function DashboardContent({ role }) {
           </div>
         </header>
         <main className='flex-1 overflow-auto p-6'>
+          {/* Breadcrumbs */}
+          {/* Dynamically generate breadcrumb paths based on location.pathname */}
+          {(() => {
+            const { pathname } = location;
+            // Split path and build breadcrumb array
+            const segments = pathname.split('/').filter(Boolean);
+            const paths = segments.map((seg, idx) => {
+              const href = '/' + segments.slice(0, idx + 1).join('/');
+              // Capitalize segment for display
+              const name = seg.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+              return { name, href };
+            });
+            // Add root dashboard if not present
+            if (paths.length > 0 && paths[0].name.toLowerCase() !== 'dashboard') {
+              paths.unshift({ name: 'Dashboard', href: `/${role}/overview` });
+            }
+            return <Breadcrumb paths={paths} />;
+          })()}
           <Outlet />
         </main>
       </SidebarInset>
