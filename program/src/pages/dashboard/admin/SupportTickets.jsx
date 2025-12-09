@@ -12,6 +12,10 @@ export function SupportTickets() {
         { id: 'TKT-005', pharmacy: 'HealthFirst Pharmacy', subject: 'Feature request: Export to PDF', priority: 'low', status: 'resolved', assignee: 'Mulugeta Assefa', created: '2 days ago' },
     ]);
 
+    const [filterStatus, setFilterStatus] = useState('all');
+    const [filterPriority, setFilterPriority] = useState('all');
+    const [filterAssignee, setFilterAssignee] = useState('all');
+
     const getPriorityBadge = (priority) => {
         const variants = {
             urgent: 'destructive',
@@ -31,6 +35,26 @@ export function SupportTickets() {
         return <Badge variant={variants[status]}>{status}</Badge>;
     };
 
+    // Filter tickets based on selected filters
+    const filteredTickets = tickets.filter(ticket => {
+        const matchesStatus = filterStatus === 'all' || ticket.status === filterStatus;
+        const matchesPriority = filterPriority === 'all' || ticket.priority === filterPriority;
+
+        // Handle assignee filter - need to match the assignee name
+        let matchesAssignee = true;
+        if (filterAssignee !== 'all') {
+            if (filterAssignee === 'unassigned') {
+                matchesAssignee = ticket.assignee === 'Unassigned';
+            } else if (filterAssignee === 'mulugeta') {
+                matchesAssignee = ticket.assignee === 'Mulugeta Assefa';
+            } else if (filterAssignee === 'bethlehem') {
+                matchesAssignee = ticket.assignee === 'Bethlehem Yilma';
+            }
+        }
+
+        return matchesStatus && matchesPriority && matchesAssignee;
+    });
+
     const stats = [
         { title: 'Open Tickets', value: '12', icon: Ticket, color: 'text-red-600' },
         { title: 'In Progress', value: '8', icon: Clock, color: 'text-blue-600' },
@@ -45,7 +69,7 @@ export function SupportTickets() {
                 <p className='text-muted-foreground mt-2'>Manage and respond to pharmacy support requests</p>
             </div>
 
-            {}
+            { }
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
@@ -60,24 +84,36 @@ export function SupportTickets() {
                 ))}
             </div>
 
-            {}
+            { }
             <Card>
                 <CardContent className='pt-6'>
                     <div className='flex flex-col sm:flex-row gap-4'>
-                        <Select className='w-48'>
+                        <Select
+                            className='w-full sm:w-48'
+                            value={filterStatus}
+                            onChange={(e) => setFilterStatus(e.target.value)}
+                        >
                             <option value='all'>All Status</option>
                             <option value='open'>Open</option>
                             <option value='in-progress'>In Progress</option>
                             <option value='resolved'>Resolved</option>
                         </Select>
-                        <Select className='w-48'>
+                        <Select
+                            className='w-full sm:w-48'
+                            value={filterPriority}
+                            onChange={(e) => setFilterPriority(e.target.value)}
+                        >
                             <option value='all'>All Priority</option>
                             <option value='urgent'>Urgent</option>
                             <option value='high'>High</option>
                             <option value='medium'>Medium</option>
                             <option value='low'>Low</option>
                         </Select>
-                        <Select className='w-48'>
+                        <Select
+                            className='w-full sm:w-48'
+                            value={filterAssignee}
+                            onChange={(e) => setFilterAssignee(e.target.value)}
+                        >
                             <option value='all'>All Assignees</option>
                             <option value='unassigned'>Unassigned</option>
                             <option value='mulugeta'>Mulugeta Assefa</option>
@@ -87,10 +123,10 @@ export function SupportTickets() {
                 </CardContent>
             </Card>
 
-            {}
+            { }
             <Card>
                 <CardHeader>
-                    <CardTitle>All Tickets</CardTitle>
+                    <CardTitle>All Tickets ({filteredTickets.length})</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className='overflow-x-auto'>
@@ -108,22 +144,30 @@ export function SupportTickets() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {tickets.map((ticket) => (
-                                    <TableRow key={ticket.id}>
-                                        <TableCell className='font-medium'>{ticket.id}</TableCell>
-                                        <TableCell>{ticket.pharmacy}</TableCell>
-                                        <TableCell>{ticket.subject}</TableCell>
-                                        <TableCell>{getPriorityBadge(ticket.priority)}</TableCell>
-                                        <TableCell>{getStatusBadge(ticket.status)}</TableCell>
-                                        <TableCell>{ticket.assignee}</TableCell>
-                                        <TableCell>{ticket.created}</TableCell>
-                                        <TableCell>
-                                            <Button size='sm' variant='outline'>
-                                                View
-                                            </Button>
+                                {filteredTickets.length > 0 ? (
+                                    filteredTickets.map((ticket) => (
+                                        <TableRow key={ticket.id}>
+                                            <TableCell className='font-medium'>{ticket.id}</TableCell>
+                                            <TableCell>{ticket.pharmacy}</TableCell>
+                                            <TableCell>{ticket.subject}</TableCell>
+                                            <TableCell>{getPriorityBadge(ticket.priority)}</TableCell>
+                                            <TableCell>{getStatusBadge(ticket.status)}</TableCell>
+                                            <TableCell>{ticket.assignee}</TableCell>
+                                            <TableCell>{ticket.created}</TableCell>
+                                            <TableCell>
+                                                <Button size='sm' variant='outline'>
+                                                    View
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={8} className='text-center py-8 text-muted-foreground'>
+                                            No tickets match the selected filters.
                                         </TableCell>
                                     </TableRow>
-                                ))}
+                                )}
                             </TableBody>
                         </Table>
                     </div>

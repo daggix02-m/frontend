@@ -70,7 +70,7 @@ const RealtimeChart = React.memo(({ data, title, dataKey, lineColor, tooltipForm
     };
 
     return (
-        <Card className="w-full lg:w-[calc(50%-12px)]">
+        <Card className="w-full">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <BarChart className="h-5 w-5 text-blue-600" />{title}
@@ -167,7 +167,7 @@ export const LiveSalesDashboard = () => {
                 </p>
             </div>
 
-            {}
+            { }
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <MetricCard
                     title="Total Revenue"
@@ -209,7 +209,7 @@ export const LiveSalesDashboard = () => {
                 </Card>
             </div>
 
-            {}
+            { }
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <RealtimeChart
                     data={safeSalesChartData}
@@ -229,7 +229,7 @@ export const LiveSalesDashboard = () => {
                 />
             </div>
 
-            {}
+            { }
             <Card className="col-span-1 md:col-span-2 lg:col-span-4 max-h-[400px] overflow-hidden">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">

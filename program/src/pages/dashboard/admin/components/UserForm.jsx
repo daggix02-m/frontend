@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { UserPlus } from 'lucide-react';
 import { FormCard, FADE_IN_VARIANTS } from '@/components/shared/FormCard';
@@ -13,12 +13,32 @@ export const UserForm = ({
     onSubmit,
     onCancel,
     className,
+    initialData = null,
+    isEditMode = false,
 }) => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         role: 'Support Admin',
     });
+
+    // Populate form with initial data when editing
+    useEffect(() => {
+        if (isEditMode && initialData) {
+            setFormData({
+                name: initialData.name || '',
+                email: initialData.email || '',
+                role: initialData.role || 'Support Admin',
+            });
+        } else {
+            // Reset form when adding new user
+            setFormData({
+                name: '',
+                email: '',
+                role: 'Support Admin',
+            });
+        }
+    }, [isEditMode, initialData]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -32,12 +52,12 @@ export const UserForm = ({
 
     return (
         <FormCard
-            title="Add New Admin User"
+            title={isEditMode ? "Edit Admin User" : "Add New Admin User"}
             onCancel={onCancel}
             className={className}
         >
             <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-8 md:grid-cols-3">
-                {}
+                { }
                 <motion.div variants={FADE_IN_VARIANTS} className="flex flex-col items-center gap-3 md:col-span-1">
                     <div className="relative">
                         <Avatar className="h-24 w-24 border-2 border-dashed border-border flex items-center justify-center bg-muted/30">
@@ -48,11 +68,13 @@ export const UserForm = ({
                     </div>
                     <div className="text-center">
                         <p className="text-sm font-medium text-foreground">Admin Details</p>
-                        <p className="text-xs text-muted-foreground">Create new administrator</p>
+                        <p className="text-xs text-muted-foreground">
+                            {isEditMode ? 'Update administrator' : 'Create new administrator'}
+                        </p>
                     </div>
                 </motion.div>
 
-                {}
+                { }
                 <div className="flex flex-col gap-4 md:col-span-2">
                     <motion.div variants={FADE_IN_VARIANTS} className="grid w-full items-center gap-1.5">
                         <Label htmlFor="name">Full Name</Label>
@@ -95,12 +117,14 @@ export const UserForm = ({
                     </motion.div>
                 </div>
 
-                {}
+                { }
                 <motion.div variants={FADE_IN_VARIANTS} className="flex justify-end gap-3 md:col-span-3">
                     <Button type="button" variant="ghost" onClick={onCancel}>
                         Cancel
                     </Button>
-                    <Button type="submit">Add User</Button>
+                    <Button type="submit">
+                        {isEditMode ? 'Update User' : 'Add User'}
+                    </Button>
                 </motion.div>
             </form>
         </FormCard>
