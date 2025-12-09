@@ -1,14 +1,71 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Button } from '@/components/ui/ui';
-import { DollarSign, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Button, Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/ui';
+import { DollarSign, AlertCircle, CheckCircle, Clock, X } from 'lucide-react';
 
 export function BillingManagement() {
     const [billingIssues] = useState([
-        { id: 1, pharmacy: 'Green Valley Pharmacy', issue: 'Payment Failed', amount: 'ETB 299.00', status: 'pending', date: '2025-11-25' },
-        { id: 2, pharmacy: 'City Health Pharmacy', issue: 'Refund Request', amount: 'ETB 149.00', status: 'in-progress', date: '2025-11-24' },
-        { id: 3, pharmacy: 'MediCare Plus', issue: 'Billing Dispute', amount: 'ETB 499.00', status: 'resolved', date: '2025-11-23' },
-        { id: 4, pharmacy: 'Wellness Pharmacy', issue: 'Card Declined', amount: 'ETB 299.00', status: 'pending', date: '2025-11-22' },
+        {
+            id: 1,
+            pharmacy: 'Green Valley Pharmacy',
+            issue: 'Payment Failed',
+            amount: 'ETB 299.00',
+            status: 'pending',
+            date: '2025-11-25',
+            description: 'Credit card payment failed due to insufficient funds. Customer notified via email.',
+            transactionId: 'TXN-2025-001',
+            contactEmail: 'billing@greenvalley.com',
+            lastAttempt: '2025-11-25 14:30'
+        },
+        {
+            id: 2,
+            pharmacy: 'City Health Pharmacy',
+            issue: 'Refund Request',
+            amount: 'ETB 149.00',
+            status: 'in-progress',
+            date: '2025-11-24',
+            description: 'Customer requested refund for double billing. Finance team reviewing.',
+            transactionId: 'TXN-2025-002',
+            contactEmail: 'admin@cityhealth.com',
+            lastAttempt: '2025-11-24 10:15'
+        },
+        {
+            id: 3,
+            pharmacy: 'MediCare Plus',
+            issue: 'Billing Dispute',
+            amount: 'ETB 499.00',
+            status: 'resolved',
+            date: '2025-11-23',
+            description: 'Dispute regarding subscription tier resolved. Upgraded to Enterprise plan.',
+            transactionId: 'TXN-2025-003',
+            contactEmail: 'support@medicareplus.com',
+            lastAttempt: '2025-11-23 16:45'
+        },
+        {
+            id: 4,
+            pharmacy: 'Wellness Pharmacy',
+            issue: 'Card Declined',
+            amount: 'ETB 299.00',
+            status: 'pending',
+            date: '2025-11-22',
+            description: 'Payment card declined multiple times. Customer needs to update payment method.',
+            transactionId: 'TXN-2025-004',
+            contactEmail: 'finance@wellnesspharm.com',
+            lastAttempt: '2025-11-22 09:20'
+        },
     ]);
+
+    const [selectedIssue, setSelectedIssue] = useState(null);
+    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+
+    const handleViewDetails = (issue) => {
+        setSelectedIssue(issue);
+        setIsDetailsModalOpen(true);
+    };
+
+    const handleCloseDetails = () => {
+        setIsDetailsModalOpen(false);
+        setSelectedIssue(null);
+    };
 
     const getStatusBadge = (status) => {
         const variants = {
@@ -33,7 +90,7 @@ export function BillingManagement() {
                 <p className='text-muted-foreground mt-2'>Handle billing issues and payment disputes</p>
             </div>
 
-            {}
+            { }
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
@@ -49,7 +106,7 @@ export function BillingManagement() {
                 ))}
             </div>
 
-            {}
+            { }
             <Card>
                 <CardHeader>
                     <CardTitle>Recent Billing Issues</CardTitle>
@@ -76,7 +133,11 @@ export function BillingManagement() {
                                         <TableCell>{issue.date}</TableCell>
                                         <TableCell>{getStatusBadge(issue.status)}</TableCell>
                                         <TableCell>
-                                            <Button size='sm' variant='outline'>
+                                            <Button
+                                                size='sm'
+                                                variant='outline'
+                                                onClick={() => handleViewDetails(issue)}
+                                            >
                                                 View Details
                                             </Button>
                                         </TableCell>
@@ -88,7 +149,7 @@ export function BillingManagement() {
                 </CardContent>
             </Card>
 
-            {}
+            { }
             <Card>
                 <CardHeader>
                     <CardTitle>Recent Transactions</CardTitle>
@@ -110,6 +171,76 @@ export function BillingManagement() {
                     </div>
                 </CardContent>
             </Card>
+
+            { }
+            <Dialog open={isDetailsModalOpen} onOpenChange={handleCloseDetails}>
+                <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                        <DialogTitle>Billing Issue Details</DialogTitle>
+                    </DialogHeader>
+
+                    {selectedIssue && (
+                        <div className='space-y-6 p-4'>
+                            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                                <div>
+                                    <p className='text-sm font-medium text-muted-foreground'>Pharmacy Name</p>
+                                    <p className='text-base font-semibold mt-1'>{selectedIssue.pharmacy}</p>
+                                </div>
+                                <div>
+                                    <p className='text-sm font-medium text-muted-foreground'>Issue Type</p>
+                                    <p className='text-base font-semibold mt-1'>{selectedIssue.issue}</p>
+                                </div>
+                            </div>
+
+                            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                                <div>
+                                    <p className='text-sm font-medium text-muted-foreground'>Amount</p>
+                                    <p className='text-base font-semibold mt-1'>{selectedIssue.amount}</p>
+                                </div>
+                                <div>
+                                    <p className='text-sm font-medium text-muted-foreground'>Status</p>
+                                    <div className='mt-1'>{getStatusBadge(selectedIssue.status)}</div>
+                                </div>
+                            </div>
+
+                            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                                <div>
+                                    <p className='text-sm font-medium text-muted-foreground'>Date Reported</p>
+                                    <p className='text-base font-semibold mt-1'>{selectedIssue.date}</p>
+                                </div>
+                                <div>
+                                    <p className='text-sm font-medium text-muted-foreground'>Transaction ID</p>
+                                    <p className='text-base font-semibold mt-1'>{selectedIssue.transactionId}</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <p className='text-sm font-medium text-muted-foreground'>Contact Email</p>
+                                <p className='text-base font-semibold mt-1'>{selectedIssue.contactEmail}</p>
+                            </div>
+
+                            <div>
+                                <p className='text-sm font-medium text-muted-foreground'>Last Payment Attempt</p>
+                                <p className='text-base font-semibold mt-1'>{selectedIssue.lastAttempt}</p>
+                            </div>
+
+                            <div>
+                                <p className='text-sm font-medium text-muted-foreground'>Description</p>
+                                <p className='text-base mt-1 text-gray-700 dark:text-gray-300'>{selectedIssue.description}</p>
+                            </div>
+
+                            <div className='flex gap-3 justify-end pt-4 border-t'>
+                                <Button variant='outline' onClick={handleCloseDetails}>
+                                    Close
+                                </Button>
+                                <Button>
+                                    Take Action
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

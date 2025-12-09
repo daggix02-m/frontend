@@ -49,10 +49,11 @@ export function PharmacyManagement() {
                     <h2 className='text-3xl font-bold tracking-tight'>Pharmacy Management</h2>
                     <p className='text-muted-foreground'>Approve, suspend, or deactivate pharmacies across Ethiopia.</p>
                 </div>
-                <div className='flex gap-2'>
-                    <Button variant={filterStatus === 'All' ? 'default' : 'outline'} onClick={() => setFilterStatus('All')}>All</Button>
-                    <Button variant={filterStatus === 'Pending' ? 'default' : 'outline'} onClick={() => setFilterStatus('Pending')}>Pending</Button>
-                    <Button variant={filterStatus === 'Active' ? 'default' : 'outline'} onClick={() => setFilterStatus('Active')}>Active</Button>
+                <div className='flex flex-wrap gap-2'>
+                    <Button variant={filterStatus === 'All' ? 'default' : 'outline'} onClick={() => setFilterStatus('All')} size='sm'>All</Button>
+                    <Button variant={filterStatus === 'Pending' ? 'default' : 'outline'} onClick={() => setFilterStatus('Pending')} size='sm'>Pending</Button>
+                    <Button variant={filterStatus === 'Active' ? 'default' : 'outline'} onClick={() => setFilterStatus('Active')} size='sm'>Active</Button>
+                    <Button variant={filterStatus === 'Suspended' ? 'default' : 'outline'} onClick={() => setFilterStatus('Suspended')} size='sm'>Suspended</Button>
                 </div>
             </div>
 

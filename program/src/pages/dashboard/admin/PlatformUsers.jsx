@@ -14,13 +14,10 @@ export function PlatformUsers() {
     ]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [editingUser, setEditingUser] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterRole, setFilterRole] = useState('All');
-    const [newUser, setNewUser] = useState({
-        name: '',
-        email: '',
-        role: 'Support Admin'
-    });
 
     const handleAddUser = (data) => {
         const user = {
@@ -31,6 +28,35 @@ export function PlatformUsers() {
         };
         setUsers([...users, user]);
         setIsModalOpen(false);
+    };
+
+    const handleEditUser = (user) => {
+        setEditingUser(user);
+        setIsEditMode(true);
+        setIsModalOpen(true);
+    };
+
+    const handleUpdateUser = (data) => {
+        setUsers(users.map(u =>
+            u.id === editingUser.id
+                ? { ...u, ...data }
+                : u
+        ));
+        setIsModalOpen(false);
+        setIsEditMode(false);
+        setEditingUser(null);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setIsEditMode(false);
+        setEditingUser(null);
+    };
+
+    const handleOpenAddModal = () => {
+        setIsEditMode(false);
+        setEditingUser(null);
+        setIsModalOpen(true);
     };
 
     const getStatusBadge = (status) => {
@@ -74,13 +100,13 @@ export function PlatformUsers() {
                     <h1 className='text-3xl font-bold tracking-tight'>Platform Users</h1>
                     <p className='text-muted-foreground mt-2'>Manage platform administrator accounts</p>
                 </div>
-                <Button onClick={() => setIsModalOpen(true)}>
+                <Button onClick={handleOpenAddModal}>
                     <UserPlus className='mr-2 h-4 w-4' />
                     Add Admin User
                 </Button>
             </div>
 
-            {}
+            { }
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
@@ -95,7 +121,7 @@ export function PlatformUsers() {
                 ))}
             </div>
 
-            {}
+            { }
             <Card>
                 <CardContent className='pt-6'>
                     <div className='flex flex-col sm:flex-row gap-4'>
@@ -114,7 +140,7 @@ export function PlatformUsers() {
                 </CardContent>
             </Card>
 
-            {}
+            { }
             <Card>
                 <CardHeader>
                     <CardTitle>Administrator Accounts</CardTitle>
@@ -142,7 +168,13 @@ export function PlatformUsers() {
                                             <TableCell>{getStatusBadge(user.status)}</TableCell>
                                             <TableCell className='text-sm text-muted-foreground'>{user.lastActive}</TableCell>
                                             <TableCell className='text-right'>
-                                                <Button variant='ghost' size='sm'>Edit</Button>
+                                                <Button
+                                                    variant='ghost'
+                                                    size='sm'
+                                                    onClick={() => handleEditUser(user)}
+                                                >
+                                                    Edit
+                                                </Button>
                                             </TableCell>
                                         </TableRow>
                                     ))
@@ -159,7 +191,7 @@ export function PlatformUsers() {
                 </CardContent>
             </Card>
 
-            {}
+            { }
             <Card>
                 <CardHeader>
                     <CardTitle>Recent Admin Activity</CardTitle>
@@ -184,12 +216,14 @@ export function PlatformUsers() {
                 </CardContent>
             </Card>
 
-            {}
-            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+            { }
+            <Dialog open={isModalOpen} onOpenChange={handleCloseModal}>
                 <DialogContent className="p-0 bg-transparent border-none shadow-none w-full max-w-lg">
                     <UserForm
-                        onSubmit={handleAddUser}
-                        onCancel={() => setIsModalOpen(false)}
+                        onSubmit={isEditMode ? handleUpdateUser : handleAddUser}
+                        onCancel={handleCloseModal}
+                        initialData={isEditMode ? editingUser : null}
+                        isEditMode={isEditMode}
                     />
                 </DialogContent>
             </Dialog>
