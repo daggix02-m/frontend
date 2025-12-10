@@ -104,12 +104,30 @@ export const managerService = {
         return await makeApiCall(`/manager/staff/${id}`, { method: 'DELETE' });
     },
 
+
     /**
      * Get pending stock transfers
      * @returns {Promise}
      */
     async getStockTransfers() {
         return await makeApiCall('/manager/stock-transfers', { method: 'GET' });
+    },
+
+    /**
+     * Get count of pending stock transfers
+     * @returns {Promise<number>}
+     */
+    async getPendingStockTransfersCount() {
+        // Assumes getStockTransfers returns an array of transfers with a 'status' property
+        const transfers = await this.getStockTransfers();
+        if (Array.isArray(transfers)) {
+            return transfers.filter(t => t.status === 'pending').length;
+        }
+        // If API returns { data: [...] }
+        if (transfers && Array.isArray(transfers.data)) {
+            return transfers.data.filter(t => t.status === 'pending').length;
+        }
+        return 0;
     },
 
     /**

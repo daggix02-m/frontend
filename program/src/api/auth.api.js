@@ -6,7 +6,7 @@ import { apiClient } from './apiClient';
  * @param {Object} options - Request options
  * @returns {Promise<Object>} Response object with success status and data
  */
-const makeApiCall = async (endpoint, options = {}) => {
+export const makeApiCall = async (endpoint, options = {}) => {
   try {
     const response = await apiClient(endpoint, options);
     return {

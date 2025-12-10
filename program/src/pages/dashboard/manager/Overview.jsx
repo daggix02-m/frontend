@@ -10,11 +10,13 @@ import {
   PackageCheck,
   Store
 } from 'lucide-react';
+
 import { LiveSalesDashboard } from '@/components/dashboard/LiveSalesDashboard';
 import { LowStockAlert } from './components/LowStockAlert';
 import { NearToExpireAlert } from './components/NearToExpireAlert';
 import { QuickActionsCard } from './components/QuickActionsCard';
 import { BranchPerformanceCard } from './components/BranchPerformanceCard';
+import PendingStockTransfersCard from '@/components/dashboard/PendingStockTransfersCard';
 
 export function Overview() {
   const navigate = useNavigate();
@@ -121,7 +123,7 @@ export function Overview() {
       </div>
 
       {}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
@@ -168,6 +170,9 @@ export function Overview() {
             <p className="text-xs text-muted-foreground">Overall performance</p>
           </CardContent>
         </Card>
+
+        {/* Pending Stock Transfers Card */}
+        <PendingStockTransfersCard />
       </div>
 
       {}
