@@ -41,15 +41,18 @@ export const login = async (email, password) => {
       localStorage.setItem('refreshToken', response.refreshToken);
     }
 
-    let role = 'manager';
-    if (email.includes('admin')) role = 'admin';
-    else if (email.includes('pharmacist')) role = 'pharmacist';
-    else if (email.includes('cashier')) role = 'cashier';
+    // Get user role from the response
+    const userRole = response.user?.role || response.role;
+    if (userRole) {
+      localStorage.setItem('userRole', userRole);
+      response.role = userRole;
+    }
 
-    const userRole = response.user?.role || role;
-    localStorage.setItem('userRole', userRole);
-
-    response.role = userRole;
+    // Also store other user information if available
+    if (response.user) {
+      localStorage.setItem('userId', response.user.id || '');
+      localStorage.setItem('userName', response.user.name || response.user.full_name || '');
+    }
   }
 
   return response;
@@ -71,6 +74,7 @@ export const signup = async (full_name, email, password, pharmacyData) => {
       email,
       password,
       role_id: 2,
+      branch_id: pharmacyData.branch_id, // Extract branch_id from pharmacyData
       pharmacy: pharmacyData,
     }),
   });
@@ -246,5 +250,43 @@ export const createUser = async (userData) => {
   return await makeApiCall('/users', {
     method: 'POST',
     body: JSON.stringify(userData),
+  });
+};
+
+/**
+ * Change user password
+ * @param {string} currentPassword - Current password
+ * @param {string} newPassword - New password
+ * @returns {Promise<Object>} Response object with success status
+ */
+export const changePassword = async (currentPassword, newPassword) => {
+  return await makeApiCall('/auth/change-password', {
+    method: 'POST',
+    body: JSON.stringify({
+      current_password: currentPassword,
+      new_password: newPassword
+    }),
+  });
+};
+
+/**
+ * Get current user profile
+ * @returns {Promise<Object>} Response object with user profile data
+ */
+export const getProfile = async () => {
+  return await makeApiCall('/auth/profile', {
+    method: 'GET',
+  });
+};
+
+/**
+ * Update user profile
+ * @param {Object} profileData - Updated profile data
+ * @returns {Promise<Object>} Response object with success status
+ */
+export const updateProfile = async (profileData) => {
+  return await makeApiCall('/auth/profile', {
+    method: 'PUT',
+    body: JSON.stringify(profileData),
   });
 };

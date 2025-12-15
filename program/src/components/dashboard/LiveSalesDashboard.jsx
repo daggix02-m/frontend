@@ -150,11 +150,30 @@ export const LiveSalesDashboard = () => {
         averageSale,
         salesChartData,
         latestPayments,
+        loading
     } = useRealtimeSalesData();
 
     const safeSalesChartData = Array.isArray(salesChartData) ? salesChartData : [];
     const safeCumulativeRevenueData = Array.isArray(cumulativeRevenueData) ? cumulativeRevenueData : [];
     const safeLatestPayments = Array.isArray(latestPayments) ? latestPayments : [];
+
+    if (loading) {
+        return (
+            <div className="w-full bg-background text-foreground p-4 md:p-8 flex flex-col gap-4 md:gap-8 items-center justify-center">
+                <div className="flex flex-col space-y-2 text-center">
+                    <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight lg:text-5xl text-primary drop-shadow-lg">
+                        Active Sales Tracker
+                    </h1>
+                    <p className="text-md md:text-lg text-muted-foreground">
+                        Loading real-time sales data...
+                    </p>
+                </div>
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="w-full bg-background text-foreground p-4 md:p-8 flex flex-col gap-4 md:gap-8">

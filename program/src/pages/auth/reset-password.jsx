@@ -1,12 +1,69 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import FloatingPaths from '@/components/shared/FloatingPaths';
 import { ChevronLeftIcon, LockIcon } from 'lucide-react';
+import { resetPassword } from '@/api/auth.api';
 
 export function ResetPasswordPage() {
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const token = searchParams.get('token');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (!token) {
+      setError('Reset token is missing. Please use the link from your email.');
+      return;
+    }
+
+    if (!password) {
+      setError('Please enter a new password.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await resetPassword(token, password);
+
+      if (response.success) {
+        setSuccess('Password has been reset successfully. Redirecting to login...');
+        setTimeout(() => {
+          navigate('/auth/login');
+        }, 2000);
+      } else {
+        setError(response.message || 'Failed to reset password. Please try again.');
+      }
+    } catch (err) {
+      setError(err.message || 'An unexpected error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <main className='relative md:h-screen md:overflow-hidden lg:grid lg:grid-cols-2'>
       <div className='bg-muted/60 relative hidden h-full flex-col border-r p-10 lg:flex'>
@@ -47,10 +104,16 @@ export function ResetPasswordPage() {
             <p className='text-muted-foreground text-base'>Enter your new password below.</p>
           </div>
 
-          <form className='space-y-4'>
+          <form onSubmit={handleSubmit} className='space-y-4'>
             <div className='space-y-2'>
               <div className='relative h-max'>
-                <Input placeholder='New Password' className='peer ps-9' type='password' />
+                <Input
+                  placeholder='New Password'
+                  className={`peer ps-9 ${error && error.includes('Password') ? 'border-red-500' : ''}`}
+                  type='password'
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
                 <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
                   <LockIcon className='size-4' aria-hidden='true' />
                 </div>
@@ -58,15 +121,24 @@ export function ResetPasswordPage() {
             </div>
             <div className='space-y-2'>
               <div className='relative h-max'>
-                <Input placeholder='Confirm New Password' className='peer ps-9' type='password' />
+                <Input
+                  placeholder='Confirm New Password'
+                  className={`peer ps-9 ${error && error.includes('match') ? 'border-red-500' : ''}`}
+                  type='password'
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
                 <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
                   <LockIcon className='size-4' aria-hidden='true' />
                 </div>
               </div>
             </div>
 
-            <Button type='button' className='w-full'>
-              <span>Reset Password</span>
+            {error && <p className='text-red-500 text-sm'>{error}</p>}
+            {success && <p className='text-green-500 text-sm'>{success}</p>}
+
+            <Button type='submit' className='w-full' disabled={isLoading}>
+              {isLoading ? 'Resetting...' : 'Reset Password'}
             </Button>
           </form>
         </div>

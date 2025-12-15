@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -18,23 +18,46 @@ import {
 } from '@/components/ui/ui';
 import { Plus, Search, MapPin, Phone, Edit, Trash2, Building2 } from 'lucide-react';
 import { BranchForm } from './components/BranchForm';
+import { managerService } from '@/services/manager.service';
+import { toast } from 'sonner';
 
 export function BranchManagement() {
-  const [branches, setBranches] = useState([
-    { id: 1, name: 'Main Branch', address: 'Bole Road, Near Edna Mall, Addis Ababa', contact: '+251-11-662-3456' },
-    { id: 2, name: 'Downtown Branch', address: 'Tana Avenue, Kebele 03, Bahir Dar', contact: '+251-58-220-1234' },
-    { id: 3, name: 'Westside Branch', address: 'Hawassa Road, Piazza Area, Hawassa', contact: '+251-46-220-5678' },
-  ]);
-
+  const [branches, setBranches] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBranch, setEditingBranch] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     name: '',
     address: '',
     contact: '',
   });
+
+  useEffect(() => {
+    fetchBranches();
+  }, []);
+
+  const fetchBranches = async () => {
+    try {
+      setLoading(true);
+      const response = await managerService.getBranches();
+
+      if (response.success) {
+        const branchesData = response.data || response.branches || [];
+        setBranches(Array.isArray(branchesData) ? branchesData : []);
+      } else {
+        toast.error('Failed to load branches');
+        setBranches([]);
+      }
+    } catch (error) {
+      console.error('Error fetching branches:', error);
+      toast.error('Failed to load branches');
+      setBranches([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -53,29 +76,65 @@ export function BranchManagement() {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editingBranch) {
-
-      setBranches(branches.map(b => b.id === editingBranch.id ? { ...formData, id: b.id } : b));
-    } else {
-
-      const newBranch = { ...formData, id: branches.length + 1 };
-      setBranches([...branches, newBranch]);
+    try {
+      if (editingBranch) {
+        const response = await managerService.updateBranch(editingBranch.id || editingBranch._id, formData);
+        if (response.success) {
+          toast.success('Branch updated successfully');
+          await fetchBranches();
+        } else {
+          toast.error(response.message || 'Failed to update branch');
+        }
+      } else {
+        const response = await managerService.createBranch(formData);
+        if (response.success) {
+          toast.success('Branch created successfully');
+          await fetchBranches();
+        } else {
+          toast.error(response.message || 'Failed to create branch');
+        }
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Error saving branch:', error);
+      toast.error('Failed to save branch');
     }
-    setIsModalOpen(false);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this branch? This action cannot be undone.')) {
-      setBranches(branches.filter(b => b.id !== id));
+      try {
+        const response = await managerService.deleteBranch(id);
+        if (response.success) {
+          toast.success('Branch deleted successfully');
+          await fetchBranches();
+        } else {
+          toast.error(response.message || 'Failed to delete branch');
+        }
+      } catch (error) {
+        console.error('Error deleting branch:', error);
+        toast.error('Failed to delete branch');
+      }
     }
   };
 
   const filteredBranches = branches.filter(branch =>
-    branch.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    branch.address.toLowerCase().includes(searchTerm.toLowerCase())
+    branch.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    branch.address?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (loading) {
+    return (
+      <div className='space-y-4 sm:space-y-6'>
+        <h2 className='text-2xl sm:text-3xl font-bold tracking-tight'>Branch Management</h2>
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-4 sm:space-y-6'>
@@ -103,7 +162,7 @@ export function BranchManagement() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {}
+          { }
           <div className='md:hidden space-y-3 p-4'>
             {filteredBranches.length > 0 ? (
               filteredBranches.map((branch) => (
@@ -156,7 +215,7 @@ export function BranchManagement() {
             )}
           </div>
 
-          {}
+          { }
           <div className='hidden md:block overflow-x-auto'>
             <Table>
               <TableHeader>
@@ -209,19 +268,36 @@ export function BranchManagement() {
         </CardContent>
       </Card>
 
-      {}
+      { }
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="p-0 bg-transparent border-none shadow-none w-full max-w-lg">
           <BranchForm
             initialData={editingBranch}
-            onSubmit={(data) => {
-              if (editingBranch) {
-                setBranches(branches.map(b => b.id === editingBranch.id ? { ...data, id: b.id } : b));
-              } else {
-                const newBranch = { ...data, id: branches.length + 1 };
-                setBranches([...branches, newBranch]);
+            onSubmit={async (data) => {
+              try {
+                if (editingBranch) {
+                  const response = await managerService.updateBranch(editingBranch.id || editingBranch._id, data);
+                  if (response.success) {
+                    toast.success('Branch updated successfully');
+                    await fetchBranches();
+                    setIsModalOpen(false);
+                  } else {
+                    toast.error(response.message || 'Failed to update branch');
+                  }
+                } else {
+                  const response = await managerService.createBranch(data);
+                  if (response.success) {
+                    toast.success('Branch created successfully');
+                    await fetchBranches();
+                    setIsModalOpen(false);
+                  } else {
+                    toast.error(response.message || 'Failed to create branch');
+                  }
+                }
+              } catch (error) {
+                console.error('Error saving branch:', error);
+                toast.error('Failed to save branch');
               }
-              setIsModalOpen(false);
             }}
             onCancel={() => setIsModalOpen(false)}
           />

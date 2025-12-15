@@ -1,16 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Button, Input, Dialog, DialogContent, Badge } from '@/components/ui/ui';
 import { Select } from '@/components/ui/select';
 import { Plus, Search, Filter, Edit, Package } from 'lucide-react';
 import { ProductForm } from './components/ProductForm';
+import { pharmacistService } from '@/services/pharmacist.service';
+import { apiClient } from '@/api/apiClient';
+import { toast } from 'sonner';
 
 export function InventoryManagement({ readOnly = false }) {
-    const [products, setProducts] = useState([
-        { id: 1, name: 'Paracetamol 500mg', category: 'Pain Relief', stock: 1200, price: 'ETB 5.00', status: 'In Stock' },
-        { id: 2, name: 'Amoxicillin 250mg', category: 'Antibiotics', stock: 85, price: 'ETB 12.50', status: 'Low Stock' },
-        { id: 3, name: 'Vitamin C 1000mg', category: 'Supplements', stock: 500, price: 'ETB 8.00', status: 'In Stock' },
-    ]);
-
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -23,24 +22,116 @@ export function InventoryManagement({ readOnly = false }) {
         status: 'In Stock'
     });
 
-    const handleAddProduct = (data) => {
-        const product = {
-            id: products.length + 1,
-            ...data,
-            price: `ETB ${data.price}`
-        };
-        setProducts([...products, product]);
-        setIsModalOpen(false);
+    // Fetch inventory data from backend
+    useEffect(() => {
+        fetchInventory();
+    }, [searchTerm, filterCategory]); // Add dependencies for search and filtering
+
+    const fetchInventory = async (params = {}) => {
+        try {
+            setLoading(true);
+
+            // Include search and filter parameters in the API call
+            const queryParams = {
+                ...params,
+                search: searchTerm || undefined,
+                category: filterCategory !== 'All' ? filterCategory : undefined
+            };
+
+            const response = await pharmacistService.getInventory(queryParams);
+
+            if (response.success) {
+                // Format the response to match the expected structure
+                const formattedProducts = Array.isArray(response.data)
+                    ? response.data.map(item => ({
+                        id: item.id || item._id,
+                        name: item.name || item.product_name || item.productName || 'Unknown',
+                        category: item.category || item.category_name || 'General',
+                        stock: item.stock || item.quantity || 0,
+                        price: `ETB ${(item.price || item.unit_price || item.unitPrice || 0).toFixed(2)}`,
+                        status: calculateStatus(item.stock || item.quantity || 0)
+                    }))
+                    : [];
+
+                setProducts(formattedProducts);
+            } else {
+                // Fallback to empty array if response is not successful
+                setProducts([]);
+            }
+        } catch (error) {
+            console.error('Error fetching inventory:', error);
+            toast.error('Failed to load inventory data');
+            setProducts([]); // Set to empty array as fallback
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleEditProduct = (data) => {
-        setProducts(products.map(p =>
-            p.id === editingProduct.id
-                ? { ...data, id: p.id, price: `ETB ${data.price}` }
-                : p
-        ));
-        setIsModalOpen(false);
-        setEditingProduct(null);
+    const calculateStatus = (stock) => {
+        if (stock === 0) return 'Out of Stock';
+        if (stock <= 50) return 'Low Stock';
+        return 'In Stock';
+    };
+
+    const handleAddProduct = async (data) => {
+        try {
+            // Format the product data for API
+            const productData = {
+                name: data.name,
+                category: data.category,
+                stock: parseInt(data.stock),
+                price: parseFloat(data.price),
+                unit: data.unit || 'tablet' // Add unit if available
+            };
+
+            const response = await apiClient('/inventory', {
+                method: 'POST',
+                body: JSON.stringify(productData)
+            });
+
+            if (response.success) {
+                toast.success('Product added successfully');
+                setIsModalOpen(false);
+                fetchInventory(); // Refresh the inventory list
+            } else {
+                toast.error(response.message || 'Failed to add product');
+            }
+        } catch (error) {
+            console.error('Error adding product:', error);
+            toast.error('Failed to add product');
+        }
+    };
+
+    const handleEditProduct = async (data) => {
+        try {
+            if (!editingProduct) return;
+
+            // Format the product data for API
+            const productData = {
+                name: data.name,
+                category: data.category,
+                stock: parseInt(data.stock),
+                price: parseFloat(data.price),
+                unit: data.unit || 'tablet' // Add unit if available
+            };
+
+            const response = await apiClient(`/inventory/${editingProduct.id}`, {
+                method: 'PUT',
+                body: JSON.stringify(productData)
+            });
+
+            if (response.success) {
+                toast.success('Product updated successfully');
+                setIsModalOpen(false);
+                setEditingProduct(null);
+                fetchInventory(); // Refresh the inventory list
+            } else {
+                toast.error(response.message || 'Failed to update product');
+            }
+        } catch (error) {
+            console.error('Error updating product:', error);
+            toast.error('Failed to update product');
+        }
     };
 
     const openAddModal = () => {
@@ -53,13 +144,10 @@ export function InventoryManagement({ readOnly = false }) {
         setIsModalOpen(true);
     };
 
-    const filteredProducts = products.filter(product => {
-        const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            product.category.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesFilter = filterCategory === 'All' || product.category === filterCategory;
-        return matchesSearch && matchesFilter;
-    });
+    // Use the products from the API directly since filtering is handled server-side
+    const filteredProducts = products;
 
+    // Extract unique categories for the filter dropdown
     const categories = ['All', ...new Set(products.map(p => p.category))];
 
     return (

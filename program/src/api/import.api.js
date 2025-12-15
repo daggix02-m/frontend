@@ -1,33 +1,23 @@
+import { makeApiCall } from './auth.api';
 
 
 export const importMedications = async (data) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-
-            if (Math.random() > 0.9) {
-                reject(new Error('Failed to process medication data. Duplicate entries found.'));
-            } else {
-                console.log('Importing Medications:', data);
-                resolve({ success: true, message: `Successfully imported ${data.length} medications.` });
-            }
-        }, 1500);
+    return await makeApiCall('/manager/import/medications', {
+        method: 'POST',
+        body: JSON.stringify(data),
     });
 };
 
 export const importEmployees = async (data) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            console.log('Importing Employees:', data);
-            resolve({ success: true, message: `Successfully imported ${data.length} employees.` });
-        }, 1500);
+    return await makeApiCall('/manager/import/employees', {
+        method: 'POST',
+        body: JSON.stringify(data),
     });
 };
 
 export const importBranches = async (data) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            console.log('Importing Branches:', data);
-            resolve({ success: true, message: `Successfully imported ${data.length} branches.` });
-        }, 1500);
+    return await makeApiCall('/manager/import/branches', {
+        method: 'POST',
+        body: JSON.stringify(data),
     });
 };

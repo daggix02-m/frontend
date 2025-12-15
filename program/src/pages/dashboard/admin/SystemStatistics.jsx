@@ -1,32 +1,84 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/ui';
 import { Building2, Users, DollarSign, TrendingUp, Activity, Globe } from 'lucide-react';
+import { adminService } from '@/services/admin.service';
+import { toast } from 'sonner';
 
 export function SystemStatistics() {
+    const [statsData, setStatsData] = useState({
+        totalPharmacies: 0,
+        activeUsers: 0,
+        monthlyRevenue: 0,
+        growthRate: 0,
+        uptime: 0,
+        countries: 0,
+        recentActivity: [],
+        topPharmacies: [],
+        platformStats: {
+            totalTransactions: 0,
+            productsManaged: 0,
+            prescriptionsFilled: 0,
+            supportTickets: 0
+        }
+    });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchStats();
+    }, []);
+
+    const fetchStats = async () => {
+        try {
+            setLoading(true);
+            const response = await adminService.getSystemStatistics();
+
+            if (response.success) {
+                setStatsData(response.data || {
+                    totalPharmacies: 0,
+                    activeUsers: 0,
+                    monthlyRevenue: 0,
+                    growthRate: 0,
+                    uptime: 0,
+                    countries: 0,
+                    recentActivity: [],
+                    topPharmacies: [],
+                    platformStats: {
+                        totalTransactions: 0,
+                        productsManaged: 0,
+                        prescriptionsFilled: 0,
+                        supportTickets: 0
+                    }
+                });
+            } else {
+                toast.error('Failed to load system statistics');
+            }
+        } catch (error) {
+            console.error('Error fetching system statistics:', error);
+            toast.error('Failed to load system statistics');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const stats = [
-        { title: 'Total Pharmacies', value: '1,234', icon: Building2, trend: '+12.5%', color: 'text-blue-600' },
-        { title: 'Active Users', value: '8,456', icon: Users, trend: '+8.2%', color: 'text-green-600' },
-        { title: 'Monthly Revenue', value: 'ETB 368,940', icon: DollarSign, trend: '+15.3%', color: 'text-purple-600' },
-        { title: 'Growth Rate', value: '23.5%', icon: TrendingUp, trend: '+2.1%', color: 'text-orange-600' },
-        { title: 'System Uptime', value: '99.98%', icon: Activity, trend: '+0.02%', color: 'text-cyan-600' },
-        { title: 'Countries', value: '45', icon: Globe, trend: '+3', color: 'text-pink-600' },
+        { title: 'Total Pharmacies', value: statsData.totalPharmacies.toLocaleString(), icon: Building2, trend: '+12.5%', color: 'text-blue-600' },
+        { title: 'Active Users', value: statsData.activeUsers.toLocaleString(), icon: Users, trend: '+8.2%', color: 'text-green-600' },
+        { title: 'Monthly Revenue', value: `ETB ${statsData.monthlyRevenue.toLocaleString()}`, icon: DollarSign, trend: '+15.3%', color: 'text-purple-600' },
+        { title: 'Growth Rate', value: `${statsData.growthRate}%`, icon: TrendingUp, trend: '+2.1%', color: 'text-orange-600' },
+        { title: 'System Uptime', value: `${statsData.uptime}%`, icon: Activity, trend: '+0.02%', color: 'text-cyan-600' },
+        { title: 'Countries', value: statsData.countries.toString(), icon: Globe, trend: '+3', color: 'text-pink-600' },
     ];
 
-    const recentActivity = [
-        { action: 'New pharmacy registered', pharmacy: 'Green Valley Pharmacy', time: '5 minutes ago' },
-        { action: 'Subscription upgraded', pharmacy: 'City Health Pharmacy', time: '15 minutes ago' },
-        { action: 'New user created', pharmacy: 'MediCare Plus', time: '1 hour ago' },
-        { action: 'Payment received', pharmacy: 'Wellness Pharmacy', time: '2 hours ago' },
-        { action: 'Support ticket resolved', pharmacy: 'HealthFirst Pharmacy', time: '3 hours ago' },
-    ];
-
-    const topPharmacies = [
-        { name: 'Green Valley Pharmacy', revenue: 'ETB 12,450', users: 45, growth: '+18%' },
-        { name: 'City Health Pharmacy', revenue: 'ETB 10,230', users: 38, growth: '+15%' },
-        { name: 'MediCare Plus', revenue: 'ETB 9,870', users: 32, growth: '+22%' },
-        { name: 'Wellness Pharmacy', revenue: 'ETB 8,560', users: 28, growth: '+12%' },
-        { name: 'HealthFirst Pharmacy', revenue: 'ETB 7,890', users: 25, growth: '+10%' },
-    ];
+    if (loading) {
+        return (
+            <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
+                <h1 className='text-3xl font-bold'>System Statistics</h1>
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
@@ -61,15 +113,19 @@ export function SystemStatistics() {
                     </CardHeader>
                     <CardContent>
                         <div className='space-y-4'>
-                            {recentActivity.map((activity, index) => (
-                                <div key={index} className='flex items-start justify-between border-b pb-3 last:border-0'>
-                                    <div>
-                                        <p className='font-medium'>{activity.action}</p>
-                                        <p className='text-sm text-muted-foreground'>{activity.pharmacy}</p>
+                            {statsData.recentActivity && statsData.recentActivity.length > 0 ? (
+                                statsData.recentActivity.map((activity, index) => (
+                                    <div key={index} className='flex items-start justify-between border-b pb-3 last:border-0'>
+                                        <div>
+                                            <p className='font-medium'>{activity.action}</p>
+                                            <p className='text-sm text-muted-foreground'>{activity.pharmacy}</p>
+                                        </div>
+                                        <p className='text-xs text-muted-foreground'>{activity.time}</p>
                                     </div>
-                                    <p className='text-xs text-muted-foreground'>{activity.time}</p>
-                                </div>
-                            ))}
+                                ))
+                            ) : (
+                                <p className='text-sm text-muted-foreground'>No recent activity available</p>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
@@ -81,18 +137,22 @@ export function SystemStatistics() {
                     </CardHeader>
                     <CardContent>
                         <div className='space-y-4'>
-                            {topPharmacies.map((pharmacy, index) => (
-                                <div key={index} className='flex items-center justify-between border-b pb-3 last:border-0'>
-                                    <div>
-                                        <p className='font-medium'>{pharmacy.name}</p>
-                                        <p className='text-sm text-muted-foreground'>{pharmacy.users} active users</p>
+                            {statsData.topPharmacies && statsData.topPharmacies.length > 0 ? (
+                                statsData.topPharmacies.map((pharmacy, index) => (
+                                    <div key={index} className='flex items-center justify-between border-b pb-3 last:border-0'>
+                                        <div>
+                                            <p className='font-medium'>{pharmacy.name}</p>
+                                            <p className='text-sm text-muted-foreground'>{pharmacy.users} active users</p>
+                                        </div>
+                                        <div className='text-right'>
+                                            <p className='font-bold'>{pharmacy.revenue}</p>
+                                            <p className='text-xs text-green-600'>{pharmacy.growth}</p>
+                                        </div>
                                     </div>
-                                    <div className='text-right'>
-                                        <p className='font-bold'>{pharmacy.revenue}</p>
-                                        <p className='text-xs text-green-600'>{pharmacy.growth}</p>
-                                    </div>
-                                </div>
-                            ))}
+                                ))
+                            ) : (
+                                <p className='text-sm text-muted-foreground'>No top pharmacies data available</p>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
@@ -106,19 +166,19 @@ export function SystemStatistics() {
                 <CardContent>
                     <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                         <div className='text-center p-4 border rounded-lg'>
-                            <p className='text-2xl font-bold'>45,678</p>
+                            <p className='text-2xl font-bold'>{statsData.platformStats?.totalTransactions?.toLocaleString() || '0'}</p>
                             <p className='text-sm text-muted-foreground mt-1'>Total Transactions</p>
                         </div>
                         <div className='text-center p-4 border rounded-lg'>
-                            <p className='text-2xl font-bold'>12,345</p>
+                            <p className='text-2xl font-bold'>{statsData.platformStats?.productsManaged?.toLocaleString() || '0'}</p>
                             <p className='text-sm text-muted-foreground mt-1'>Products Managed</p>
                         </div>
                         <div className='text-center p-4 border rounded-lg'>
-                            <p className='text-2xl font-bold'>8,901</p>
+                            <p className='text-2xl font-bold'>{statsData.platformStats?.prescriptionsFilled?.toLocaleString() || '0'}</p>
                             <p className='text-sm text-muted-foreground mt-1'>Prescriptions Filled</p>
                         </div>
                         <div className='text-center p-4 border rounded-lg'>
-                            <p className='text-2xl font-bold'>234</p>
+                            <p className='text-2xl font-bold'>{statsData.platformStats?.supportTickets?.toLocaleString() || '0'}</p>
                             <p className='text-sm text-muted-foreground mt-1'>Support Tickets</p>
                         </div>
                     </div>

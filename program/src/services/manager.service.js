@@ -147,6 +147,210 @@ export const managerService = {
     async rejectStockTransfer(id) {
         return await makeApiCall(`/manager/stock-transfers/${id}/reject`, { method: 'PATCH' });
     },
+
+    /**
+     * Get all products/inventory
+     * @param {Object} params - Query parameters (search, category, status)
+     * @returns {Promise}
+     */
+    async getProducts(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        const endpoint = queryString ? `/manager/products?${queryString}` : '/manager/products';
+        return await makeApiCall(endpoint, { method: 'GET' });
+    },
+
+    /**
+     * Get inventory (alias for getProducts)
+     * @param {Object} params - Query parameters
+     * @returns {Promise}
+     */
+    async getInventory(params = {}) {
+        return await this.getProducts(params);
+    },
+
+    /**
+     * Create new product
+     * @param {Object} productData - Product data
+     * @returns {Promise}
+     */
+    async createProduct(productData) {
+        return await makeApiCall('/manager/products', {
+            method: 'POST',
+            body: JSON.stringify(productData),
+        });
+    },
+
+    /**
+     * Update product
+     * @param {string} id - Product ID
+     * @param {Object} productData - Updated product data
+     * @returns {Promise}
+     */
+    async updateProduct(id, productData) {
+        return await makeApiCall(`/manager/products/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(productData),
+        });
+    },
+
+    /**
+     * Delete product
+     * @param {string} id - Product ID
+     * @returns {Promise}
+     */
+    async deleteProduct(id) {
+        return await makeApiCall(`/manager/products/${id}`, { method: 'DELETE' });
+    },
+
+    /**
+     * Get low stock items
+     * @returns {Promise}
+     */
+    async getLowStockItems() {
+        return await makeApiCall('/manager/inventory/low-stock', { method: 'GET' });
+    },
+
+    /**
+     * Get items near expiry
+     * @returns {Promise}
+     */
+    async getNearExpiryItems() {
+        return await makeApiCall('/manager/inventory/near-expiry', { method: 'GET' });
+    },
+
+    /**
+     * Get reports
+     * @param {Object} params - Query parameters (type, period, startDate, endDate)
+     * @returns {Promise}
+     */
+    async getReports(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        const endpoint = queryString ? `/manager/reports?${queryString}` : '/manager/reports';
+        return await makeApiCall(endpoint, { method: 'GET' });
+    },
+
+    /**
+     * Get refunds
+     * @param {Object} params - Query parameters (status, search)
+     * @returns {Promise}
+     */
+    async getRefunds(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        const endpoint = queryString ? `/manager/refunds?${queryString}` : '/manager/refunds';
+        return await makeApiCall(endpoint, { method: 'GET' });
+    },
+
+    /**
+     * Get refund policy
+     * @returns {Promise}
+     */
+    async getRefundPolicy() {
+        return await makeApiCall('/manager/refunds/policy', { method: 'GET' });
+    },
+
+    /**
+     * Update refund policy
+     * @param {Object} policyData - Policy data
+     * @returns {Promise}
+     */
+    async updateRefundPolicy(policyData) {
+        return await makeApiCall('/manager/refunds/policy', {
+            method: 'PUT',
+            body: JSON.stringify(policyData),
+        });
+    },
+
+    /**
+     * Get discount rules
+     * @returns {Promise}
+     */
+    async getDiscountRules() {
+        return await makeApiCall('/manager/discounts', { method: 'GET' });
+    },
+
+    /**
+     * Create discount rule
+     * @param {Object} discountData - Discount data
+     * @returns {Promise}
+     */
+    async createDiscountRule(discountData) {
+        return await makeApiCall('/manager/discounts', {
+            method: 'POST',
+            body: JSON.stringify(discountData),
+        });
+    },
+
+    /**
+     * Delete discount rule
+     * @param {string} id - Discount ID
+     * @returns {Promise}
+     */
+    async deleteDiscountRule(id) {
+        return await makeApiCall(`/manager/discounts/${id}`, { method: 'DELETE' });
+    },
+
+    /**
+     * Get discount statistics
+     * @returns {Promise}
+     */
+    async getDiscountStats() {
+        return await makeApiCall('/manager/discounts/stats', { method: 'GET' });
+    },
+
+    /**
+     * Get notifications
+     * @param {Object} params - Query parameters (category, status)
+     * @returns {Promise}
+     */
+    async getNotifications(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        const endpoint = queryString ? `/manager/notifications?${queryString}` : '/manager/notifications';
+        return await makeApiCall(endpoint, { method: 'GET' });
+    },
+
+    /**
+     * Mark notification as read
+     * @param {string} id - Notification ID
+     * @returns {Promise}
+     */
+    async markNotificationRead(id) {
+        return await makeApiCall(`/manager/notifications/${id}/read`, { method: 'PATCH' });
+    },
+
+    /**
+     * Get sales report
+     * @param {string} period - 'daily', 'monthly', 'yearly'
+     * @returns {Promise}
+     */
+    async getSalesReport(period) {
+        return await makeApiCall(`/manager/reports/sales?period=${period}`, { method: 'GET' });
+    },
+
+    /**
+     * Get inventory report
+     * @returns {Promise}
+     */
+    async getInventoryReport() {
+        return await makeApiCall('/manager/reports/inventory', { method: 'GET' });
+    },
+
+    /**
+     * Get staff activity report
+     * @returns {Promise}
+     */
+    async getStaffActivityReport() {
+        return await makeApiCall('/manager/reports/staff-activity', { method: 'GET' });
+    },
+
+    /**
+     * Get staff activity logs
+     * @param {string} staffId - Staff ID
+     * @returns {Promise}
+     */
+    async getStaffActivityLogs(staffId) {
+        return await makeApiCall(`/manager/staff/${staffId}/activity-logs`, { method: 'GET' });
+    },
 };
 
 export default managerService;
+

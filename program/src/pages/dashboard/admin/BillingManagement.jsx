@@ -1,61 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Button, Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/ui';
 import { DollarSign, AlertCircle, CheckCircle, Clock, X } from 'lucide-react';
+import { adminService } from '@/services/admin.service';
+import { toast } from 'sonner';
 
 export function BillingManagement() {
-    const [billingIssues] = useState([
-        {
-            id: 1,
-            pharmacy: 'Green Valley Pharmacy',
-            issue: 'Payment Failed',
-            amount: 'ETB 299.00',
-            status: 'pending',
-            date: '2025-11-25',
-            description: 'Credit card payment failed due to insufficient funds. Customer notified via email.',
-            transactionId: 'TXN-2025-001',
-            contactEmail: 'billing@greenvalley.com',
-            lastAttempt: '2025-11-25 14:30'
-        },
-        {
-            id: 2,
-            pharmacy: 'City Health Pharmacy',
-            issue: 'Refund Request',
-            amount: 'ETB 149.00',
-            status: 'in-progress',
-            date: '2025-11-24',
-            description: 'Customer requested refund for double billing. Finance team reviewing.',
-            transactionId: 'TXN-2025-002',
-            contactEmail: 'admin@cityhealth.com',
-            lastAttempt: '2025-11-24 10:15'
-        },
-        {
-            id: 3,
-            pharmacy: 'MediCare Plus',
-            issue: 'Billing Dispute',
-            amount: 'ETB 499.00',
-            status: 'resolved',
-            date: '2025-11-23',
-            description: 'Dispute regarding subscription tier resolved. Upgraded to Enterprise plan.',
-            transactionId: 'TXN-2025-003',
-            contactEmail: 'support@medicareplus.com',
-            lastAttempt: '2025-11-23 16:45'
-        },
-        {
-            id: 4,
-            pharmacy: 'Wellness Pharmacy',
-            issue: 'Card Declined',
-            amount: 'ETB 299.00',
-            status: 'pending',
-            date: '2025-11-22',
-            description: 'Payment card declined multiple times. Customer needs to update payment method.',
-            transactionId: 'TXN-2025-004',
-            contactEmail: 'finance@wellnesspharm.com',
-            lastAttempt: '2025-11-22 09:20'
-        },
-    ]);
-
+    const [billingIssues, setBillingIssues] = useState([]);
+    const [transactions, setTransactions] = useState([]);
     const [selectedIssue, setSelectedIssue] = useState(null);
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchBillingIssues();
+        fetchTransactions();
+    }, []);
+
+    const fetchBillingIssues = async () => {
+        try {
+            setLoading(true);
+            const response = await adminService.getBillingIssues();
+
+            if (response.success) {
+                const billingIssuesData = response.data || response.billingIssues || [];
+                setBillingIssues(Array.isArray(billingIssuesData) ? billingIssuesData : []);
+            } else {
+                toast.error('Failed to load billing issues');
+                setBillingIssues([]);
+            }
+        } catch (error) {
+            console.error('Error fetching billing issues:', error);
+            toast.error('Failed to load billing issues');
+            setBillingIssues([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchTransactions = async () => {
+        try {
+            const response = await adminService.getTransactions({ limit: 5 });
+            if (response.success) {
+                setTransactions(response.data || response.transactions || []);
+            }
+        } catch (error) {
+            console.error('Error fetching transactions:', error);
+        }
+    };
 
     const handleViewDetails = (issue) => {
         setSelectedIssue(issue);
@@ -65,6 +56,23 @@ export function BillingManagement() {
     const handleCloseDetails = () => {
         setIsDetailsModalOpen(false);
         setSelectedIssue(null);
+    };
+
+    const handleResolveIssue = async (id) => {
+        if (window.confirm('Are you sure you want to resolve this billing issue?')) {
+            try {
+                const response = await adminService.resolveBillingIssue(id);
+                if (response.success) {
+                    toast.success('Billing issue resolved successfully');
+                    await fetchBillingIssues(); // Refresh the list
+                } else {
+                    toast.error(response.message || 'Failed to resolve billing issue');
+                }
+            } catch (error) {
+                console.error('Error resolving billing issue:', error);
+                toast.error('Failed to resolve billing issue');
+            }
+        }
     };
 
     const getStatusBadge = (status) => {
@@ -77,11 +85,22 @@ export function BillingManagement() {
     };
 
     const stats = [
-        { title: 'Total Revenue', value: 'ETB 45,231', icon: DollarSign, trend: '+12.5%' },
-        { title: 'Pending Issues', value: '8', icon: AlertCircle, trend: '-3' },
-        { title: 'Resolved Today', value: '12', icon: CheckCircle, trend: '+5' },
+        { title: 'Total Revenue', value: 'ETB ' + transactions.reduce((acc, curr) => acc + (curr.amount || 0), 0).toLocaleString(), icon: DollarSign, trend: '+12.5%' },
+        { title: 'Pending Issues', value: billingIssues.filter(i => i.status === 'pending').length.toString(), icon: AlertCircle, trend: '-3' },
+        { title: 'Resolved Today', value: billingIssues.filter(i => i.status === 'resolved').length.toString(), icon: CheckCircle, trend: '+5' },
         { title: 'Avg Resolution Time', value: '2.3 hrs', icon: Clock, trend: '-0.5 hrs' },
     ];
+
+    if (loading) {
+        return (
+            <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
+                <h1 className='text-3xl font-bold'>Billing Management</h1>
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
@@ -90,7 +109,7 @@ export function BillingManagement() {
                 <p className='text-muted-foreground mt-2'>Handle billing issues and payment disputes</p>
             </div>
 
-            { }
+            {/* Stats Cards */}
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
@@ -106,7 +125,7 @@ export function BillingManagement() {
                 ))}
             </div>
 
-            { }
+            {/* Recent Billing Issues */}
             <Card>
                 <CardHeader>
                     <CardTitle>Recent Billing Issues</CardTitle>
@@ -149,30 +168,33 @@ export function BillingManagement() {
                 </CardContent>
             </Card>
 
-            { }
+            {/* Recent Transactions */}
             <Card>
                 <CardHeader>
                     <CardTitle>Recent Transactions</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className='space-y-4'>
-                        {[1, 2, 3, 4].map((i) => (
-                            <div key={i} className='flex items-center justify-between border-b pb-3'>
-                                <div>
-                                    <p className='font-medium'>Payment from Pharmacy #{i}</p>
-                                    <p className='text-sm text-muted-foreground'>Subscription - Pro Plan</p>
+                        {transactions.length > 0 ? (
+                            transactions.map((transaction, index) => (
+                                <div key={index} className='flex items-center justify-between border-b pb-3 last:border-0'>
+                                    <div>
+                                        <p className='font-medium'>Payment from {transaction.pharmacy || transaction.source}</p>
+                                        <p className='text-sm text-muted-foreground'>{transaction.description || 'Subscription Payment'}</p>
+                                    </div>
+                                    <div className='text-right'>
+                                        <p className='font-bold text-green-600'>+ETB {transaction.amount?.toLocaleString()}</p>
+                                        <p className='text-xs text-muted-foreground'>{new Date(transaction.date || transaction.createdAt).toLocaleDateString()}</p>
+                                    </div>
                                 </div>
-                                <div className='text-right'>
-                                    <p className='font-bold text-green-600'>+ETB 299.00</p>
-                                    <p className='text-xs text-muted-foreground'>Nov {28 - i}, 2025</p>
-                                </div>
-                            </div>
-                        ))}
+                            ))
+                        ) : (
+                            <p className="text-sm text-muted-foreground">No recent transactions.</p>
+                        )}
                     </div>
                 </CardContent>
             </Card>
 
-            { }
             <Dialog open={isDetailsModalOpen} onOpenChange={handleCloseDetails}>
                 <DialogContent className="max-w-2xl">
                     <DialogHeader>
@@ -233,8 +255,8 @@ export function BillingManagement() {
                                 <Button variant='outline' onClick={handleCloseDetails}>
                                     Close
                                 </Button>
-                                <Button>
-                                    Take Action
+                                <Button onClick={() => handleResolveIssue(selectedIssue.id)}>
+                                    Resolve Issue
                                 </Button>
                             </div>
                         </div>

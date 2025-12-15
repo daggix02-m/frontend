@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import FloatingPaths from '@/components/shared/FloatingPaths';
 import { useSignupStore } from '../../store/signupStore';
+import { signup } from '@/api/auth.api';
+import { useNavigate } from 'react-router-dom';
 import {
   ChevronLeftIcon,
   Building2Icon,
@@ -18,8 +20,11 @@ import {
 } from 'lucide-react';
 
 export function SignupPage() {
+  const navigate = useNavigate();
   const { step, formData, setFormData, nextStep, prevStep } = useSignupStore();
   const [errors, setErrors] = useState({});
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -76,7 +81,7 @@ export function SignupPage() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
     let isValid = true;
@@ -95,7 +100,40 @@ export function SignupPage() {
     setErrors(newErrors);
 
     if (isValid) {
+      setIsLoading(true);
+      // Call the actual signup API
+      try {
+        const response = await signup(
+          formData.managerName,
+          formData.managerEmail,
+          formData.managerPassword,
+          {
+            name: formData.pharmacyName,
+            license_number: formData.licenseNumber,
+            branches: [
+              {
+                name: `${formData.pharmacyName} - Main Branch`,
+                address: formData.branchAddress,
+                contact: formData.branchContact,
+              }
+            ],
+            branch_id: 1 // Workaround: Backend requires branch_id even for new pharmacy creation
+          }
+        );
 
+        if (response.success) {
+          // Registration successful - navigate to login or show success message
+          alert('Registration successful! You can now log in.');
+          // Redirect to login page
+          navigate('/auth/login');
+        } else {
+          setErrors({ general: response.message || 'Registration failed. Please try again.' });
+        }
+      } catch (error) {
+        setErrors({ general: error.message || 'An error occurred during registration.' });
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -315,12 +353,16 @@ export function SignupPage() {
                   <p className='text-red-500 text-xs'>{errors.branchContact}</p>
                 )}
 
+                {errors.general && (
+                  <p className='text-red-500 text-sm'>{errors.general}</p>
+                )}
+
                 <div className='flex gap-2'>
                   <Button type='button' variant='outline' onClick={prevStep} className='w-full'>
                     Back
                   </Button>
-                  <Button type='submit' className='w-full'>
-                    Complete Registration
+                  <Button type='submit' className='w-full' disabled={isLoading}>
+                    {isLoading ? 'Registering...' : 'Complete Registration'}
                   </Button>
                 </div>
               </motion.div>

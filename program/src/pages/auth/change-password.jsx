@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import FloatingPaths from '@/components/shared/FloatingPaths';
 import { LockIcon, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { changePassword } from '@/api/auth.api';
 
 export function ChangePasswordPage() {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -48,21 +49,23 @@ export function ChangePasswordPage() {
         setIsSubmitting(true);
 
         try {
+            const response = await changePassword(currentPassword, newPassword);
 
-            await new Promise((resolve) => setTimeout(resolve, 1500));
+            if (response.success) {
+                localStorage.removeItem('requiresPasswordChange');
+                toast.success('Password changed successfully!');
 
-            localStorage.removeItem('requiresPasswordChange');
-
-            toast.success('Password changed successfully!');
-
-            const role = localStorage.getItem('userRole') || 'manager';
-            if (role === 'admin') navigate('/admin/overview');
-            else if (role === 'manager') navigate('/manager/overview');
-            else if (role === 'pharmacist') navigate('/pharmacist/overview');
-            else if (role === 'cashier') navigate('/cashier/overview');
-            else navigate('/manager/overview');
+                const role = localStorage.getItem('userRole') || 'manager';
+                if (role === 'admin') navigate('/admin/overview');
+                else if (role === 'manager') navigate('/manager/overview');
+                else if (role === 'pharmacist') navigate('/pharmacist/overview');
+                else if (role === 'cashier') navigate('/cashier/overview');
+                else navigate('/manager/overview');
+            } else {
+                setError(response.message || 'Failed to change password. Please try again.');
+            }
         } catch (err) {
-            setError('Failed to change password. Please try again.');
+            setError(err.message || 'Failed to change password. Please try again.');
         } finally {
             setIsSubmitting(false);
         }

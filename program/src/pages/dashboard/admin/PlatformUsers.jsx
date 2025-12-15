@@ -1,33 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Button, Input, Dialog, DialogContent } from '@/components/ui/ui';
 import { Select } from '@/components/ui/select';
 import { UserPlus, Shield, Activity, Users } from 'lucide-react';
+import { adminService } from '@/services/admin.service';
+import { toast } from 'sonner';
 import { UserForm } from './components/UserForm';
 
 export function PlatformUsers() {
-    const [users, setUsers] = useState([
-        { id: 1, name: 'Getachew Mamo', email: 'getachew@pharmacare.com', role: 'Super Admin', status: 'active', lastActive: '2 hours ago' },
-        { id: 2, name: 'Rahel Bekele', email: 'rahel@pharmacare.com', role: 'Support Admin', status: 'active', lastActive: '5 minutes ago' },
-        { id: 3, name: 'Elias Tesfaye', email: 'elias@pharmacare.com', role: 'Billing Admin', status: 'active', lastActive: '1 day ago' },
-        { id: 4, name: 'Meron Hailu', email: 'meron@pharmacare.com', role: 'Support Admin', status: 'inactive', lastActive: '3 days ago' },
-        { id: 5, name: 'Daniel Kebede', email: 'daniel@pharmacare.com', role: 'Analytics Admin', status: 'active', lastActive: '30 minutes ago' },
-    ]);
-
+    const [users, setUsers] = useState([]);
+    const [auditLogs, setAuditLogs] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterRole, setFilterRole] = useState('All');
+    const [loading, setLoading] = useState(true);
 
-    const handleAddUser = (data) => {
-        const user = {
-            id: users.length + 1,
-            ...data,
-            status: 'active',
-            lastActive: 'Just now'
-        };
-        setUsers([...users, user]);
-        setIsModalOpen(false);
+    useEffect(() => {
+        fetchUsers();
+        fetchAuditLogs();
+    }, []);
+
+    const fetchUsers = async () => {
+        try {
+            setLoading(true);
+            const response = await adminService.getPlatformUsers();
+
+            if (response.success) {
+                const usersData = response.data || response.users || [];
+                setUsers(Array.isArray(usersData) ? usersData : []);
+            } else {
+                toast.error('Failed to load platform users');
+                setUsers([]);
+            }
+        } catch (error) {
+            console.error('Error fetching platform users:', error);
+            toast.error('Failed to load platform users');
+            setUsers([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchAuditLogs = async () => {
+        try {
+            const response = await adminService.getAuditLogs({ limit: 5 });
+            if (response.success) {
+                setAuditLogs(response.data || response.logs || []);
+            }
+        } catch (error) {
+            console.error('Error fetching audit logs:', error);
+        }
+    };
+
+    const handleAddUser = async (data) => {
+        try {
+            const response = await adminService.createPlatformUser(data);
+            if (response.success) {
+                toast.success('User added successfully');
+                await fetchUsers(); // Refresh the list
+                setIsModalOpen(false);
+            } else {
+                toast.error(response.message || 'Failed to add user');
+            }
+        } catch (error) {
+            console.error('Error adding user:', error);
+            toast.error('Failed to add user');
+        }
     };
 
     const handleEditUser = (user) => {
@@ -36,15 +75,22 @@ export function PlatformUsers() {
         setIsModalOpen(true);
     };
 
-    const handleUpdateUser = (data) => {
-        setUsers(users.map(u =>
-            u.id === editingUser.id
-                ? { ...u, ...data }
-                : u
-        ));
-        setIsModalOpen(false);
-        setIsEditMode(false);
-        setEditingUser(null);
+    const handleUpdateUser = async (data) => {
+        try {
+            const response = await adminService.updateUser(editingUser.id, data);
+            if (response.success) {
+                toast.success('User updated successfully');
+                await fetchUsers(); // Refresh the list
+                setIsModalOpen(false);
+                setIsEditMode(false);
+                setEditingUser(null);
+            } else {
+                toast.error(response.message || 'Failed to update user');
+            }
+        } catch (error) {
+            console.error('Error updating user:', error);
+            toast.error('Failed to update user');
+        }
     };
 
     const handleCloseModal = () => {
@@ -57,6 +103,21 @@ export function PlatformUsers() {
         setIsEditMode(false);
         setEditingUser(null);
         setIsModalOpen(true);
+    };
+
+    const handleUpdateUserStatus = async (userId, newStatus) => {
+        try {
+            const response = await adminService.updateUserStatus(userId, newStatus);
+            if (response.success) {
+                toast.success(`User status updated to ${newStatus}`);
+                await fetchUsers(); // Refresh the list
+            } else {
+                toast.error(response.message || 'Failed to update user status');
+            }
+        } catch (error) {
+            console.error('Error updating user status:', error);
+            toast.error('Failed to update user status');
+        }
     };
 
     const getStatusBadge = (status) => {
@@ -87,11 +148,28 @@ export function PlatformUsers() {
     const roles = ['All', 'Super Admin', 'Support Admin', 'Billing Admin', 'Analytics Admin'];
 
     const stats = [
-        { title: 'Total Admins', value: '12', icon: Users, color: 'text-blue-600' },
-        { title: 'Active Now', value: '8', icon: Activity, color: 'text-green-600' },
-        { title: 'Super Admins', value: '3', icon: Shield, color: 'text-red-600' },
-        { title: 'New This Month', value: '2', icon: UserPlus, color: 'text-purple-600' },
+        { title: 'Total Admins', value: users.length.toString(), icon: Users, color: 'text-blue-600' },
+        { title: 'Active Now', value: users.filter(u => u.status === 'active').length.toString(), icon: Activity, color: 'text-green-600' },
+        { title: 'Super Admins', value: users.filter(u => u.role === 'Super Admin').length.toString(), icon: Shield, color: 'text-red-600' },
+        {
+            title: 'New This Month', value: users.filter(u => {
+                const joinedDate = new Date(u.joinedAt || u.createdAt);
+                const now = new Date();
+                return joinedDate.getMonth() === now.getMonth() && joinedDate.getFullYear() === now.getFullYear();
+            }).length.toString(), icon: UserPlus, color: 'text-purple-600'
+        },
     ];
+
+    if (loading) {
+        return (
+            <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
+                <h1 className='text-3xl font-bold'>Platform Users</h1>
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
@@ -106,7 +184,7 @@ export function PlatformUsers() {
                 </Button>
             </div>
 
-            { }
+            {/* Stats Cards */}
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
@@ -121,7 +199,7 @@ export function PlatformUsers() {
                 ))}
             </div>
 
-            { }
+            {/* Filters and Search */}
             <Card>
                 <CardContent className='pt-6'>
                     <div className='flex flex-col sm:flex-row gap-4'>
@@ -131,7 +209,7 @@ export function PlatformUsers() {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        <Select value={filterRole} onChange={(e) => setFilterRole(e.target.value)}>
+                        <Select value={filterRole} onValueChange={(value) => setFilterRole(value)}>
                             {roles.map(role => (
                                 <option key={role} value={role}>{role}</option>
                             ))}
@@ -140,7 +218,7 @@ export function PlatformUsers() {
                 </CardContent>
             </Card>
 
-            { }
+            {/* Administrator Accounts Table */}
             <Card>
                 <CardHeader>
                     <CardTitle>Administrator Accounts</CardTitle>
@@ -191,32 +269,30 @@ export function PlatformUsers() {
                 </CardContent>
             </Card>
 
-            { }
+            {/* Recent Admin Activity */}
             <Card>
                 <CardHeader>
                     <CardTitle>Recent Admin Activity</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className='space-y-3'>
-                        {[
-                            { user: 'Getachew Mamo', action: 'Approved pharmacy registration', time: '10 minutes ago' },
-                            { user: 'Rahel Bekele', action: 'Resolved support ticket #TKT-045', time: '25 minutes ago' },
-                            { user: 'Daniel Kebede', action: 'Generated system report', time: '1 hour ago' },
-                            { user: 'Elias Tesfaye', action: 'Processed refund for Pharmacy #123', time: '2 hours ago' },
-                        ].map((activity, index) => (
-                            <div key={index} className='flex items-center justify-between border-b pb-2 last:border-0'>
-                                <div>
-                                    <p className='font-medium'>{activity.user}</p>
-                                    <p className='text-sm text-muted-foreground'>{activity.action}</p>
+                        {auditLogs.length > 0 ? (
+                            auditLogs.map((activity, index) => (
+                                <div key={index} className='flex items-center justify-between border-b pb-2 last:border-0'>
+                                    <div>
+                                        <p className='font-medium'>{activity.user || activity.userName}</p>
+                                        <p className='text-sm text-muted-foreground'>{activity.action}</p>
+                                    </div>
+                                    <p className='text-xs text-muted-foreground'>{new Date(activity.timestamp || activity.createdAt).toLocaleString()}</p>
                                 </div>
-                                <p className='text-xs text-muted-foreground'>{activity.time}</p>
-                            </div>
-                        ))}
+                            ))
+                        ) : (
+                            <p className="text-sm text-muted-foreground">No recent activity.</p>
+                        )}
                     </div>
                 </CardContent>
             </Card>
 
-            { }
             <Dialog open={isModalOpen} onOpenChange={handleCloseModal}>
                 <DialogContent className="p-0 bg-transparent border-none shadow-none w-full max-w-lg">
                     <UserForm

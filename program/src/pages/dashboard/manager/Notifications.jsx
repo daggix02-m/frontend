@@ -1,31 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, Badge, Button, Input } from '@/components/ui/ui';
 import { Bell, DollarSign, Package, Users, AlertTriangle, CheckCircle, Clock, Search, Filter } from 'lucide-react';
+import { managerService } from '@/services/manager.service';
 import { toast } from 'sonner';
 
 export function Notifications() {
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [searchTerm, setSearchTerm] = useState('');
     const [activeFilter, setActiveFilter] = useState('Total');
-    const [notifications, setNotifications] = useState([
+    const [notifications, setNotifications] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-        { id: 1, type: 'transaction', title: 'High-Value Sale Completed', description: 'Sale of ETB 5,450 - Receipt #RCP-1234', time: '5 minutes ago', read: false, priority: 'high' },
-        { id: 2, type: 'transaction', title: 'Refund Processed', description: 'Refund of ETB 245 for Receipt #RCP-1189', time: '15 minutes ago', read: false, priority: 'medium' },
-        { id: 3, type: 'transaction', title: 'Daily Sales Target Reached', description: 'Congratulations! Daily target of ETB 50,000 achieved', time: '1 hour ago', read: true, priority: 'low' },
+    useEffect(() => {
+        fetchNotifications();
+    }, []);
 
-        { id: 4, type: 'stock', title: 'Transfer Request Pending', description: 'Paracetamol 500mg (500 units) - From Main to Downtown', time: '10 minutes ago', read: false, priority: 'high' },
-        { id: 5, type: 'stock', title: 'Low Stock Alert', description: 'Amoxicillin 250mg below minimum threshold (Current: 45, Min: 100)', time: '30 minutes ago', read: false, priority: 'high' },
-        { id: 6, type: 'stock', title: 'Replenishment Request', description: 'Vitamin C 1000mg - Requested by Alemayehu Desta', time: '2 hours ago', read: true, priority: 'medium' },
-        { id: 7, type: 'stock', title: 'Stock Transfer Approved', description: 'Transfer #ST-003 approved - Ibuprofen 400mg (300 units)', time: '3 hours ago', read: true, priority: 'low' },
+    const fetchNotifications = async () => {
+        try {
+            setLoading(true);
+            const response = await managerService.getNotifications();
 
-        { id: 8, type: 'staff', title: 'New Staff Member Added', description: 'Tigist Alemayehu joined as Pharmacist', time: '45 minutes ago', read: false, priority: 'medium' },
-        { id: 9, type: 'staff', title: 'Staff Login Alert', description: 'Unusual login time: Berhanu Wolde at 2:30 AM', time: '6 hours ago', read: true, priority: 'high' },
-        { id: 10, type: 'staff', title: 'Staff Activity Log', description: 'Selamawit Mekonnen completed 8-hour shift', time: 'Yesterday', read: true, priority: 'low' },
+            if (response.success) {
+                const notificationsData = response.data || response.notifications || [];
+                setNotifications(Array.isArray(notificationsData) ? notificationsData : []);
+            } else {
+                toast.error('Failed to load notifications');
+                setNotifications([]);
+            }
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+            toast.error('Failed to load notifications');
+            setNotifications([]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        { id: 11, type: 'system', title: 'Products Expiring Soon', description: '15 products expiring within 30 days', time: '20 minutes ago', read: false, priority: 'high' },
-        { id: 12, type: 'system', title: 'System Update Available', description: 'Version 2.1.0 ready for installation', time: '4 hours ago', read: true, priority: 'medium' },
-        { id: 13, type: 'system', title: 'Backup Completed', description: 'Daily backup completed successfully', time: 'Yesterday', read: true, priority: 'low' },
-    ]);
+    const handleMarkAsRead = async (id) => {
+        try {
+            const response = await managerService.markNotificationRead(id);
+            if (response.success) {
+                setNotifications(notifications.map(n =>
+                    n.id === id ? { ...n, read: true } : n
+                ));
+                toast.success('Marked as read');
+            } else {
+                toast.error(response.message || 'Failed to mark as read');
+            }
+        } catch (error) {
+            console.error('Error marking notification as read:', error);
+            toast.error('Failed to mark as read');
+        }
+    };
+
+    const handleMarkAllAsRead = async () => {
+        try {
+            const unreadNotifications = notifications.filter(n => !n.read);
+            for (const notification of unreadNotifications) {
+                await managerService.markNotificationRead(notification.id);
+            }
+            setNotifications(notifications.map(n => ({ ...n, read: true })));
+            toast.success('All notifications marked as read');
+        } catch (error) {
+            console.error('Error marking all notifications as read:', error);
+            toast.error('Failed to mark all notifications as read');
+        }
+    };
+
+    const handleDeleteNotification = (id) => {
+        setNotifications(notifications.filter(n => n.id !== id));
+        toast.success('Notification deleted');
+    };
 
     const categories = [
         { name: 'All', icon: Bell, color: 'text-blue-600' },
@@ -41,23 +86,6 @@ export function Notifications() {
         { title: 'Today', value: notifications.filter(n => !n.time.includes('Yesterday')).length, icon: Clock, color: 'text-orange-600' },
         { title: 'Total', value: notifications.length, icon: CheckCircle, color: 'text-green-600' },
     ];
-
-    const handleMarkAsRead = (id) => {
-        setNotifications(notifications.map(n =>
-            n.id === id ? { ...n, read: true } : n
-        ));
-        toast.success('Marked as read');
-    };
-
-    const handleMarkAllAsRead = () => {
-        setNotifications(notifications.map(n => ({ ...n, read: true })));
-        toast.success('All notifications marked as read');
-    };
-
-    const handleDeleteNotification = (id) => {
-        setNotifications(notifications.filter(n => n.id !== id));
-        toast.success('Notification deleted');
-    };
 
     const filteredNotifications = notifications.filter(notification => {
         const matchesCategory = selectedCategory === 'All' ||
@@ -179,6 +207,17 @@ export function Notifications() {
             </div>
         );
     };
+
+    if (loading) {
+        return (
+            <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
+                <h1 className='text-3xl font-bold'>Notifications</h1>
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className='space-y-4 sm:space-y-6 p-4 md:p-8'>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -21,46 +21,17 @@ import {
 import { Plus, Search, Edit, Trash2, Clock, Activity, User, Mail, MapPin } from 'lucide-react';
 import { StaffForm } from './components/StaffForm';
 import { ActivityLogDialog } from './components/ActivityLogDialog';
+import { managerService } from '@/services/manager.service';
+import { toast } from 'sonner';
 
 export function StaffManagement() {
-  const [staff, setStaff] = useState([
-    {
-      id: 1,
-      name: 'Alemayehu Desta',
-      email: 'alemayehu@example.com',
-      role: 'Pharmacist',
-      branch: 'Main Branch',
-      status: 'Active',
-      isOnline: true,
-      lastActive: new Date().toISOString(),
-    },
-    {
-      id: 2,
-      name: 'Selamawit Mekonnen',
-      email: 'selamawit@example.com',
-      role: 'Cashier',
-      branch: 'Downtown Branch',
-      status: 'Active',
-      isOnline: false,
-      lastActive: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    },
-    {
-      id: 3,
-      name: 'Berhanu Wolde',
-      email: 'berhanu@example.com',
-      role: 'Pharmacist',
-      branch: 'Westside Branch',
-      status: 'On Leave',
-      isOnline: false,
-      lastActive: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    },
-  ]);
-
+  const [staff, setStaff] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStaffForLog, setSelectedStaffForLog] = useState(null);
   const [isActivityLogOpen, setIsActivityLogOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -69,6 +40,31 @@ export function StaffManagement() {
     branch: 'Main Branch',
     status: 'Active',
   });
+
+  useEffect(() => {
+    fetchStaff();
+  }, []);
+
+  const fetchStaff = async () => {
+    try {
+      setLoading(true);
+      const response = await managerService.getStaff();
+
+      if (response.success) {
+        const staffData = response.data || response.staff || [];
+        setStaff(Array.isArray(staffData) ? staffData : []);
+      } else {
+        toast.error('Failed to load staff');
+        setStaff([]);
+      }
+    } catch (error) {
+      console.error('Error fetching staff:', error);
+      toast.error('Failed to load staff');
+      setStaff([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -98,29 +94,54 @@ export function StaffManagement() {
     setIsActivityLogOpen(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editingStaff) {
-
-      setStaff(staff.map(s => s.id === editingStaff.id ? { ...formData, id: s.id } : s));
-    } else {
-
-      const newStaff = { ...formData, id: staff.length + 1 };
-      setStaff([...staff, newStaff]);
+    try {
+      if (editingStaff) {
+        const response = await managerService.updateStaff(editingStaff.id || editingStaff._id, formData);
+        if (response.success) {
+          toast.success('Staff updated successfully');
+          await fetchStaff();
+        } else {
+          toast.error(response.message || 'Failed to update staff');
+        }
+      } else {
+        const response = await managerService.createStaff(formData);
+        if (response.success) {
+          toast.success('Staff created successfully');
+          await fetchStaff();
+        } else {
+          toast.error(response.message || 'Failed to create staff');
+        }
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Error saving staff:', error);
+      toast.error('Failed to save staff');
     }
-    setIsModalOpen(false);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to remove this staff member?')) {
-      setStaff(staff.filter(s => s.id !== id));
+      try {
+        const response = await managerService.deleteStaff(id);
+        if (response.success) {
+          toast.success('Staff deleted successfully');
+          await fetchStaff();
+        } else {
+          toast.error(response.message || 'Failed to delete staff');
+        }
+      } catch (error) {
+        console.error('Error deleting staff:', error);
+        toast.error('Failed to delete staff');
+      }
     }
   };
 
   const filteredStaff = staff.filter(member =>
-    member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.branch.toLowerCase().includes(searchTerm.toLowerCase())
+    member.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    member.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    member.branch?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getTimeAgo = (timestamp) => {
@@ -136,6 +157,17 @@ export function StaffManagement() {
     if (diffHours < 24) return `${diffHours}h ago`;
     return `${diffDays}d ago`;
   };
+
+  if (loading) {
+    return (
+      <div className='space-y-4 sm:space-y-6'>
+        <h2 className='text-2xl sm:text-3xl font-bold tracking-tight'>Staff Management</h2>
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-4 sm:space-y-6'>
@@ -163,7 +195,7 @@ export function StaffManagement() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {}
+          { }
           <div className='lg:hidden space-y-3 p-4'>
             {filteredStaff.length > 0 ? (
               filteredStaff.map((member) => (
@@ -243,7 +275,7 @@ export function StaffManagement() {
             )}
           </div>
 
-          {}
+          { }
           <div className='hidden lg:block overflow-x-auto'>
             <Table>
               <TableHeader>
@@ -327,7 +359,7 @@ export function StaffManagement() {
         </CardContent>
       </Card>
 
-      {}
+      { }
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="p-0 bg-transparent border-none shadow-none w-full max-w-lg">
           <StaffForm
@@ -351,7 +383,7 @@ export function StaffManagement() {
         </DialogContent>
       </Dialog>
 
-      {}
+      { }
       <ActivityLogDialog
         isOpen={isActivityLogOpen}
         onClose={() => setIsActivityLogOpen(false)}

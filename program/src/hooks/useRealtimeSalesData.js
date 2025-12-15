@@ -1,58 +1,52 @@
 import { useState, useEffect } from 'react';
+import { apiClient } from '@/api/apiClient';
 
 export const useRealtimeSalesData = () => {
     const [data, setData] = useState({
-        totalRevenue: 12500.50,
-        salesCount: 142,
-        averageSale: 88.03,
+        totalRevenue: 0,
+        salesCount: 0,
+        averageSale: 0,
         salesChartData: [],
         cumulativeRevenueData: [],
         latestPayments: [],
     });
+    const [loading, setLoading] = useState(true);
+
+    const fetchSalesData = async () => {
+        try {
+            // Fetch real sales data from the backend
+            const response = await apiClient('/admin/sales-data', { method: 'GET' });
+
+            if (response.success) {
+                const salesData = response.data || response;
+
+                // Update state with real data
+                setData({
+                    totalRevenue: salesData.totalRevenue || salesData.total_revenue || 0,
+                    salesCount: salesData.salesCount || salesData.sales_count || 0,
+                    averageSale: salesData.averageSale || salesData.average_sale || 0,
+                    salesChartData: salesData.salesChartData || salesData.sales_chart_data || [],
+                    cumulativeRevenueData: salesData.cumulativeRevenueData || salesData.cumulative_revenue_data || [],
+                    latestPayments: salesData.latestPayments || salesData.latest_payments || [],
+                });
+            } else {
+                console.error('Failed to fetch sales data:', response.message);
+            }
+        } catch (error) {
+            console.error('Error fetching sales data:', error);
+        }
+    };
 
     useEffect(() => {
+        // Initial data fetch
+        fetchSalesData().then(() => setLoading(false));
 
-        const interval = setInterval(() => {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString();
-
-            const newSaleAmount = Math.random() * 100 + 20;
-
-            setData(prev => {
-                const newTotalRevenue = prev.totalRevenue + newSaleAmount;
-                const newSalesCount = prev.salesCount + 1;
-
-                const newChartPoint = {
-                    time: timeString,
-                    sales: newSaleAmount,
-                };
-
-                const newRevenuePoint = {
-                    time: timeString,
-                    sales: newTotalRevenue,
-                };
-
-                const newPayment = {
-                    id: Date.now(),
-                    amount: newSaleAmount,
-                    product: 'Product ' + Math.floor(Math.random() * 100),
-                    customer: 'Customer ' + Math.floor(Math.random() * 100),
-                    time: timeString,
-                };
-
-                return {
-                    totalRevenue: newTotalRevenue,
-                    salesCount: newSalesCount,
-                    averageSale: newTotalRevenue / newSalesCount,
-                    salesChartData: [...prev.salesChartData.slice(-19), newChartPoint],
-                    cumulativeRevenueData: [...prev.cumulativeRevenueData.slice(-19), newRevenuePoint],
-                    latestPayments: [newPayment, ...prev.latestPayments].slice(0, 10),
-                };
-            });
-        }, 3000);
+        // Set up periodic refresh
+        const interval = setInterval(fetchSalesData, 10000); // Refresh every 10 seconds
 
         return () => clearInterval(interval);
     }, []);
 
-    return data;
+    // Return loading state indicator if needed by the component
+    return { ...data, loading };
 };

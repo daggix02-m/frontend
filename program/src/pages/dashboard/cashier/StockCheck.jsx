@@ -1,14 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Input } from '@/components/ui/ui';
 import { Search } from 'lucide-react';
+import { cashierService } from '@/services/cashier.service';
+import { toast } from 'sonner';
 
 export function StockCheck() {
     const [searchTerm, setSearchTerm] = useState('');
-    const products = [
-        { id: 1, name: 'Paracetamol 500mg', stock: 1200, price: 'ETB 5.00', location: 'Shelf A1' },
-        { id: 2, name: 'Amoxicillin 250mg', stock: 85, price: 'ETB 12.50', location: 'Shelf B3' },
-        { id: 3, name: 'Vitamin C 1000mg', stock: 500, price: 'ETB 8.00', location: 'Aisle 2' },
-    ];
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    const fetchProducts = async (search = '') => {
+        try {
+            setLoading(true);
+            const response = await cashierService.checkStock({ search });
+
+            if (response.success) {
+                const productsData = response.data || response.products || [];
+                setProducts(Array.isArray(productsData) ? productsData : []);
+            } else {
+                toast.error('Failed to load product data');
+                setProducts([]);
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            toast.error('Failed to load product data');
+            setProducts([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSearch = (e) => {
+        const value = e.target.value;
+        setSearchTerm(value);
+        // Debounced search would be better, but for now we'll search on every change
+        fetchProducts(value);
+    };
+
+    if (loading) {
+        return (
+            <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
+                <h1 className='text-3xl font-bold'>Stock Check</h1>
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                </div>
+            </div>
+        );
+    }
 
     const filteredProducts = products.filter(product =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -30,7 +72,7 @@ export function StockCheck() {
                                 placeholder='Search for a product...'
                                 className='pl-8'
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onChange={handleSearch}
                             />
                         </div>
                     </div>
@@ -56,8 +98,8 @@ export function StockCheck() {
                                                     {product.stock} units
                                                 </span>
                                             </TableCell>
-                                            <TableCell>{product.price}</TableCell>
-                                            <TableCell>{product.location}</TableCell>
+                                            <TableCell>{product.price || 'N/A'}</TableCell>
+                                            <TableCell>{product.location || 'N/A'}</TableCell>
                                         </TableRow>
                                     ))
                                 ) : (

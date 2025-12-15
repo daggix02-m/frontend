@@ -1,31 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input } from '@/components/ui/ui';
 import { Check, X, Plus } from 'lucide-react';
+import { adminService } from '@/services/admin.service';
+import { toast } from 'sonner';
 
 export function SubscriptionManagement() {
-    const [plans, setPlans] = useState([
-        {
-            id: 1,
-            name: 'Basic',
-            price: 'ETB 29',
-            features: ['1 Branch', '2 Staff Members', 'Basic Reporting', 'Email Support'],
-        },
-        {
-            id: 2,
-            name: 'Pro',
-            price: 'ETB 79',
-            features: ['3 Branches', '10 Staff Members', 'Advanced Reporting', 'Priority Support', 'Inventory Management'],
-            popular: true,
-        },
-        {
-            id: 3,
-            name: 'Enterprise',
-            price: 'ETB 199',
-            features: ['Unlimited Branches', 'Unlimited Staff', 'Custom Reporting', '24/7 Dedicated Support', 'API Access'],
-        },
-    ]);
-
+    const [plans, setPlans] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingPlan, setEditingPlan] = useState(null);
     const [formData, setFormData] = useState({
@@ -35,25 +17,57 @@ export function SubscriptionManagement() {
         popular: false
     });
 
+    useEffect(() => {
+        fetchSubscriptions();
+    }, []);
+
+    const fetchSubscriptions = async () => {
+        try {
+            setLoading(true);
+            const response = await adminService.getSubscriptions();
+
+            if (response.success) {
+                const subscriptionsData = response.data || response.subscriptions || [];
+                setPlans(Array.isArray(subscriptionsData) ? subscriptionsData : []);
+            } else {
+                toast.error('Failed to load subscriptions');
+                setPlans([]);
+            }
+        } catch (error) {
+            console.error('Error fetching subscriptions:', error);
+            toast.error('Failed to load subscriptions');
+            setPlans([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleEditPlan = (plan) => {
         setEditingPlan(plan);
         setFormData({
             name: plan.name,
             price: plan.price,
-            features: [...plan.features],
+            features: [...(plan.features || [])],
             popular: plan.popular || false
         });
         setIsEditModalOpen(true);
     };
 
-    const handleSavePlan = () => {
-        setPlans(plans.map(p =>
-            p.id === editingPlan.id
-                ? { ...p, ...formData }
-                : p
-        ));
-        setIsEditModalOpen(false);
-        setEditingPlan(null);
+    const handleSavePlan = async () => {
+        try {
+            const response = await adminService.updateSubscription(editingPlan.id || editingPlan._id, formData);
+            if (response.success) {
+                toast.success('Subscription plan updated successfully');
+                await fetchSubscriptions();
+                setIsEditModalOpen(false);
+                setEditingPlan(null);
+            } else {
+                toast.error(response.message || 'Failed to update plan');
+            }
+        } catch (error) {
+            console.error('Error updating plan:', error);
+            toast.error('Failed to update plan');
+        }
     };
 
     const handleAddFeature = () => {
@@ -70,6 +84,17 @@ export function SubscriptionManagement() {
         newFeatures[index] = value;
         setFormData({ ...formData, features: newFeatures });
     };
+
+    if (loading) {
+        return (
+            <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
+                <h2 className='text-3xl font-bold tracking-tight'>Subscription Management</h2>
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>

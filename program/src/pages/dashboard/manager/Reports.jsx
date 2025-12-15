@@ -1,38 +1,52 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, Button, Select } from '@/components/ui/ui';
 import { BarChart3, TrendingUp, DollarSign, CreditCard, Download, FileSpreadsheet } from 'lucide-react';
-import { exportToExcel, generateSalesReport, generateInventoryReport, generateStaffActivityReport } from '@/utils/exportUtils';
+import { exportToExcel } from '@/utils/exportUtils';
+import managerService from '@/services/manager.service';
 import { toast } from 'sonner';
 
 export function Reports() {
     const [reportType, setReportType] = useState('sales');
     const [reportPeriod, setReportPeriod] = useState('monthly');
+    const [isExporting, setIsExporting] = useState(false);
 
-    const handleExport = () => {
+    const handleExport = async () => {
         const today = new Date();
         const dateStr = today.toISOString().split('T')[0];
 
-        let data, filename, sheetName;
-
-        if (reportType === 'sales') {
-            data = generateSalesReport(reportPeriod);
-            filename = `Sales_Report_${reportPeriod}_${dateStr}`;
-            sheetName = `${reportPeriod.charAt(0).toUpperCase() + reportPeriod.slice(1)} Sales`;
-        } else if (reportType === 'inventory') {
-            data = generateInventoryReport();
-            filename = `Inventory_Report_${dateStr}`;
-            sheetName = 'Inventory';
-        } else if (reportType === 'staff') {
-            data = generateStaffActivityReport();
-            filename = `Staff_Activity_Report_${dateStr}`;
-            sheetName = 'Staff Activity';
-        }
+        let filename, sheetName;
+        setIsExporting(true);
 
         try {
-            exportToExcel(data, filename, sheetName);
-            toast.success(`${reportType.charAt(0).toUpperCase() + reportType.slice(1)} report exported successfully!`);
+            let data;
+            if (reportType === 'sales') {
+                filename = `Sales_Report_${reportPeriod}_${dateStr}`;
+                sheetName = `${reportPeriod.charAt(0).toUpperCase() + reportPeriod.slice(1)} Sales`;
+                const response = await managerService.getSalesReport(reportPeriod);
+                if (response.success) data = response.data;
+            } else if (reportType === 'inventory') {
+                filename = `Inventory_Report_${dateStr}`;
+                sheetName = 'Inventory';
+                const response = await managerService.getInventoryReport();
+                if (response.success) data = response.data;
+            } else if (reportType === 'staff') {
+                filename = `Staff_Activity_Report_${dateStr}`;
+                sheetName = 'Staff Activity';
+                const response = await managerService.getStaffActivityReport();
+                if (response.success) data = response.data;
+            }
+
+            if (data && Array.isArray(data) && data.length > 0) {
+                exportToExcel(data, filename, sheetName);
+                toast.success(`${reportType.charAt(0).toUpperCase() + reportType.slice(1)} report exported successfully!`);
+            } else {
+                toast.error('No data available to export or failed to fetch data.');
+            }
         } catch (error) {
+            console.error(error);
             toast.error('Failed to export report');
+        } finally {
+            setIsExporting(false);
         }
     };
 
@@ -45,7 +59,7 @@ export function Reports() {
                 </div>
             </div>
 
-            {}
+            { }
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -76,9 +90,15 @@ export function Reports() {
                         )}
 
                         <div className="flex items-end">
-                            <Button onClick={handleExport} className="w-full">
-                                <Download className="mr-2 h-4 w-4" />
-                                Export to Excel
+                            <Button onClick={handleExport} className="w-full" disabled={isExporting}>
+                                {isExporting ? (
+                                    'Exporting...'
+                                ) : (
+                                    <>
+                                        <Download className="mr-2 h-4 w-4" />
+                                        Export to Excel
+                                    </>
+                                )}
                             </Button>
                         </div>
                     </div>
@@ -92,7 +112,7 @@ export function Reports() {
                 </CardContent>
             </Card>
 
-            {}
+            { }
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 <Card>
                     <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>

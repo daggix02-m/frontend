@@ -1,14 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Button, Input } from '@/components/ui/ui';
 import { FileText, AlertCircle, CheckCircle, Clock, Search } from 'lucide-react';
+import { pharmacistService } from '@/services/pharmacist.service';
+import { toast } from 'sonner';
 
 export function Prescriptions() {
-    const [prescriptions, setPrescriptions] = useState([
-        { id: 'RX-001', patient: 'Abebe Kebede', doctor: 'Dr. Yohannes Tadesse', medication: 'Amoxicillin 500mg', dosage: '3x daily', duration: '7 days', status: 'pending', date: '2025-11-28' },
-        { id: 'RX-002', patient: 'Tigist Alemayehu', doctor: 'Dr. Mekdes Hailu', medication: 'Lisinopril 10mg', dosage: '1x daily', duration: '30 days', status: 'validated', date: '2025-11-28' },
-        { id: 'RX-003', patient: 'Dawit Tesfaye', doctor: 'Dr. Solomon Bekele', medication: 'Metformin 850mg', dosage: '2x daily', duration: '90 days', status: 'dispensed', date: '2025-11-27' },
-        { id: 'RX-004', patient: 'Hanna Girma', doctor: 'Dr. Mulugeta Assefa', medication: 'Atorvastatin 20mg', dosage: '1x daily', duration: '30 days', status: 'pending', date: '2025-11-27' },
-    ]);
+    const [prescriptions, setPrescriptions] = useState([]);
+    const [alerts, setAlerts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchPrescriptions();
+        fetchAlerts();
+    }, []);
+
+    const fetchPrescriptions = async () => {
+        try {
+            setLoading(true);
+            const response = await pharmacistService.getPrescriptions();
+
+            if (response.success) {
+                const prescriptionsData = response.data || response.prescriptions || [];
+                setPrescriptions(Array.isArray(prescriptionsData) ? prescriptionsData : []);
+            } else {
+                toast.error('Failed to load prescriptions');
+                setPrescriptions([]);
+            }
+        } catch (error) {
+            console.error('Error fetching prescriptions:', error);
+            toast.error('Failed to load prescriptions');
+            setPrescriptions([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchAlerts = async () => {
+        try {
+            const response = await pharmacistService.getAlerts();
+            if (response.success) {
+                setAlerts(response.data || response.alerts || []);
+            }
+        } catch (error) {
+            console.error('Error fetching alerts:', error);
+        }
+    };
 
     const getStatusBadge = (status) => {
         const variants = {
@@ -36,24 +72,53 @@ export function Prescriptions() {
         { title: 'Pending Validation', value: prescriptions.filter(p => p.status === 'pending').length, icon: Clock, color: 'text-orange-600' },
         { title: 'Validated Today', value: prescriptions.filter(p => p.status === 'validated').length, icon: CheckCircle, color: 'text-green-600' },
         { title: 'Dispensed Today', value: prescriptions.filter(p => p.status === 'dispensed').length, icon: FileText, color: 'text-blue-600' },
-        { title: 'Flagged', value: '3', icon: AlertCircle, color: 'text-red-600' },
+        { title: 'Flagged', value: prescriptions.filter(p => p.flagged).length, icon: AlertCircle, color: 'text-red-600' },
     ];
 
-    const handleValidate = (id) => {
+    const handleValidate = async (id) => {
         if (window.confirm('Are you sure you want to validate this prescription?')) {
-            setPrescriptions(prescriptions.map(p =>
-                p.id === id ? { ...p, status: 'validated' } : p
-            ));
+            try {
+                const response = await pharmacistService.validatePrescription(id);
+                if (response.success) {
+                    toast.success('Prescription validated successfully');
+                    await fetchPrescriptions();
+                } else {
+                    toast.error(response.message || 'Failed to validate prescription');
+                }
+            } catch (error) {
+                console.error('Error validating prescription:', error);
+                toast.error('Failed to validate prescription');
+            }
         }
     };
 
-    const handleDispense = (id) => {
+    const handleDispense = async (id) => {
         if (window.confirm('Confirm dispensing for this prescription?')) {
-            setPrescriptions(prescriptions.map(p =>
-                p.id === id ? { ...p, status: 'dispensed' } : p
-            ));
+            try {
+                const response = await pharmacistService.dispensePrescription(id);
+                if (response.success) {
+                    toast.success('Prescription dispensed successfully');
+                    await fetchPrescriptions();
+                } else {
+                    toast.error(response.message || 'Failed to dispense prescription');
+                }
+            } catch (error) {
+                console.error('Error dispensing prescription:', error);
+                toast.error('Failed to dispense prescription');
+            }
         }
     };
+
+    if (loading) {
+        return (
+            <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
+                <h1 className='text-3xl font-bold tracking-tight'>Prescription Management</h1>
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
@@ -62,7 +127,7 @@ export function Prescriptions() {
                 <p className='text-muted-foreground mt-2'>Validate and dispense prescriptions</p>
             </div>
 
-            {}
+            {/* Stats Cards */}
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
@@ -77,7 +142,7 @@ export function Prescriptions() {
                 ))}
             </div>
 
-            {}
+            {/* Search Bar */}
             <Card>
                 <CardContent className='pt-6'>
                     <div className='relative w-full md:max-w-md'>
@@ -87,7 +152,7 @@ export function Prescriptions() {
                 </CardContent>
             </Card>
 
-            {}
+            {/* Active Prescriptions Table */}
             <Card>
                 <CardHeader>
                     <CardTitle>Active Prescriptions</CardTitle>
@@ -144,7 +209,7 @@ export function Prescriptions() {
                 </CardContent>
             </Card>
 
-            {}
+            {/* Drug Interaction Alerts */}
             <Card>
                 <CardHeader>
                     <CardTitle className='flex items-center gap-2'>
@@ -154,18 +219,18 @@ export function Prescriptions() {
                 </CardHeader>
                 <CardContent>
                     <div className='space-y-3'>
-                        <div className='border-l-4 border-red-600 pl-4 py-2'>
-                            <p className='font-medium'>Patient: Abebe Kebede (RX-001)</p>
-                            <p className='text-sm text-muted-foreground'>
-                                Potential interaction between Amoxicillin and current medication (Warfarin). Consult with doctor before dispensing.
-                            </p>
-                        </div>
-                        <div className='border-l-4 border-yellow-600 pl-4 py-2'>
-                            <p className='font-medium'>Patient: Hanna Girma (RX-004)</p>
-                            <p className='text-sm text-muted-foreground'>
-                                Patient has reported allergy to statins. Verify prescription with prescribing doctor.
-                            </p>
-                        </div>
+                        {alerts.length > 0 ? (
+                            alerts.map((alert, index) => (
+                                <div key={index} className={`border-l-4 ${alert.severity === 'high' ? 'border-red-600' : 'border-yellow-600'} pl-4 py-2`}>
+                                    <p className='font-medium'>Patient: {alert.patientName} ({alert.prescriptionId})</p>
+                                    <p className='text-sm text-muted-foreground'>
+                                        {alert.message}
+                                    </p>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-sm text-muted-foreground">No active alerts.</p>
+                        )}
                     </div>
                 </CardContent>
             </Card>

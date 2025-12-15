@@ -6,11 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import FloatingPaths from '@/components/shared/FloatingPaths';
 import { AppleIcon, AtSignIcon, GithubIcon, LockIcon } from 'lucide-react';
+import { login } from '@/api/auth.api';
+import { toast } from 'sonner';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const validateEmail = (email) => {
@@ -26,17 +29,27 @@ export function LoginPage() {
       return;
     }
 
+    if (!password) {
+      setError('Please enter your password.');
+      return;
+    }
+
+    setIsLoading(true);
+
     try {
+      const response = await login(email, password);
 
-      let role = 'manager';
-      if (email.includes('admin')) role = 'admin';
-      else if (email.includes('pharmacist')) role = 'pharmacist';
-      else if (email.includes('cashier')) role = 'cashier';
+      if (!response.success) {
+        setError(response.message || 'Login failed. Please check your credentials and try again.');
+        setIsLoading(false);
+        return;
+      }
 
-      localStorage.setItem('accessToken', 'test-token-' + Date.now());
-      localStorage.setItem('userRole', role);
+      // Store user role from response or determine from email as fallback
+      const role = response.role || localStorage.getItem('userRole') || 'manager';
 
-      const isFirstTimeLogin = email.includes('new') || email.includes('first');
+      // Check if user needs to change password (first time login)
+      const isFirstTimeLogin = response.firstTimeLogin || email.includes('new') || email.includes('first');
 
       if (isFirstTimeLogin) {
         localStorage.setItem('requiresPasswordChange', 'true');
@@ -44,6 +57,7 @@ export function LoginPage() {
         return;
       }
 
+      // Redirect based on role
       if (role === 'admin') navigate('/admin/overview');
       else if (role === 'manager') navigate('/manager/overview');
       else if (role === 'pharmacist') navigate('/pharmacist/overview');
@@ -51,8 +65,14 @@ export function LoginPage() {
       else navigate('/manager/overview');
 
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError(err.message || 'An unexpected error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleSocialLogin = (provider) => {
+    toast.info(`${provider} login is coming soon!`);
   };
 
   return (
@@ -97,7 +117,7 @@ export function LoginPage() {
             <p className='text-muted-foreground text-base'>Login to your PharmaCare account.</p>
           </div>
           <div className='space-y-2'>
-            <Button type='button' size='lg' className='w-full'>
+            <Button type='button' size='lg' className='w-full' onClick={() => handleSocialLogin('Google')}>
               <svg
                 xmlns='http://www.w3.org/2000/svg'
                 viewBox='0 0 24 24'
@@ -110,11 +130,11 @@ export function LoginPage() {
               </svg>
               Continue with Google
             </Button>
-            <Button type='button' size='lg' className='w-full'>
+            <Button type='button' size='lg' className='w-full' onClick={() => handleSocialLogin('Apple')}>
               <AppleIcon className='size-4 me-2' />
               Continue with Apple
             </Button>
-            <Button type='button' size='lg' className='w-full'>
+            <Button type='button' size='lg' className='w-full' onClick={() => handleSocialLogin('GitHub')}>
               <GithubIcon className='size-4 me-2' />
               Continue with GitHub
             </Button>
@@ -144,8 +164,7 @@ export function LoginPage() {
             <div className='space-y-2'>
               <div className='flex items-center justify-between'>
                 <label className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>
-                  Password{' '}
-                  <span className='text-muted-foreground text-xs'>(Optional for testing)</span>
+                  Password
                 </label>
                 <a
                   href='/auth/forgot-password'
@@ -156,7 +175,7 @@ export function LoginPage() {
               </div>
               <div className='relative h-max'>
                 <Input
-                  placeholder='Password (optional)'
+                  placeholder='Password'
                   className={`peer ps-9 ${error && error.includes('Password') ? 'border-red-500' : ''}`}
                   type='password'
                   value={password}
@@ -170,8 +189,8 @@ export function LoginPage() {
 
             {error && <p className='text-red-500 text-sm'>{error}</p>}
 
-            <Button type='submit' className='w-full'>
-              <span>Sign In</span>
+            <Button type='submit' className='w-full' disabled={isLoading}>
+              {isLoading ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
 

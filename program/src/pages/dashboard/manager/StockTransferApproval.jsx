@@ -1,18 +1,78 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Button, Dialog, DialogContent } from '@/components/ui/ui';
 import { Package, CheckCircle, XCircle, Clock, TrendingUp, ArrowRight } from 'lucide-react';
+import { managerService } from '@/services/manager.service';
 import { toast } from 'sonner';
 
 export function StockTransferApproval() {
-    const [transfers, setTransfers] = useState([
-        { id: 'ST-001', from: 'Main Branch', to: 'Downtown Branch', product: 'Paracetamol 500mg', quantity: 500, requestedBy: 'Alemayehu Desta', status: 'pending', date: '2025-11-28' },
-        { id: 'ST-002', from: 'Downtown Branch', to: 'Westside Branch', product: 'Amoxicillin 250mg', quantity: 200, requestedBy: 'Selamawit Mekonnen', status: 'pending', date: '2025-11-27' },
-        { id: 'ST-003', from: 'Main Branch', to: 'Eastside Branch', product: 'Ibuprofen 400mg', quantity: 300, requestedBy: 'Berhanu Wolde', status: 'approved', date: '2025-11-26' },
-        { id: 'ST-004', from: 'Westside Branch', to: 'Main Branch', product: 'Aspirin 100mg', quantity: 150, requestedBy: 'Tigist Alemayehu', status: 'rejected', date: '2025-11-25' },
-    ]);
-
+    const [transfers, setTransfers] = useState([]);
     const [selectedTransfer, setSelectedTransfer] = useState(null);
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchTransfers();
+    }, []);
+
+    const fetchTransfers = async () => {
+        try {
+            setLoading(true);
+            const response = await managerService.getStockTransfers();
+
+            if (response.success) {
+                const transfersData = response.data || response.transfers || [];
+                setTransfers(Array.isArray(transfersData) ? transfersData : []);
+            } else {
+                toast.error('Failed to load stock transfers');
+                setTransfers([]);
+            }
+        } catch (error) {
+            console.error('Error fetching stock transfers:', error);
+            toast.error('Failed to load stock transfers');
+            setTransfers([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleApprove = async (id) => {
+        if (window.confirm('Are you sure you want to approve this transfer?')) {
+            try {
+                const response = await managerService.approveStockTransfer(id);
+                if (response.success) {
+                    toast.success('Transfer approved successfully!');
+                    await fetchTransfers(); // Refresh the list
+                } else {
+                    toast.error(response.message || 'Failed to approve transfer');
+                }
+            } catch (error) {
+                console.error('Error approving transfer:', error);
+                toast.error('Failed to approve transfer');
+            }
+        }
+    };
+
+    const handleReject = async (id) => {
+        if (window.confirm('Are you sure you want to reject this transfer?')) {
+            try {
+                const response = await managerService.rejectStockTransfer(id);
+                if (response.success) {
+                    toast.error('Transfer rejected');
+                    await fetchTransfers(); // Refresh the list
+                } else {
+                    toast.error(response.message || 'Failed to reject transfer');
+                }
+            } catch (error) {
+                console.error('Error rejecting transfer:', error);
+                toast.error('Failed to reject transfer');
+            }
+        }
+    };
+
+    const handleViewDetails = (transfer) => {
+        setSelectedTransfer(transfer);
+        setIsDetailsOpen(true);
+    };
 
     const getStatusBadge = (status) => {
         const variants = {
@@ -41,37 +101,25 @@ export function StockTransferApproval() {
         { title: 'Total This Month', value: transfers.length, icon: TrendingUp, color: 'text-blue-600' },
     ];
 
-    const handleApprove = (id) => {
-        if (window.confirm('Are you sure you want to approve this transfer?')) {
-            setTransfers(transfers.map(t =>
-                t.id === id ? { ...t, status: 'approved' } : t
-            ));
-            toast.success('Transfer approved successfully!');
-        }
-    };
-
-    const handleReject = (id) => {
-        if (window.confirm('Are you sure you want to reject this transfer?')) {
-            setTransfers(transfers.map(t =>
-                t.id === id ? { ...t, status: 'rejected' } : t
-            ));
-            toast.error('Transfer rejected');
-        }
-    };
-
-    const handleViewDetails = (transfer) => {
-        setSelectedTransfer(transfer);
-        setIsDetailsOpen(true);
-    };
+    if (loading) {
+        return (
+            <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
+                <h1 className='text-3xl font-bold'>Stock Transfer Approval</h1>
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className='space-y-4 sm:space-y-6'>
+        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
             <div>
                 <h1 className='text-2xl sm:text-3xl font-bold tracking-tight'>Stock Transfer Approval</h1>
                 <p className='text-sm text-muted-foreground mt-1'>Review and approve stock transfers between branches</p>
             </div>
 
-            {}
+            { }
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
@@ -86,13 +134,13 @@ export function StockTransferApproval() {
                 ))}
             </div>
 
-            {}
+            { }
             <Card>
                 <CardHeader>
                     <CardTitle className="text-lg sm:text-xl">Transfer Requests</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                    {}
+                    { }
                     <div className='lg:hidden space-y-3 p-4'>
                         {transfers.map((transfer) => (
                             <Card key={transfer.id} className="overflow-hidden">
@@ -169,7 +217,7 @@ export function StockTransferApproval() {
                         ))}
                     </div>
 
-                    {}
+                    { }
                     <div className='hidden lg:block overflow-x-auto'>
                         <Table>
                             <TableHeader>
@@ -220,33 +268,35 @@ export function StockTransferApproval() {
                 </CardContent>
             </Card>
 
-            {}
+            { }
             <Card>
                 <CardHeader>
                     <CardTitle className="text-lg sm:text-xl">Recent Transfer History</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className='space-y-3'>
-                        {[
-                            { product: 'Paracetamol 500mg', from: 'Main', to: 'Downtown', qty: 500, status: 'completed' },
-                            { product: 'Amoxicillin 250mg', from: 'Downtown', to: 'Westside', qty: 200, status: 'in-transit' },
-                            { product: 'Ibuprofen 400mg', from: 'Main', to: 'Eastside', qty: 300, status: 'completed' },
-                        ].map((item, index) => (
-                            <div key={index} className='flex flex-col sm:flex-row sm:items-center justify-between border-b pb-2 last:border-0 gap-2'>
-                                <div>
-                                    <p className='font-medium'>{item.product}</p>
-                                    <p className='text-sm text-muted-foreground'>
-                                        {item.from} → {item.to} • Qty: {item.qty}
-                                    </p>
+                        {transfers
+                            .filter(t => t.status !== 'pending')
+                            .slice(0, 5)
+                            .map((item, index) => (
+                                <div key={index} className='flex flex-col sm:flex-row sm:items-center justify-between border-b pb-2 last:border-0 gap-2'>
+                                    <div>
+                                        <p className='font-medium'>{item.product}</p>
+                                        <p className='text-sm text-muted-foreground'>
+                                            {item.from} → {item.to} • Qty: {item.quantity}
+                                        </p>
+                                    </div>
+                                    <Badge variant={item.status === 'approved' ? 'secondary' : 'destructive'}>{item.status}</Badge>
                                 </div>
-                                <Badge variant={item.status === 'completed' ? 'secondary' : 'default'}>{item.status}</Badge>
-                            </div>
-                        ))}
+                            ))}
+                        {transfers.filter(t => t.status !== 'pending').length === 0 && (
+                            <p className="text-sm text-muted-foreground text-center py-4">No recent transfer history</p>
+                        )}
                     </div>
                 </CardContent>
             </Card>
 
-            {}
+            { }
             <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
                 <DialogContent className="max-w-2xl">
                     {selectedTransfer && (

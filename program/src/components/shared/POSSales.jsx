@@ -1,22 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, Input, Button, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge } from '@/components/ui/ui';
 import { Search, Plus, Minus, Trash2, DollarSign, CreditCard, Banknote } from 'lucide-react';
+import { cashierService } from '@/services/cashier.service';
+import { toast } from 'sonner';
 
 export function POSSales({ role = 'cashier' }) {
-    const [cart, setCart] = useState([
-        { id: 1, name: 'Paracetamol 500mg', price: 5.99, quantity: 2, stock: 150 },
-        { id: 2, name: 'Amoxicillin 250mg', price: 12.50, quantity: 1, stock: 80 },
-    ]);
-
+    const [cart, setCart] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [discount, setDiscount] = useState(0);
     const [paymentMethod, setPaymentMethod] = useState('cash');
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-    const products = [
-        { id: 3, name: 'Ibuprofen 400mg', price: 8.99, stock: 200 },
-        { id: 4, name: 'Aspirin 100mg', price: 4.50, stock: 300 },
-        { id: 5, name: 'Vitamin C 1000mg', price: 15.99, stock: 120 },
-    ];
+    // Fetch products when search term changes
+    useEffect(() => {
+        if (searchTerm.length > 2) {
+            searchProducts();
+        } else {
+            setProducts([]);
+        }
+    }, [searchTerm]);
+
+    const searchProducts = async () => {
+        try {
+            setLoading(true);
+            const response = await cashierService.lookupProduct(searchTerm);
+            if (response.success) {
+                const productsData = response.data || response.products || [];
+                setProducts(Array.isArray(productsData) ? productsData : []);
+            } else {
+                setProducts([]);
+            }
+        } catch (error) {
+            console.error('Error searching products:', error);
+            setProducts([]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const discountAmount = (subtotal * discount) / 100;
@@ -41,33 +62,97 @@ export function POSSales({ role = 'cashier' }) {
         } else {
             setCart([...cart, { ...product, quantity: 1 }]);
         }
+        toast.success(`${product.name} added to cart`);
     };
 
-    const handleCheckout = () => {
-        if (cart.length === 0) return;
-        if (window.confirm(`Process payment of $${total.toFixed(2)} via ${paymentMethod}?`)) {
+    const handleCheckout = async () => {
+        if (cart.length === 0) {
+            toast.error('Cart is empty');
+            return;
+        }
 
-            alert('Sale processed successfully!');
-            setCart([]);
-            setDiscount(0);
-            setPaymentMethod('cash');
+        try {
+            const saleData = {
+                items: cart.map(item => ({
+                    productId: item.id,
+                    quantity: item.quantity,
+                    price: item.price
+                })),
+                paymentMethod,
+                discount,
+                subtotal,
+                total
+            };
+
+            const response = await cashierService.processSale(saleData);
+
+            if (response.success) {
+                toast.success(`Sale processed successfully! Total: ETB ${total.toFixed(2)}`);
+                setCart([]);
+                setDiscount(0);
+                setPaymentMethod('cash');
+                setSearchTerm('');
+            } else {
+                toast.error(response.message || 'Failed to process sale');
+            }
+        } catch (error) {
+            console.error('Error processing sale:', error);
+            toast.error('Failed to process sale');
         }
     };
 
-    const handleHoldTransaction = () => {
-        if (cart.length === 0) return;
-        alert('Transaction held successfully.');
-        setCart([]);
+    const handleHoldTransaction = async () => {
+        if (cart.length === 0) {
+            toast.error('Cart is empty');
+            return;
+        }
+
+        try {
+            const holdData = {
+                items: cart,
+                discount,
+                paymentMethod
+            };
+
+            const response = await cashierService.holdTransaction(holdData);
+
+            if (response.success) {
+                toast.success('Transaction held successfully');
+                setCart([]);
+                setDiscount(0);
+            } else {
+                toast.error(response.message || 'Failed to hold transaction');
+            }
+        } catch (error) {
+            console.error('Error holding transaction:', error);
+            toast.error('Failed to hold transaction');
+        }
     };
 
-    const handleRetrieveHeld = () => {
-        alert('No held transactions found.');
+    const handleRetrieveHeld = async () => {
+        try {
+            const response = await cashierService.getHeldTransactions();
+
+            if (response.success && response.data && response.data.length > 0) {
+                const held = response.data[0]; // Get first held transaction
+                setCart(held.items || []);
+                setDiscount(held.discount || 0);
+                setPaymentMethod(held.paymentMethod || 'cash');
+                toast.success('Transaction retrieved');
+            } else {
+                toast.info('No held transactions found');
+            }
+        } catch (error) {
+            console.error('Error retrieving held transaction:', error);
+            toast.error('Failed to retrieve held transaction');
+        }
     };
 
     const handleProcessReturn = () => {
         const receiptId = prompt('Enter Receipt ID for return:');
         if (receiptId) {
-            alert(`Processing return for receipt: ${receiptId}`);
+            toast.info(`Processing return for receipt: ${receiptId}`);
+            // This would call cashierService.processReturn(receiptId) in a real implementation
         }
     };
 
@@ -81,7 +166,7 @@ export function POSSales({ role = 'cashier' }) {
             </div>
 
             <div className='grid gap-6 lg:grid-cols-3'>
-                {}
+                { }
                 <div className='lg:col-span-2 space-y-4'>
                     <Card>
                         <CardHeader>
@@ -100,7 +185,7 @@ export function POSSales({ role = 'cashier' }) {
                         </CardContent>
                     </Card>
 
-                    {}
+                    { }
                     <Card>
                         <CardHeader>
                             <CardTitle>Available Products</CardTitle>
@@ -133,7 +218,7 @@ export function POSSales({ role = 'cashier' }) {
                         </CardContent>
                     </Card>
 
-                    {}
+                    { }
                     <Card>
                         <CardHeader>
                             <CardTitle>Shopping Cart</CardTitle>
@@ -183,7 +268,7 @@ export function POSSales({ role = 'cashier' }) {
                     </Card>
                 </div>
 
-                {}
+                { }
                 <div className='space-y-4'>
                     <Card>
                         <CardHeader>
@@ -254,7 +339,7 @@ export function POSSales({ role = 'cashier' }) {
                         </CardContent>
                     </Card>
 
-                    {}
+                    { }
                     <Card>
                         <CardHeader>
                             <CardTitle>Quick Actions</CardTitle>

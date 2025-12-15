@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, Button, Input } from '@/components/ui/ui';
 import { Select } from '@/components/ui/select';
 import { Percent, DollarSign, Tag, Settings } from 'lucide-react';
+import { managerService } from '@/services/manager.service';
 import { toast } from 'sonner';
 
 export function RefundsDiscounts() {
@@ -12,41 +13,113 @@ export function RefundsDiscounts() {
         requireApproval: true,
     });
 
-    const [discountRules, setDiscountRules] = useState([
-        { id: 1, name: 'Senior Citizen Discount', type: 'percentage', value: 10, active: true },
-        { id: 2, name: 'Bulk Purchase (10+ items)', type: 'percentage', value: 5, active: true },
-        { id: 3, name: 'Loyalty Program', type: 'percentage', value: 15, active: true },
-        { id: 4, name: 'Seasonal Promotion', type: 'fixed', value: 50, active: false },
-    ]);
-
+    const [discountRules, setDiscountRules] = useState([]);
     const [newDiscount, setNewDiscount] = useState({
         name: '',
         type: 'percentage',
         value: '',
         appliesTo: 'all'
     });
+    const [loading, setLoading] = useState(true);
 
-    const handleCreateDiscount = () => {
-        if (!newDiscount.name || !newDiscount.value) return;
+    const [statsData, setStatsData] = useState({
+        totalSavings: 0,
+        avgDiscount: 0,
+        refundsCount: 0
+    });
 
-        const discount = {
-            id: discountRules.length + 1,
-            name: newDiscount.name,
-            type: newDiscount.type,
-            value: Number(newDiscount.value),
-            active: true
-        };
+    useEffect(() => {
+        fetchDiscountRules();
+        fetchStats();
+    }, []);
 
-        setDiscountRules([...discountRules, discount]);
-        setNewDiscount({ name: '', type: 'percentage', value: '', appliesTo: 'all' });
-        toast.success('Discount created successfully!');
+    const fetchStats = async () => {
+        try {
+            const response = await managerService.getDiscountStats();
+            if (response.success) {
+                setStatsData(response.data || { totalSavings: 0, avgDiscount: 0, refundsCount: 0 });
+            }
+        } catch (error) {
+            console.error('Error fetching stats:', error);
+        }
     };
 
-    const handleToggleDiscount = (id) => {
-        setDiscountRules(discountRules.map(rule =>
-            rule.id === id ? { ...rule, active: !rule.active } : rule
-        ));
-        toast.success('Discount status updated!');
+    const fetchDiscountRules = async () => {
+        try {
+            setLoading(true);
+            const response = await managerService.getDiscountRules();
+
+            if (response.success) {
+                const rulesData = response.data || response.rules || [];
+                setDiscountRules(Array.isArray(rulesData) ? rulesData : []);
+            } else {
+                toast.error('Failed to load discount rules');
+                setDiscountRules([]);
+            }
+        } catch (error) {
+            console.error('Error fetching discount rules:', error);
+            toast.error('Failed to load discount rules');
+            setDiscountRules([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // ... (rest of the functions)
+
+    const stats = [
+        { title: 'Active Discounts', value: discountRules.filter(r => r.active).length.toString(), icon: Tag, color: 'text-blue-600' },
+        { title: 'Total Savings', value: `ETB ${statsData.totalSavings.toLocaleString()}`, icon: DollarSign, color: 'text-green-600' },
+        { title: 'Avg Discount', value: `${statsData.avgDiscount}%`, icon: Percent, color: 'text-purple-600' },
+        { title: 'Refunds This Month', value: statsData.refundsCount.toString(), icon: Settings, color: 'text-orange-600' },
+    ];
+
+    const handleCreateDiscount = async () => {
+        if (!newDiscount.name || !newDiscount.value) return;
+
+        try {
+            const discountData = {
+                name: newDiscount.name,
+                type: newDiscount.type,
+                value: Number(newDiscount.value),
+                appliesTo: newDiscount.appliesTo,
+                active: true
+            };
+
+            const response = await managerService.createDiscountRule(discountData);
+            if (response.success) {
+                toast.success('Discount created successfully!');
+                await fetchDiscountRules(); // Refresh the list
+                setNewDiscount({ name: '', type: 'percentage', value: '', appliesTo: 'all' });
+            } else {
+                toast.error(response.message || 'Failed to create discount');
+            }
+        } catch (error) {
+            console.error('Error creating discount:', error);
+            toast.error('Failed to create discount');
+        }
+    };
+
+    const handleToggleDiscount = async (id) => {
+        try {
+            // In a real implementation, we'd have a separate method to toggle status
+            // For now, we'll use the delete method to toggle the discount
+            const rule = discountRules.find(r => r.id === id);
+            if (rule) {
+                const response = rule.active
+                    ? await managerService.deleteDiscountRule(id) // Assuming this deactivates
+                    : await managerService.createDiscountRule({ ...rule, active: true }); // Reactivate
+                if (response.success) {
+                    toast.success('Discount status updated!');
+                    await fetchDiscountRules(); // Refresh the list
+                } else {
+                    toast.error(response.message || 'Failed to update discount status');
+                }
+            }
+        } catch (error) {
+            console.error('Error toggling discount:', error);
+            toast.error('Failed to update discount status');
+        }
     };
 
     const handleEditDiscount = (rule) => {
@@ -59,21 +132,41 @@ export function RefundsDiscounts() {
         toast.info('Edit discount details and click Create to update');
     };
 
-    const stats = [
-        { title: 'Active Discounts', value: '12', icon: Tag, color: 'text-blue-600' },
-        { title: 'Total Savings', value: 'ETB 8,450', icon: DollarSign, color: 'text-green-600' },
-        { title: 'Avg Discount', value: '8.5%', icon: Percent, color: 'text-purple-600' },
-        { title: 'Refunds This Month', value: '23', icon: Settings, color: 'text-orange-600' },
-    ];
+    const handleSaveRefundPolicy = async () => {
+        try {
+            const response = await managerService.updateRefundPolicy(refundPolicy);
+            if (response.success) {
+                toast.success('Refund policy saved!');
+            } else {
+                toast.error(response.message || 'Failed to save refund policy');
+            }
+        } catch (error) {
+            console.error('Error saving refund policy:', error);
+            toast.error('Failed to save refund policy');
+        }
+    };
+
+
+
+    if (loading) {
+        return (
+            <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
+                <h1 className='text-3xl font-bold'>Refunds & Discounts</h1>
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className='space-y-4 sm:space-y-6'>
+        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
             <div>
                 <h1 className='text-2xl sm:text-3xl font-bold tracking-tight'>Refunds & Discounts</h1>
                 <p className='text-sm text-muted-foreground mt-1'>Configure refund policies and discount rules</p>
             </div>
 
-            {}
+            { }
             <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
                 {stats.map((stat, index) => (
                     <Card key={index}>
@@ -89,7 +182,7 @@ export function RefundsDiscounts() {
             </div>
 
             <div className='grid gap-6 grid-cols-1 md:grid-cols-2'>
-                {}
+                { }
                 <Card>
                     <CardHeader>
                         <CardTitle>Refund Policy Settings</CardTitle>
@@ -131,11 +224,11 @@ export function RefundsDiscounts() {
                                 className='h-4 w-4'
                             />
                         </div>
-                        <Button className='w-full' onClick={() => toast.success('Refund policy saved!')}>Save Refund Policy</Button>
+                        <Button className='w-full' onClick={handleSaveRefundPolicy}>Save Refund Policy</Button>
                     </CardContent>
                 </Card>
 
-                {}
+                { }
                 <Card>
                     <CardHeader>
                         <CardTitle>Create New Discount</CardTitle>
@@ -185,7 +278,7 @@ export function RefundsDiscounts() {
                 </Card>
             </div>
 
-            {}
+            { }
             <Card>
                 <CardHeader>
                     <CardTitle className="text-lg sm:text-xl">Active Discount Rules</CardTitle>
@@ -217,7 +310,7 @@ export function RefundsDiscounts() {
                 </CardContent>
             </Card>
 
-            {}
+            { }
             <Card>
                 <CardHeader>
                     <CardTitle className="text-lg sm:text-xl">Approval Thresholds</CardTitle>

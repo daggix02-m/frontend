@@ -6,12 +6,13 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { User, Eye, EyeOff, Camera } from 'lucide-react';
 import { toast } from 'sonner';
+import { getProfile, updateProfile, changePassword } from '@/api/auth.api';
 
 export const ProfileSettings = ({ userRole = 'User' }) => {
     const [profileData, setProfileData] = useState({
-        name: 'Abebe Bikila',
-        email: 'abebe.bikila@pharmacare.com',
-        phone: '+251 91 234 5678',
+        name: '',
+        email: '',
+        phone: '',
     });
 
     const [passwordData, setPasswordData] = useState({
@@ -25,6 +26,27 @@ export const ProfileSettings = ({ userRole = 'User' }) => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
     const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+    React.useEffect(() => {
+        fetchProfile();
+    }, []);
+
+    const fetchProfile = async () => {
+        try {
+            const response = await getProfile();
+            if (response.success) {
+                const user = response.data || response.user;
+                setProfileData({
+                    name: user.name || user.full_name || '',
+                    email: user.email || '',
+                    phone: user.phone || user.phone_number || '',
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+            toast.error('Failed to load profile data');
+        }
+    };
 
     const handleProfileChange = (e) => {
         const { name, value } = e.target;
@@ -41,10 +63,14 @@ export const ProfileSettings = ({ userRole = 'User' }) => {
         setIsUpdatingProfile(true);
 
         try {
-
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            toast.success('Profile updated successfully!');
+            const response = await updateProfile(profileData);
+            if (response.success) {
+                toast.success('Profile updated successfully!');
+            } else {
+                toast.error(response.message || 'Failed to update profile');
+            }
         } catch (error) {
+            console.error('Error updating profile:', error);
             toast.error('Failed to update profile');
         } finally {
             setIsUpdatingProfile(false);
@@ -67,15 +93,19 @@ export const ProfileSettings = ({ userRole = 'User' }) => {
         setIsChangingPassword(true);
 
         try {
-
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            toast.success('Password changed successfully!');
-            setPasswordData({
-                currentPassword: '',
-                newPassword: '',
-                confirmPassword: '',
-            });
+            const response = await changePassword(passwordData.currentPassword, passwordData.newPassword);
+            if (response.success) {
+                toast.success('Password changed successfully!');
+                setPasswordData({
+                    currentPassword: '',
+                    newPassword: '',
+                    confirmPassword: '',
+                });
+            } else {
+                toast.error(response.message || 'Failed to change password');
+            }
         } catch (error) {
+            console.error('Error changing password:', error);
             toast.error('Failed to change password');
         } finally {
             setIsChangingPassword(false);
@@ -84,7 +114,7 @@ export const ProfileSettings = ({ userRole = 'User' }) => {
 
     return (
         <div className="space-y-6">
-            {}
+            { }
             <Card>
                 <CardHeader>
                     <CardTitle>Profile Information</CardTitle>
@@ -158,7 +188,7 @@ export const ProfileSettings = ({ userRole = 'User' }) => {
                 </CardContent>
             </Card>
 
-            {}
+            { }
             <Card>
                 <CardHeader>
                     <CardTitle>Change Password</CardTitle>

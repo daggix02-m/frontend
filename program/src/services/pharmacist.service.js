@@ -136,6 +136,31 @@ export const pharmacistService = {
     async getReports() {
         return await makeApiCall('/pharmacist/reports', { method: 'GET' });
     },
+
+    /**
+     * Get drug interaction alerts
+     * @returns {Promise}
+     */
+    async getAlerts() {
+        return await makeApiCall('/pharmacist/alerts', { method: 'GET' });
+    },
+
+    /**
+     * Get receipts
+     * @returns {Promise}
+     */
+    async getReceipts() {
+        return await makeApiCall('/pharmacist/receipts', { method: 'GET' });
+    },
+
+    /**
+     * Get delivery items
+     * @param {string} id - Delivery ID
+     * @returns {Promise}
+     */
+    async getDeliveryItems(id) {
+        return await makeApiCall(`/pharmacist/deliveries/${id}/items`, { method: 'GET' });
+    },
 };
 
 export default pharmacistService;

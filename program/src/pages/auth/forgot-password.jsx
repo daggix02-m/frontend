@@ -5,18 +5,22 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import FloatingPaths from '@/components/shared/FloatingPaths';
 import { ChevronLeftIcon, AtSignIcon } from 'lucide-react';
+import { forgotPassword } from '@/api/auth.api';
 
 export function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const validateEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
     if (!email.trim()) {
       setError('Email is required');
@@ -28,6 +32,22 @@ export function ForgotPasswordPage() {
       return;
     }
 
+    setIsLoading(true);
+
+    try {
+      const response = await forgotPassword(email);
+
+      if (response.success) {
+        setSuccess('Password reset link has been sent to your email address.');
+        setEmail('');
+      } else {
+        setError(response.message || 'Failed to send reset link. Please try again.');
+      }
+    } catch (err) {
+      setError(err.message || 'An unexpected error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -91,9 +111,10 @@ export function ForgotPasswordPage() {
             </div>
 
             {error && <p className='text-red-500 text-sm'>{error}</p>}
+            {success && <p className='text-green-500 text-sm'>{success}</p>}
 
-            <Button type='submit' className='w-full'>
-              <span>Send Reset Link</span>
+            <Button type='submit' className='w-full' disabled={isLoading}>
+              {isLoading ? 'Sending...' : 'Send Reset Link'}
             </Button>
           </form>
         </div>

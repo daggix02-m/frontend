@@ -1,20 +1,42 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Button } from '@/components/ui/ui';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Button, Input } from '@/components/ui/ui';
 import { Select } from '@/components/ui/select';
 import { Ticket, MessageSquare, User, Clock } from 'lucide-react';
+import { adminService } from '@/services/admin.service';
+import { toast } from 'sonner';
 
 export function SupportTickets() {
-    const [tickets] = useState([
-        { id: 'TKT-001', pharmacy: 'Green Valley Pharmacy', subject: 'Cannot access inventory', priority: 'high', status: 'open', assignee: 'Unassigned', created: '2 hours ago' },
-        { id: 'TKT-002', pharmacy: 'City Health Pharmacy', subject: 'Payment integration issue', priority: 'urgent', status: 'in-progress', assignee: 'Mulugeta Assefa', created: '5 hours ago' },
-        { id: 'TKT-003', pharmacy: 'MediCare Plus', subject: 'Report generation error', priority: 'medium', status: 'open', assignee: 'Unassigned', created: '1 day ago' },
-        { id: 'TKT-004', pharmacy: 'Wellness Pharmacy', subject: 'User account locked', priority: 'high', status: 'in-progress', assignee: 'Bethlehem Yilma', created: '3 hours ago' },
-        { id: 'TKT-005', pharmacy: 'HealthFirst Pharmacy', subject: 'Feature request: Export to PDF', priority: 'low', status: 'resolved', assignee: 'Mulugeta Assefa', created: '2 days ago' },
-    ]);
-
+    const [tickets, setTickets] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [filterStatus, setFilterStatus] = useState('all');
     const [filterPriority, setFilterPriority] = useState('all');
     const [filterAssignee, setFilterAssignee] = useState('all');
+    const [searchTerm, setSearchTerm] = useState('');
+
+    useEffect(() => {
+        fetchTickets();
+    }, []);
+
+    const fetchTickets = async () => {
+        try {
+            setLoading(true);
+            const response = await adminService.getSupportTickets();
+
+            if (response.success) {
+                const ticketsData = response.data || response.tickets || [];
+                setTickets(Array.isArray(ticketsData) ? ticketsData : []);
+            } else {
+                toast.error('Failed to load support tickets');
+                setTickets([]);
+            }
+        } catch (error) {
+            console.error('Error fetching support tickets:', error);
+            toast.error('Failed to load support tickets');
+            setTickets([]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const getPriorityBadge = (priority) => {
         const variants = {
@@ -35,16 +57,20 @@ export function SupportTickets() {
         return <Badge variant={variants[status]}>{status}</Badge>;
     };
 
-    // Filter tickets based on selected filters
+    // Filter tickets based on selected filters and search term
     const filteredTickets = tickets.filter(ticket => {
         const matchesStatus = filterStatus === 'all' || ticket.status === filterStatus;
         const matchesPriority = filterPriority === 'all' || ticket.priority === filterPriority;
+        const matchesSearch = searchTerm === '' ||
+            ticket.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            ticket.pharmacy.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            ticket.subject.toLowerCase().includes(searchTerm.toLowerCase());
 
         // Handle assignee filter - need to match the assignee name
         let matchesAssignee = true;
         if (filterAssignee !== 'all') {
             if (filterAssignee === 'unassigned') {
-                matchesAssignee = ticket.assignee === 'Unassigned';
+                matchesAssignee = ticket.assignee === 'Unassigned' || !ticket.assignee;
             } else if (filterAssignee === 'mulugeta') {
                 matchesAssignee = ticket.assignee === 'Mulugeta Assefa';
             } else if (filterAssignee === 'bethlehem') {
@@ -52,15 +78,26 @@ export function SupportTickets() {
             }
         }
 
-        return matchesStatus && matchesPriority && matchesAssignee;
+        return matchesStatus && matchesPriority && matchesAssignee && matchesSearch;
     });
 
     const stats = [
-        { title: 'Open Tickets', value: '12', icon: Ticket, color: 'text-red-600' },
-        { title: 'In Progress', value: '8', icon: Clock, color: 'text-blue-600' },
-        { title: 'Resolved Today', value: '15', icon: MessageSquare, color: 'text-green-600' },
-        { title: 'Avg Response Time', value: '1.2 hrs', icon: User, color: 'text-purple-600' },
+        { title: 'Open Tickets', value: tickets.filter(t => t.status === 'open').length.toString(), icon: Ticket, color: 'text-red-600' },
+        { title: 'In Progress', value: tickets.filter(t => t.status === 'in-progress').length.toString(), icon: Clock, color: 'text-blue-600' },
+        { title: 'Resolved', value: tickets.filter(t => t.status === 'resolved').length.toString(), icon: MessageSquare, color: 'text-green-600' },
+        { title: 'Total Tickets', value: tickets.length.toString(), icon: User, color: 'text-purple-600' },
     ];
+
+    if (loading) {
+        return (
+            <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
+                <h1 className='text-3xl font-bold'>Support Tickets</h1>
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
@@ -88,6 +125,12 @@ export function SupportTickets() {
             <Card>
                 <CardContent className='pt-6'>
                     <div className='flex flex-col sm:flex-row gap-4'>
+                        <Input
+                            placeholder='Search tickets...'
+                            className='max-w-sm'
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                         <Select
                             className='w-full sm:w-48'
                             value={filterStatus}
@@ -152,7 +195,7 @@ export function SupportTickets() {
                                             <TableCell>{ticket.subject}</TableCell>
                                             <TableCell>{getPriorityBadge(ticket.priority)}</TableCell>
                                             <TableCell>{getStatusBadge(ticket.status)}</TableCell>
-                                            <TableCell>{ticket.assignee}</TableCell>
+                                            <TableCell>{ticket.assignee || 'Unassigned'}</TableCell>
                                             <TableCell>{ticket.created}</TableCell>
                                             <TableCell>
                                                 <Button size='sm' variant='outline'>
