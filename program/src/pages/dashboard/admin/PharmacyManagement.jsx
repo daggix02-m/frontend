@@ -1,228 +1,276 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Button, Badge, Input } from '@/components/ui/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+  Button,
+  Badge,
+  Input,
+} from '@/components/ui/ui';
 import { Check, X, Ban, Search } from 'lucide-react';
 import { adminService } from '@/services/admin.service';
+import { Building2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function PharmacyManagement() {
-    const [pharmacies, setPharmacies] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filterStatus, setFilterStatus] = useState('All');
-    const [loading, setLoading] = useState(true);
+  const [managers, setManagers] = useState([]);
+  const [pendingManagers, setPendingManagers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('All');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    useEffect(() => {
-        fetchPharmacies();
-    }, []);
+  useEffect(() => {
+    fetchManagers();
+  }, []);
 
-    const fetchPharmacies = async () => {
-        try {
-            setLoading(true);
-            const response = await adminService.getPharmacies();
+  const fetchManagers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await adminService.getManagers();
 
-            if (response.success) {
-                const pharmaciesData = response.data || response.pharmacies || [];
-                setPharmacies(Array.isArray(pharmaciesData) ? pharmaciesData : []);
-            } else {
-                toast.error('Failed to load pharmacies');
-                setPharmacies([]);
-            }
-        } catch (error) {
-            console.error('Error fetching pharmacies:', error);
-            toast.error('Failed to load pharmacies');
-            setPharmacies([]);
-        } finally {
-            setLoading(false);
-        }
-    };
+      if (response.success) {
+        const managersData = response.data || {};
+        const allManagers = Array.isArray(managersData.all) ? managersData.all : [];
+        const pending = Array.isArray(managersData.pending) ? managersData.pending : [];
 
-    const handleApprove = async (id) => {
-        if (window.confirm('Are you sure you want to approve this pharmacy?')) {
-            try {
-                const response = await adminService.approvePharmacy(id);
-                if (response.success) {
-                    toast.success('Pharmacy approved successfully');
-                    await fetchPharmacies(); // Refresh the list
-                } else {
-                    toast.error(response.message || 'Failed to approve pharmacy');
-                }
-            } catch (error) {
-                console.error('Error approving pharmacy:', error);
-                toast.error('Failed to approve pharmacy');
-            }
-        }
-    };
-
-    const handleReject = async (id) => {
-        if (window.confirm('Are you sure you want to reject this pharmacy application?')) {
-            try {
-                const response = await adminService.rejectPharmacy(id);
-                if (response.success) {
-                    toast.success('Pharmacy rejected successfully');
-                    await fetchPharmacies(); // Refresh the list
-                } else {
-                    toast.error(response.message || 'Failed to reject pharmacy');
-                }
-            } catch (error) {
-                console.error('Error rejecting pharmacy:', error);
-                toast.error('Failed to reject pharmacy');
-            }
-        }
-    };
-
-    const handleSuspend = async (id) => {
-        if (window.confirm('Are you sure you want to suspend this pharmacy?')) {
-            try {
-                const response = await adminService.suspendPharmacy(id);
-                if (response.success) {
-                    toast.success('Pharmacy suspended successfully');
-                    await fetchPharmacies(); // Refresh the list
-                } else {
-                    toast.error(response.message || 'Failed to suspend pharmacy');
-                }
-            } catch (error) {
-                console.error('Error suspending pharmacy:', error);
-                toast.error('Failed to suspend pharmacy');
-            }
-        }
-    };
-
-    const handleReactivate = async (id) => {
-        if (window.confirm('Are you sure you want to reactivate this pharmacy?')) {
-            try {
-                const response = await adminService.reactivatePharmacy(id);
-                if (response.success) {
-                    toast.success('Pharmacy reactivated successfully');
-                    await fetchPharmacies(); // Refresh the list
-                } else {
-                    toast.error(response.message || 'Failed to reactivate pharmacy');
-                }
-            } catch (error) {
-                console.error('Error reactivating pharmacy:', error);
-                toast.error('Failed to reactivate pharmacy');
-            }
-        }
-    };
-
-    const filteredPharmacies = pharmacies.filter(p => {
-        const matchesSearch = p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            p.owner?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            p.location?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesFilter = filterStatus === 'All' || p.status === filterStatus;
-        return matchesSearch && matchesFilter;
-    });
-
-    if (loading) {
-        return (
-            <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
-                <h2 className='text-3xl font-bold tracking-tight'>Pharmacy Management</h2>
-                <div className="flex justify-center items-center h-64">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-                </div>
-            </div>
-        );
+        setManagers(allManagers);
+        setPendingManagers(pending);
+      } else {
+        const errorMsg = response.message || 'Failed to load managers';
+        setError(errorMsg);
+        toast.error(errorMsg);
+        setManagers([]);
+        setPendingManagers([]);
+      }
+    } catch (error) {
+      console.error('Error fetching managers:', error);
+      const errorMsg = error.message || 'Failed to load managers';
+      setError(errorMsg);
+      toast.error(errorMsg);
+      setManagers([]);
+      setPendingManagers([]);
+    } finally {
+      setLoading(false);
     }
+  };
 
+  const handleActivate = async (id) => {
+    if (window.confirm('Are you sure you want to activate this manager?')) {
+      try {
+        const response = await adminService.activateManager(id);
+        if (response.success) {
+          toast.success('Manager activated successfully');
+          await fetchManagers(); // Refresh the list
+        } else {
+          toast.error(response.message || 'Failed to activate manager');
+        }
+      } catch (error) {
+        console.error('Error activating manager:', error);
+        toast.error('Failed to activate manager');
+      }
+    }
+  };
+
+  const handleDeactivate = async (id) => {
+    if (window.confirm('Are you sure you want to deactivate this manager?')) {
+      try {
+        const response = await adminService.deactivateManager(id);
+        if (response.success) {
+          toast.success('Manager deactivated successfully');
+          await fetchManagers(); // Refresh the list
+        } else {
+          toast.error(response.message || 'Failed to deactivate manager');
+        }
+      } catch (error) {
+        console.error('Error deactivating manager:', error);
+        toast.error('Failed to deactivate manager');
+      }
+    }
+  };
+
+  // Combine all managers and pending managers for display
+  const allManagersForDisplay = Array.isArray(managers)
+    ? managers.map((manager) => ({
+        ...manager,
+        status: manager.is_active ? 'Activated' : 'Pending',
+      }))
+    : [];
+
+  const filteredManagers = Array.isArray(allManagersForDisplay)
+    ? allManagersForDisplay.filter((m) => {
+        const matchesSearch =
+          m.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          m.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          m.branch_name?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesFilter = filterStatus === 'All' || m.status === filterStatus;
+        return matchesSearch && matchesFilter;
+      })
+    : [];
+
+  if (loading) {
     return (
-        <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
-            <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
-                <div>
-                    <h2 className='text-3xl font-bold tracking-tight'>Pharmacy Management</h2>
-                    <p className='text-muted-foreground'>Approve, suspend, or deactivate pharmacies across Ethiopia.</p>
-                </div>
-                <div className='flex flex-wrap gap-2'>
-                    <Button variant={filterStatus === 'All' ? 'default' : 'outline'} onClick={() => setFilterStatus('All')} size='sm'>All</Button>
-                    <Button variant={filterStatus === 'Pending' ? 'default' : 'outline'} onClick={() => setFilterStatus('Pending')} size='sm'>Pending</Button>
-                    <Button variant={filterStatus === 'Active' ? 'default' : 'outline'} onClick={() => setFilterStatus('Active')} size='sm'>Active</Button>
-                    <Button variant={filterStatus === 'Suspended' ? 'default' : 'outline'} onClick={() => setFilterStatus('Suspended')} size='sm'>Suspended</Button>
-                </div>
-            </div>
-
-            <Card>
-                <CardHeader>
-                    <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
-                        <CardTitle>Registered Pharmacies</CardTitle>
-                        <div className='relative w-full md:max-w-md'>
-                            <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
-                            <Input
-                                placeholder='Search by name, owner, or city...'
-                                className='pl-8'
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    <div className='overflow-x-auto'>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Pharmacy Name</TableHead>
-                                    <TableHead>Owner</TableHead>
-                                    <TableHead>Location</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Plan</TableHead>
-                                    <TableHead className='text-right'>Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {filteredPharmacies.length > 0 ? (
-                                    filteredPharmacies.map((pharmacy) => (
-                                        <TableRow key={pharmacy.id || pharmacy._id}>
-                                            <TableCell>
-                                                <div className='font-medium'>{pharmacy.name}</div>
-                                                <div className='text-xs text-muted-foreground'>{pharmacy.phone}</div>
-                                            </TableCell>
-                                            <TableCell>{pharmacy.owner}</TableCell>
-                                            <TableCell>{pharmacy.location || pharmacy.address}</TableCell>
-                                            <TableCell>
-                                                <Badge variant={
-                                                    pharmacy.status === 'Active' ? 'default' :
-                                                        pharmacy.status === 'Pending' ? 'secondary' :
-                                                            pharmacy.status === 'Suspended' ? 'destructive' : 'outline'
-                                                }>
-                                                    {pharmacy.status}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell>{pharmacy.plan || 'Basic'}</TableCell>
-                                            <TableCell className='text-right'>
-                                                <div className='flex justify-end gap-2'>
-                                                    {pharmacy.status === 'Pending' && (
-                                                        <>
-                                                            <Button size='sm' variant='outline' className='text-green-600 hover:text-green-700 hover:bg-green-50' onClick={() => handleApprove(pharmacy.id || pharmacy._id)} title="Approve">
-                                                                <Check size={16} />
-                                                            </Button>
-                                                            <Button size='sm' variant='outline' className='text-red-600 hover:text-red-700 hover:bg-red-50' onClick={() => handleReject(pharmacy.id || pharmacy._id)} title="Reject">
-                                                                <X size={16} />
-                                                            </Button>
-                                                        </>
-                                                    )}
-                                                    {pharmacy.status === 'Active' && (
-                                                        <Button size='sm' variant='ghost' className='text-red-600 hover:text-red-700 hover:bg-red-50' onClick={() => handleSuspend(pharmacy.id || pharmacy._id)}>
-                                                            <Ban size={16} className='mr-2' /> Suspend
-                                                        </Button>
-                                                    )}
-                                                    {pharmacy.status === 'Suspended' && (
-                                                        <Button size='sm' variant='ghost' className='text-green-600 hover:text-green-700 hover:bg-green-50' onClick={() => handleReactivate(pharmacy.id || pharmacy._id)}>
-                                                            <Check size={16} className='mr-2' /> Reactivate
-                                                        </Button>
-                                                    )}
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell colSpan={6} className='text-center py-8 text-muted-foreground'>
-                                            No pharmacies found matching your criteria.
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
-                </CardContent>
-            </Card>
+      <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
+        <h2 className='text-3xl font-bold tracking-tight'>Manager Management</h2>
+        <div className='flex justify-center items-center h-64'>
+          <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary'></div>
         </div>
+      </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
+        <h2 className='text-3xl font-bold tracking-tight'>Manager Management</h2>
+        <div className='flex flex-col items-center justify-center h-64 text-center'>
+          <p className='text-red-600 mb-4'>{error}</p>
+          <Button onClick={fetchManagers} variant='outline'>
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
+      <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
+        <div>
+          <h2 className='text-3xl font-bold tracking-tight'>Manager Management</h2>
+          <p className='text-muted-foreground'>
+            Approve and manage pharmacy managers across Ethiopia.
+          </p>
+        </div>
+        <div className='flex flex-wrap gap-2'>
+          <Button
+            variant={filterStatus === 'All' ? 'default' : 'outline'}
+            onClick={() => setFilterStatus('All')}
+            size='sm'
+          >
+            All
+          </Button>
+          <Button
+            variant={filterStatus === 'Pending' ? 'default' : 'outline'}
+            onClick={() => setFilterStatus('Pending')}
+            size='sm'
+          >
+            Pending
+          </Button>
+          <Button
+            variant={filterStatus === 'Activated' ? 'default' : 'outline'}
+            onClick={() => setFilterStatus('Activated')}
+            size='sm'
+          >
+            Activated
+          </Button>
+        </div>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
+            <CardTitle>Pharmacy Managers</CardTitle>
+            <div className='relative w-full md:max-w-md'>
+              <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
+              <Input
+                placeholder='Search by name, email, or branch...'
+                className='pl-8'
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className='overflow-x-auto'>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Manager Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Branch</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead className='text-right'>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredManagers.length > 0 ? (
+                  filteredManagers.map((manager) => (
+                    <TableRow key={manager.user_id}>
+                      <TableCell>
+                        <div className='font-medium'>{manager.full_name}</div>
+                        <div className='text-xs text-muted-foreground'>{manager.email}</div>
+                      </TableCell>
+                      <TableCell>{manager.email}</TableCell>
+                      <TableCell>
+                        <div className='flex items-center gap-2'>
+                          <Building2 size={14} className='text-muted-foreground' />
+                          {manager.branch_name}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            manager.status === 'Activated'
+                              ? 'default'
+                              : manager.status === 'Pending'
+                                ? 'secondary'
+                                : 'outline'
+                          }
+                        >
+                          {manager.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{manager.role_name}</TableCell>
+                      <TableCell className='text-right'>
+                        <div className='flex justify-end gap-2'>
+                          {manager.status === 'Pending' && (
+                            <Button
+                              size='sm'
+                              variant='outline'
+                              className='text-green-600 hover:text-green-700 hover:bg-green-50'
+                              onClick={() => handleActivate(manager.user_id)}
+                              title='Activate'
+                            >
+                              <Check size={16} />
+                            </Button>
+                          )}
+                          {manager.status === 'Activated' && (
+                            <Button
+                              size='sm'
+                              variant='ghost'
+                              className='text-red-600 hover:text-red-700 hover:bg-red-50'
+                              onClick={() => handleDeactivate(manager.user_id)}
+                            >
+                              <Ban size={16} className='mr-2' /> Deactivate
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className='text-center py-8 text-muted-foreground'>
+                      No managers found matching your criteria.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }

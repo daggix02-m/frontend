@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Card } from "../ui/card";
-import {Skeleton} from "../ui/skeleton";
-import managerService from "../../services/manager.service";
+import React, { useEffect, useState } from 'react';
+import { Card } from '../ui/card';
+import { Skeleton } from '../ui/skeleton';
+import managerService from '../../services/manager.service';
 
 const PendingStockTransfersCard = () => {
   const [pendingCount, setPendingCount] = useState(null);
@@ -21,7 +21,7 @@ const PendingStockTransfersCard = () => {
       })
       .catch((err) => {
         if (isMounted) {
-          setError("Failed to fetch pending transfers");
+          setError('Failed to fetch pending transfers');
         }
       })
       .finally(() => {
@@ -33,14 +33,14 @@ const PendingStockTransfersCard = () => {
   }, []);
 
   return (
-    <Card className="p-6 flex flex-col items-center justify-center bg-white shadow rounded-lg min-w-[220px] min-h-[120px]">
-      <div className="text-lg font-semibold mb-2 text-gray-700">Pending Stock Transfers</div>
+    <Card className='p-6 flex flex-col items-center justify-center bg-white shadow rounded-lg min-w-[220px] min-h-[120px]'>
+      <div className='text-lg font-semibold mb-2 text-gray-700'>Pending Stock Transfers</div>
       {loading ? (
-        <Skeleton className="w-8 h-8 text-blue-500" />
+        <Skeleton className='w-8 h-8 text-blue-500' />
       ) : error ? (
-        <div className="text-red-500 text-sm">{error}</div>
+        <div className='text-red-500 text-sm'>{error}</div>
       ) : (
-        <div className="text-3xl font-bold text-blue-600">{pendingCount}</div>
+        <div className='text-3xl font-bold text-blue-600'>{pendingCount}</div>
       )}
     </Card>
   );

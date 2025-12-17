@@ -115,9 +115,9 @@ export function SignupPage() {
                 name: `${formData.pharmacyName} - Main Branch`,
                 address: formData.branchAddress,
                 contact: formData.branchContact,
-              }
+              },
             ],
-            branch_id: 1 // Workaround: Backend requires branch_id even for new pharmacy creation
+            branch_id: 1, // Workaround: Backend requires branch_id even for new pharmacy creation
           }
         );
 
@@ -353,9 +353,7 @@ export function SignupPage() {
                   <p className='text-red-500 text-xs'>{errors.branchContact}</p>
                 )}
 
-                {errors.general && (
-                  <p className='text-red-500 text-sm'>{errors.general}</p>
-                )}
+                {errors.general && <p className='text-red-500 text-sm'>{errors.general}</p>}
 
                 <div className='flex gap-2'>
                   <Button type='button' variant='outline' onClick={prevStep} className='w-full'>

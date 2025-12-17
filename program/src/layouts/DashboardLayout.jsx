@@ -38,7 +38,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
   useSidebar,
-} from "@/components/ui/sidebar";
+} from '@/components/ui/sidebar';
 
 function DashboardContent({ role }) {
   const navigate = useNavigate();
@@ -102,11 +102,13 @@ function DashboardContent({ role }) {
 
   return (
     <>
-      <Sidebar collapsible="icon">
+      <Sidebar collapsible='icon'>
         <SidebarHeader>
           <div className='flex items-center gap-2'>
             <img src='/logo.png' alt='Logo' className='size-8' />
-            <span className='text-xl font-bold text-gray-800 dark:text-white group-data-[collapsible=icon]:hidden'>PharmaCare</span>
+            <span className='text-xl font-bold text-gray-800 dark:text-white group-data-[collapsible=icon]:hidden'>
+              PharmaCare
+            </span>
           </div>
         </SidebarHeader>
         <SidebarContent>
@@ -119,11 +121,7 @@ function DashboardContent({ role }) {
                   const isActive = location.pathname === item.path;
                   return (
                     <SidebarMenuItem key={item.path}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isActive}
-                        tooltip={item.label}
-                      >
+                      <SidebarMenuButton asChild isActive={isActive} tooltip={item.label}>
                         <Link to={item.path} onClick={handleNavClick}>
                           <Icon />
                           <span>{item.label}</span>
@@ -152,7 +150,7 @@ function DashboardContent({ role }) {
       </Sidebar>
       <SidebarInset>
         <header className='bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 h-16 flex items-center px-4 md:px-6 justify-between sticky top-0 z-40'>
-          <div className="flex items-center gap-2">
+          <div className='flex items-center gap-2'>
             <SidebarTrigger />
           </div>
           <div className='flex items-center gap-4 ml-auto'>
@@ -179,7 +177,7 @@ function DashboardContent({ role }) {
             const paths = segments.map((seg, idx) => {
               const href = '/' + segments.slice(0, idx + 1).join('/');
               // Capitalize segment for display
-              const name = seg.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+              const name = seg.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
               return { name, href };
             });
             // Add root dashboard if not present
@@ -196,7 +194,6 @@ function DashboardContent({ role }) {
 }
 
 export function DashboardLayout({ role = 'manager' }) {
-
   return (
     <SidebarProvider>
       <DashboardContent role={role} />

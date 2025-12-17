@@ -38,6 +38,7 @@ export function LoginPage() {
 
     try {
       const response = await login(email, password);
+      console.log('LOGIN RESPONSE:', response);
 
       if (!response.success) {
         setError(response.message || 'Login failed. Please check your credentials and try again.');
@@ -45,11 +46,18 @@ export function LoginPage() {
         return;
       }
 
-      // Store user role from response or determine from email as fallback
-      const role = response.role || localStorage.getItem('userRole') || 'manager';
+      // Determine user role from response or stored value.
+      // Admin role is now normalized to 'admin' in the login API
+      const rawRole = response.role || localStorage.getItem('userRole') || 'manager';
+      const normalizedRole = rawRole.toLowerCase();
 
       // Check if user needs to change password (first time login)
-      const isFirstTimeLogin = response.firstTimeLogin || email.includes('new') || email.includes('first');
+      // Backend returns "mustChangePassword" boolean
+      const isFirstTimeLogin =
+        response.mustChangePassword ||
+        response.firstTimeLogin ||
+        email.includes('new') ||
+        email.includes('first');
 
       if (isFirstTimeLogin) {
         localStorage.setItem('requiresPasswordChange', 'true');
@@ -57,13 +65,18 @@ export function LoginPage() {
         return;
       }
 
-      // Redirect based on role
-      if (role === 'admin') navigate('/admin/overview');
-      else if (role === 'manager') navigate('/manager/overview');
-      else if (role === 'pharmacist') navigate('/pharmacist/overview');
-      else if (role === 'cashier') navigate('/cashier/overview');
-      else navigate('/manager/overview');
-
+      // Redirect based on role - admin role is now simply 'admin'
+      if (normalizedRole === 'admin') {
+        navigate('/admin/overview');
+      } else if (normalizedRole === 'manager') {
+        navigate('/manager/overview');
+      } else if (normalizedRole === 'pharmacist') {
+        navigate('/pharmacist/overview');
+      } else if (normalizedRole === 'cashier') {
+        navigate('/cashier/overview');
+      } else {
+        navigate('/manager/overview');
+      }
     } catch (err) {
       setError(err.message || 'An unexpected error occurred. Please try again.');
     } finally {
@@ -117,7 +130,12 @@ export function LoginPage() {
             <p className='text-muted-foreground text-base'>Login to your PharmaCare account.</p>
           </div>
           <div className='space-y-2'>
-            <Button type='button' size='lg' className='w-full' onClick={() => handleSocialLogin('Google')}>
+            <Button
+              type='button'
+              size='lg'
+              className='w-full'
+              onClick={() => handleSocialLogin('Google')}
+            >
               <svg
                 xmlns='http://www.w3.org/2000/svg'
                 viewBox='0 0 24 24'
@@ -130,11 +148,21 @@ export function LoginPage() {
               </svg>
               Continue with Google
             </Button>
-            <Button type='button' size='lg' className='w-full' onClick={() => handleSocialLogin('Apple')}>
+            <Button
+              type='button'
+              size='lg'
+              className='w-full'
+              onClick={() => handleSocialLogin('Apple')}
+            >
               <AppleIcon className='size-4 me-2' />
               Continue with Apple
             </Button>
-            <Button type='button' size='lg' className='w-full' onClick={() => handleSocialLogin('GitHub')}>
+            <Button
+              type='button'
+              size='lg'
+              className='w-full'
+              onClick={() => handleSocialLogin('GitHub')}
+            >
               <GithubIcon className='size-4 me-2' />
               Continue with GitHub
             </Button>
@@ -195,7 +223,6 @@ export function LoginPage() {
           </form>
 
           <div className='flex items-center justify-between text-sm'>
-
             <a
               href='/auth/signup'
               className='text-muted-foreground hover:text-primary underline underline-offset-4'

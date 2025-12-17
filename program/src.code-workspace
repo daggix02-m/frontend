@@ -1,17 +1,17 @@
 {
-	"folders": [
-		{
-			"path": "src"
-		},
-		{
-			"path": ".."
-		},
-		{
-			"path": "."
-		},
-		{
-			"path": "public"
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "src",
+    },
+    {
+      "path": "..",
+    },
+    {
+      "path": ".",
+    },
+    {
+      "path": "public",
+    },
+  ],
+  "settings": {},
 }

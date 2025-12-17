@@ -10,7 +10,7 @@ export function AdminOverview() {
     totalPharmacies: 0,
     activeSubscriptions: 0,
     pendingApprovals: 0,
-    systemHealth: 'Good'
+    systemHealth: 'Good',
   });
   const [loading, setLoading] = useState(true);
 
@@ -29,7 +29,7 @@ export function AdminOverview() {
           totalPharmacies: data.totalPharmacies || data.total_pharmacies || 0,
           activeSubscriptions: data.activeSubscriptions || data.active_subscriptions || 0,
           pendingApprovals: data.pendingApprovals || data.pending_approvals || 0,
-          systemHealth: data.systemHealth || data.system_health || 'Good'
+          systemHealth: data.systemHealth || data.system_health || 'Good',
         });
       }
     } catch (error) {
@@ -39,7 +39,7 @@ export function AdminOverview() {
         totalPharmacies: 0,
         activeSubscriptions: 0,
         pendingApprovals: 0,
-        systemHealth: 'Unknown'
+        systemHealth: 'Unknown',
       });
     } finally {
       setLoading(false);
@@ -50,8 +50,8 @@ export function AdminOverview() {
     return (
       <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
         <h2 className='text-3xl font-bold tracking-tight'>System Overview</h2>
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <div className='flex justify-center items-center h-64'>
+          <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary'></div>
         </div>
       </div>
     );

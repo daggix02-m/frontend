@@ -88,7 +88,7 @@ npm install
 4. Set up environment variables:
 Create a `.env` file in the `program` directory with the following variables:
 ```env
-VITE_API_BASE_URL=https://pharmacare-api.onrender.com
+VITE_API_BASE_URL=https://pharmacare-api.onrender.com/api
 # Add other environment variables as needed
 ```
 
@@ -115,7 +115,7 @@ In the project directory (`program` folder), you can run:
 
 ### Environment Configuration
 
-The application is configured to proxy API requests to `https://pharmacare-api.onrender.com` during development. This is handled in the `vite.config.js` file.
+The application uses the `VITE_API_BASE_URL` environment variable for all API requests in every environment (development and production). No dev-time proxy is configured in `vite.config.js`; the frontend talks directly to the backend URL you set in `.env`.
 
 ## Project Structure
 

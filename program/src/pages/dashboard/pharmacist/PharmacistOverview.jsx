@@ -11,7 +11,7 @@ export function PharmacistOverview() {
     lowStockAlerts: 0,
     prescriptionsProcessed: 0,
     avgProcessingTime: '0m',
-    processingTimeChange: '0m'
+    processingTimeChange: '0m',
   });
   const [loading, setLoading] = useState(true);
 
@@ -27,21 +27,23 @@ export function PharmacistOverview() {
       const [prescriptionsData, inventoryData, reportsData] = await Promise.allSettled([
         pharmacistService.getPrescriptions({ status: 'pending' }),
         pharmacistService.getInventory({ status: 'low' }),
-        pharmacistService.getReports()
+        pharmacistService.getReports(),
       ]);
 
       // Process prescriptions data
       if (prescriptionsData.status === 'fulfilled' && prescriptionsData.value.success) {
         const pendingPrescriptions = Array.isArray(prescriptionsData.value.data)
           ? prescriptionsData.value.data
-          : (prescriptionsData.value.prescriptions || []);
+          : prescriptionsData.value.prescriptions || [];
 
-        const urgentCount = pendingPrescriptions.filter(p => p.priority === 'urgent' || p.urgent).length;
+        const urgentCount = pendingPrescriptions.filter(
+          (p) => p.priority === 'urgent' || p.urgent
+        ).length;
 
-        setMetrics(prev => ({
+        setMetrics((prev) => ({
           ...prev,
           pendingPrescriptions: pendingPrescriptions.length,
-          urgentPrescriptions: urgentCount
+          urgentPrescriptions: urgentCount,
         }));
       }
 
@@ -49,11 +51,11 @@ export function PharmacistOverview() {
       if (inventoryData.status === 'fulfilled' && inventoryData.value.success) {
         const lowStockItems = Array.isArray(inventoryData.value.data)
           ? inventoryData.value.data
-          : (inventoryData.value.items || []);
+          : inventoryData.value.items || [];
 
-        setMetrics(prev => ({
+        setMetrics((prev) => ({
           ...prev,
-          lowStockAlerts: lowStockItems.length
+          lowStockAlerts: lowStockItems.length,
         }));
       }
 
@@ -61,11 +63,12 @@ export function PharmacistOverview() {
       if (reportsData.status === 'fulfilled' && reportsData.value.success) {
         const reportData = reportsData.value.data || reportsData.value;
 
-        setMetrics(prev => ({
+        setMetrics((prev) => ({
           ...prev,
-          prescriptionsProcessed: reportData.processedToday || reportData.prescriptionsProcessed || 0,
+          prescriptionsProcessed:
+            reportData.processedToday || reportData.prescriptionsProcessed || 0,
           avgProcessingTime: `${reportData.avgProcessingTime || 0}m`,
-          processingTimeChange: `${reportData.processingTimeChange || 0}m`
+          processingTimeChange: `${reportData.processingTimeChange || 0}m`,
         }));
       }
     } catch (error) {
@@ -79,7 +82,7 @@ export function PharmacistOverview() {
         lowStockAlerts: 0,
         prescriptionsProcessed: 0,
         avgProcessingTime: '0m',
-        processingTimeChange: '0m'
+        processingTimeChange: '0m',
       });
     } finally {
       setLoading(false);
@@ -90,8 +93,8 @@ export function PharmacistOverview() {
     return (
       <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
         <h2 className='text-3xl font-bold tracking-tight'>Pharmacist Dashboard</h2>
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <div className='flex justify-center items-center h-64'>
+          <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary'></div>
         </div>
       </div>
     );
@@ -138,7 +141,9 @@ export function PharmacistOverview() {
           </CardHeader>
           <CardContent className='px-6 pb-6'>
             <div className='text-2xl font-bold'>{metrics.avgProcessingTime}</div>
-            <p className='text-xs text-muted-foreground'>{metrics.processingTimeChange} from yesterday</p>
+            <p className='text-xs text-muted-foreground'>
+              {metrics.processingTimeChange} from yesterday
+            </p>
           </CardContent>
         </Card>
       </div>

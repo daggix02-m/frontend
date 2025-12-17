@@ -50,9 +50,21 @@ const RoleProtectedRoute = ({ children, allowedRoles }) => {
 
   const normalizedUserRole = userRole ? userRole.toLowerCase() : '';
 
-  if (allowedRoles && !allowedRoles.includes(normalizedUserRole)) {
+  // Check if the current role is admin
+  const isAdmin = normalizedUserRole === 'admin';
 
-    if (normalizedUserRole === 'admin') return <Navigate to='/admin/overview' replace />;
+  const isAllowed =
+    !allowedRoles ||
+    allowedRoles.some((role) => {
+      // If "admin" is an allowed role, check for the admin role
+      if (role === 'admin') {
+        return isAdmin;
+      }
+      return normalizedUserRole === role;
+    });
+
+  if (!isAllowed) {
+    if (isAdmin) return <Navigate to='/admin/overview' replace />;
     if (normalizedUserRole === 'manager') return <Navigate to='/manager/overview' replace />;
     if (normalizedUserRole === 'pharmacist') return <Navigate to='/pharmacist/overview' replace />;
     if (normalizedUserRole === 'cashier') return <Navigate to='/cashier/overview' replace />;
@@ -66,7 +78,6 @@ function App() {
   return (
     <Router>
       <Routes>
-        {}
         <Route path='/' element={<LoginPage />} />
         <Route path='/auth/login' element={<LoginPage />} />
         <Route path='/auth/signup' element={<SignupPage />} />
@@ -74,7 +85,6 @@ function App() {
         <Route path='/auth/reset-password' element={<ResetPasswordPage />} />
         <Route path='/auth/change-password' element={<ChangePasswordPage />} />
 
-        {}
         <Route
           path='/admin'
           element={
@@ -95,7 +105,6 @@ function App() {
           <Route path='platform-users' element={<PlatformUsers />} />
         </Route>
 
-        {}
         <Route
           path='/manager'
           element={
@@ -118,7 +127,6 @@ function App() {
           <Route path='pos-sales' element={<ManagerPOSSales />} />
         </Route>
 
-        {}
         <Route
           path='/pharmacist'
           element={
@@ -137,7 +145,6 @@ function App() {
           <Route path='settings' element={<PharmacistSettings />} />
         </Route>
 
-        {}
         <Route
           path='/cashier'
           element={
@@ -155,7 +162,6 @@ function App() {
           <Route path='settings' element={<CashierSettings />} />
         </Route>
 
-        {}
         <Route path='*' element={<Navigate to='/auth/login' replace />} />
       </Routes>
     </Router>

@@ -73,7 +73,13 @@ export function StaffManagement() {
 
   const openAddModal = () => {
     setEditingStaff(null);
-    setFormData({ name: '', email: '', role: 'Pharmacist', branch: 'Main Branch', status: 'Active' });
+    setFormData({
+      name: '',
+      email: '',
+      role: 'Pharmacist',
+      branch: 'Main Branch',
+      status: 'Active',
+    });
     setIsModalOpen(true);
   };
 
@@ -84,7 +90,7 @@ export function StaffManagement() {
       email: member.email,
       role: member.role,
       branch: member.branch,
-      status: member.status
+      status: member.status,
     });
     setIsModalOpen(true);
   };
@@ -98,7 +104,10 @@ export function StaffManagement() {
     e.preventDefault();
     try {
       if (editingStaff) {
-        const response = await managerService.updateStaff(editingStaff.id || editingStaff._id, formData);
+        const response = await managerService.updateStaff(
+          editingStaff.id || editingStaff._id,
+          formData
+        );
         if (response.success) {
           toast.success('Staff updated successfully');
           await fetchStaff();
@@ -138,10 +147,11 @@ export function StaffManagement() {
     }
   };
 
-  const filteredStaff = staff.filter(member =>
-    member.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.branch?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredStaff = staff.filter(
+    (member) =>
+      member.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.branch?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getTimeAgo = (timestamp) => {
@@ -162,8 +172,8 @@ export function StaffManagement() {
     return (
       <div className='space-y-4 sm:space-y-6'>
         <h2 className='text-2xl sm:text-3xl font-bold tracking-tight'>Staff Management</h2>
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <div className='flex justify-center items-center h-64'>
+          <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary'></div>
         </div>
       </div>
     );
@@ -174,16 +184,18 @@ export function StaffManagement() {
       <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4'>
         <div>
           <h2 className='text-2xl sm:text-3xl font-bold tracking-tight'>Staff Management</h2>
-          <p className='text-sm text-muted-foreground mt-1'>Manage your pharmacists and cashiers.</p>
+          <p className='text-sm text-muted-foreground mt-1'>
+            Manage your pharmacists and cashiers.
+          </p>
         </div>
-        <Button onClick={openAddModal} className="w-full sm:w-auto">
+        <Button onClick={openAddModal} className='w-full sm:w-auto'>
           <Plus className='mr-2 h-4 w-4' /> Add Staff
         </Button>
       </div>
 
-      <Card className="overflow-hidden">
-        <CardHeader className="space-y-4">
-          <CardTitle className="text-lg sm:text-xl">All Staff Members</CardTitle>
+      <Card className='overflow-hidden'>
+        <CardHeader className='space-y-4'>
+          <CardTitle className='text-lg sm:text-xl'>All Staff Members</CardTitle>
           <div className='relative w-full'>
             <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
             <Input
@@ -194,40 +206,47 @@ export function StaffManagement() {
             />
           </div>
         </CardHeader>
-        <CardContent className="p-0">
-          { }
+        <CardContent className='p-0'>
+          {}
           <div className='lg:hidden space-y-3 p-4'>
             {filteredStaff.length > 0 ? (
               filteredStaff.map((member) => (
-                <Card key={member.id} className="overflow-hidden">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <User className="h-4 w-4 text-muted-foreground" />
-                          <h3 className="font-semibold text-base">{member.name}</h3>
+                <Card key={member.id} className='overflow-hidden'>
+                  <CardContent className='p-4'>
+                    <div className='flex items-start justify-between mb-3'>
+                      <div className='flex-1'>
+                        <div className='flex items-center gap-2 mb-1'>
+                          <User className='h-4 w-4 text-muted-foreground' />
+                          <h3 className='font-semibold text-base'>{member.name}</h3>
                         </div>
-                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
-                          <Mail className="h-3.5 w-3.5" />
+                        <div className='flex items-center gap-1.5 text-sm text-muted-foreground mb-1'>
+                          <Mail className='h-3.5 w-3.5' />
                           <span>{member.email}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                          <MapPin className="h-3.5 w-3.5" />
+                        <div className='flex items-center gap-1.5 text-sm text-muted-foreground'>
+                          <MapPin className='h-3.5 w-3.5' />
                           <span>{member.branch}</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className={`h-2 w-2 rounded-full ${member.isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
+                      <div className='flex items-center gap-2'>
+                        <div
+                          className={`h-2 w-2 rounded-full ${member.isOnline ? 'bg-green-500' : 'bg-gray-400'}`}
+                        />
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 mb-3">
+                    <div className='flex items-center gap-2 mb-3'>
                       <Badge variant={member.role === 'Pharmacist' ? 'default' : 'secondary'}>
                         {member.role}
                       </Badge>
-                      <Badge variant='outline' className={
-                        member.status === 'Active' ? 'text-green-600 border-green-600' : 'text-yellow-600 border-yellow-600'
-                      }>
+                      <Badge
+                        variant='outline'
+                        className={
+                          member.status === 'Active'
+                            ? 'text-green-600 border-green-600'
+                            : 'text-yellow-600 border-yellow-600'
+                        }
+                      >
                         {member.status}
                       </Badge>
                       <div className='flex items-center gap-1 text-xs text-muted-foreground ml-auto'>
@@ -240,7 +259,7 @@ export function StaffManagement() {
                       <Button
                         variant='outline'
                         size='sm'
-                        className="flex-1"
+                        className='flex-1'
                         onClick={() => openActivityLog(member)}
                       >
                         <Activity className='h-4 w-4 mr-2' />
@@ -249,7 +268,7 @@ export function StaffManagement() {
                       <Button
                         variant='outline'
                         size='sm'
-                        className="flex-1"
+                        className='flex-1'
                         onClick={() => openEditModal(member)}
                       >
                         <Edit className='h-4 w-4 mr-2' />
@@ -269,13 +288,13 @@ export function StaffManagement() {
               ))
             ) : (
               <div className='text-center py-12 text-muted-foreground'>
-                <User className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <User className='h-12 w-12 mx-auto mb-3 opacity-50' />
                 <p>No staff members found.</p>
               </div>
             )}
           </div>
 
-          { }
+          {}
           <div className='hidden lg:block overflow-x-auto'>
             <Table>
               <TableHeader>
@@ -306,18 +325,23 @@ export function StaffManagement() {
                       </TableCell>
                       <TableCell className='whitespace-nowrap'>{member.branch}</TableCell>
                       <TableCell>
-                        <Badge variant='outline' className={
-                          member.status === 'Active' ? 'text-green-600 border-green-600' : 'text-yellow-600 border-yellow-600'
-                        }>
+                        <Badge
+                          variant='outline'
+                          className={
+                            member.status === 'Active'
+                              ? 'text-green-600 border-green-600'
+                              : 'text-yellow-600 border-yellow-600'
+                          }
+                        >
                           {member.status}
                         </Badge>
                       </TableCell>
                       <TableCell>
                         <div className='flex items-center gap-2'>
-                          <div className={`h-2 w-2 rounded-full ${member.isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
-                          <span className='text-sm'>
-                            {member.isOnline ? 'Online' : 'Offline'}
-                          </span>
+                          <div
+                            className={`h-2 w-2 rounded-full ${member.isOnline ? 'bg-green-500' : 'bg-gray-400'}`}
+                          />
+                          <span className='text-sm'>{member.isOnline ? 'Online' : 'Offline'}</span>
                         </div>
                       </TableCell>
                       <TableCell className='text-sm text-muted-foreground'>
@@ -339,7 +363,12 @@ export function StaffManagement() {
                           <Button variant='ghost' size='sm' onClick={() => openEditModal(member)}>
                             <Edit className='h-4 w-4' />
                           </Button>
-                          <Button variant='ghost' size='sm' className='text-red-600 hover:text-red-700 hover:bg-red-50' onClick={() => handleDelete(member.id)}>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            className='text-red-600 hover:text-red-700 hover:bg-red-50'
+                            onClick={() => handleDelete(member.id)}
+                          >
                             <Trash2 className='h-4 w-4' />
                           </Button>
                         </div>
@@ -359,20 +388,26 @@ export function StaffManagement() {
         </CardContent>
       </Card>
 
-      { }
+      {}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="p-0 bg-transparent border-none shadow-none w-full max-w-lg">
+        <DialogContent className='p-0 bg-transparent border-none shadow-none w-full max-w-lg'>
           <StaffForm
             initialData={editingStaff}
             onSubmit={(data) => {
               if (editingStaff) {
-                setStaff(staff.map(s => s.id === editingStaff.id ? { ...data, id: s.id, isOnline: s.isOnline, lastActive: s.lastActive } : s));
+                setStaff(
+                  staff.map((s) =>
+                    s.id === editingStaff.id
+                      ? { ...data, id: s.id, isOnline: s.isOnline, lastActive: s.lastActive }
+                      : s
+                  )
+                );
               } else {
                 const newStaff = {
                   ...data,
                   id: staff.length + 1,
                   isOnline: false,
-                  lastActive: new Date().toISOString()
+                  lastActive: new Date().toISOString(),
                 };
                 setStaff([...staff, newStaff]);
               }
@@ -383,12 +418,12 @@ export function StaffManagement() {
         </DialogContent>
       </Dialog>
 
-      { }
+      {}
       <ActivityLogDialog
         isOpen={isActivityLogOpen}
         onClose={() => setIsActivityLogOpen(false)}
         staffMember={selectedStaffForLog}
       />
-    </div >
+    </div>
   );
 }

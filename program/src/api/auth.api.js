@@ -41,15 +41,65 @@ export const login = async (email, password) => {
       localStorage.setItem('refreshToken', response.refreshToken);
     }
 
-    // Get user role from the response
-    const userRole = response.user?.role || response.role;
+    // Get user role from the response.
+    // Support different backend conventions:
+    // - response.users.role_name      e.g. "Admin" (current backend)
+    // - response.user.role           e.g. "Super Admin"
+    // - response.role                e.g. "admin"
+    // - response.user.role_name      e.g. "Support Admin"
+    // - response.user.role_id === 1  => treat as an admin role
+    // - boolean flags like is_superuser / is_admin / is_root
+    let userRole =
+      response.users?.role_name || // Backend uses "users" not "user"
+      response.user?.role ||
+      response.role ||
+      response.user?.role_name ||
+      null;
+
+    // Normalize any admin-like role to just 'admin'
+    if (userRole) {
+      const normalizedRole = userRole.toLowerCase();
+      if (
+        normalizedRole.includes('admin') ||
+        normalizedRole === 'root' ||
+        normalizedRole === 'superuser' ||
+        normalizedRole === 'owner'
+      ) {
+        userRole = 'admin';
+      }
+    }
+
+    // Fallbacks for root/admin-style flags
+    if (!userRole) {
+      if (response.users?.role_id === 1) {
+        // Backend uses "users" not "user"
+        userRole = 'admin';
+      } else if (response.user?.role_id === 1) {
+        userRole = 'admin';
+      } else if (
+        response.users?.is_superuser ||
+        response.users?.is_admin ||
+        response.users?.is_root
+      ) {
+        userRole = 'admin';
+      } else if (response.user?.is_superuser || response.user?.is_admin || response.user?.is_root) {
+        userRole = 'admin';
+      } else if (response.is_superuser || response.is_admin || response.is_root) {
+        userRole = 'admin';
+      }
+    }
+
     if (userRole) {
       localStorage.setItem('userRole', userRole);
       response.role = userRole;
     }
 
     // Also store other user information if available
-    if (response.user) {
+    // Backend uses "users" instead of "user"
+    if (response.users) {
+      localStorage.setItem('userId', response.users.user_id || '');
+      localStorage.setItem('userName', response.users.full_name || '');
+    } else if (response.user) {
       localStorage.setItem('userId', response.user.id || '');
       localStorage.setItem('userName', response.user.name || response.user.full_name || '');
     }
@@ -264,7 +314,7 @@ export const changePassword = async (currentPassword, newPassword) => {
     method: 'POST',
     body: JSON.stringify({
       current_password: currentPassword,
-      new_password: newPassword
+      new_password: newPassword,
     }),
   });
 };

@@ -7,12 +7,11 @@ import * as XLSX from 'xlsx';
  * @param {string} sheetName - Name of the worksheet
  */
 export const exportToExcel = (data, filename, sheetName = 'Sheet1') => {
+  const wb = XLSX.utils.book_new();
 
-    const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(data);
 
-    const ws = XLSX.utils.json_to_sheet(data);
+  XLSX.utils.book_append_sheet(wb, ws, sheetName);
 
-    XLSX.utils.book_append_sheet(wb, ws, sheetName);
-
-    XLSX.writeFile(wb, `${filename}.xlsx`);
+  XLSX.writeFile(wb, `${filename}.xlsx`);
 };

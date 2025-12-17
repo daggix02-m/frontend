@@ -31,15 +31,11 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-try {
-  const root = ReactDOM.createRoot(document.getElementById('root'));
-  root.render(
-    <React.StrictMode>
-      <ErrorBoundary>
-        <App />
-      </ErrorBoundary>
-    </React.StrictMode>
-  );
-} catch (e) {
-  console.error('main.jsx: Error creating root or rendering', e);
-}
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+  </React.StrictMode>
+);
