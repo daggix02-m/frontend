@@ -1,335 +1,297 @@
 import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-  Button,
-  Input,
-  Dialog,
-  DialogContent,
-  Badge,
-} from '@/components/ui/ui';
-import { Select } from '@/components/ui/select';
-import { Plus, Search, Filter, Edit, Package } from 'lucide-react';
-import { ProductForm } from './components/ProductForm';
-import { pharmacistService } from '@/services/pharmacist.service';
-import { apiClient } from '@/api/apiClient';
+  Search,
+  Plus,
+  Package,
+  AlertTriangle,
+  Calendar,
+  Pill,
+  Edit,
+  Trash2,
+  Eye
+} from 'lucide-react';
+import { managerService } from '@/services/manager.service';
 import { toast } from 'sonner';
 
-export function InventoryManagement({ readOnly = false }) {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState(null);
+export function InventoryManagement() {
+  const [medicines, setMedicines] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterCategory, setFilterCategory] = useState('All');
-  const [newProduct, setNewProduct] = useState({
+  const [loading, setLoading] = useState(true);
+  const [showAddMedicineForm, setShowAddMedicineForm] = useState(false);
+  const [newMedicine, setNewMedicine] = useState({
     name: '',
-    category: 'Pain Relief',
-    stock: '',
+    category: '',
     price: '',
-    status: 'In Stock',
+    stock_quantity: '',
+    expiry_date: '',
+    description: ''
   });
 
-  // Fetch inventory data from backend
   useEffect(() => {
-    fetchInventory();
-  }, [searchTerm, filterCategory]); // Add dependencies for search and filtering
+    fetchMedicines();
+  }, []);
 
-  const fetchInventory = async (params = {}) => {
+  const fetchMedicines = async () => {
     try {
       setLoading(true);
-
-      // Include search and filter parameters in the API call
-      const queryParams = {
-        ...params,
-        search: searchTerm || undefined,
-        category: filterCategory !== 'All' ? filterCategory : undefined,
-      };
-
-      const response = await pharmacistService.getInventory(queryParams);
+      const response = await managerService.getProducts();
 
       if (response.success) {
-        // Format the response to match the expected structure
-        const formattedProducts = Array.isArray(response.data)
-          ? response.data.map((item) => ({
-              id: item.id || item._id,
-              name: item.name || item.product_name || item.productName || 'Unknown',
-              category: item.category || item.category_name || 'General',
-              stock: item.stock || item.quantity || 0,
-              price: `ETB ${(item.price || item.unit_price || item.unitPrice || 0).toFixed(2)}`,
-              status: calculateStatus(item.stock || item.quantity || 0),
-            }))
-          : [];
-
-        setProducts(formattedProducts);
+        setMedicines(Array.isArray(response.data) ? response.data : []);
       } else {
-        // Fallback to empty array if response is not successful
-        setProducts([]);
+        toast.error(response.message || 'Failed to fetch medicines');
+        setMedicines([]);
       }
     } catch (error) {
-      console.error('Error fetching inventory:', error);
-      toast.error('Failed to load inventory data');
-      setProducts([]); // Set to empty array as fallback
+      console.error('Error fetching medicines:', error);
+      toast.error('Failed to fetch medicines');
+      setMedicines([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const calculateStatus = (stock) => {
-    if (stock === 0) return 'Out of Stock';
-    if (stock <= 50) return 'Low Stock';
-    return 'In Stock';
-  };
+  const handleAddMedicine = async (e) => {
+    e.preventDefault();
 
-  const handleAddProduct = async (data) => {
     try {
-      // Format the product data for API
-      const productData = {
-        name: data.name,
-        category: data.category,
-        stock: parseInt(data.stock),
-        price: parseFloat(data.price),
-        unit: data.unit || 'tablet', // Add unit if available
+      const medicineData = {
+        ...newMedicine,
+        price: parseFloat(newMedicine.price),
+        stock_quantity: parseInt(newMedicine.stock_quantity)
       };
 
-      const response = await apiClient('/inventory', {
-        method: 'POST',
-        body: JSON.stringify(productData),
-      });
+      const response = await managerService.createProduct(medicineData);
 
       if (response.success) {
-        toast.success('Product added successfully');
-        setIsModalOpen(false);
-        fetchInventory(); // Refresh the inventory list
+        toast.success('Medicine added successfully');
+        setNewMedicine({
+          name: '',
+          category: '',
+          price: '',
+          stock_quantity: '',
+          expiry_date: '',
+          description: ''
+        });
+        setShowAddMedicineForm(false);
+        fetchMedicines(); // Refresh the list
       } else {
-        toast.error(response.message || 'Failed to add product');
+        toast.error(response.message || 'Failed to add medicine');
       }
     } catch (error) {
-      console.error('Error adding product:', error);
-      toast.error('Failed to add product');
+      console.error('Error adding medicine:', error);
+      toast.error('Failed to add medicine');
     }
   };
 
-  const handleEditProduct = async (data) => {
-    try {
-      if (!editingProduct) return;
+  const handleDeleteMedicine = async (id) => {
+    if (window.confirm('Are you sure you want to delete this medicine?')) {
+      try {
+        const response = await managerService.deleteProduct(id);
 
-      // Format the product data for API
-      const productData = {
-        name: data.name,
-        category: data.category,
-        stock: parseInt(data.stock),
-        price: parseFloat(data.price),
-        unit: data.unit || 'tablet', // Add unit if available
-      };
-
-      const response = await apiClient(`/inventory/${editingProduct.id}`, {
-        method: 'PUT',
-        body: JSON.stringify(productData),
-      });
-
-      if (response.success) {
-        toast.success('Product updated successfully');
-        setIsModalOpen(false);
-        setEditingProduct(null);
-        fetchInventory(); // Refresh the inventory list
-      } else {
-        toast.error(response.message || 'Failed to update product');
+        if (response.success) {
+          toast.success('Medicine deleted successfully');
+          fetchMedicines(); // Refresh the list
+        } else {
+          toast.error(response.message || 'Failed to delete medicine');
+        }
+      } catch (error) {
+        console.error('Error deleting medicine:', error);
+        toast.error('Failed to delete medicine');
       }
-    } catch (error) {
-      console.error('Error updating product:', error);
-      toast.error('Failed to update product');
     }
   };
 
-  const openAddModal = () => {
-    setEditingProduct(null);
-    setIsModalOpen(true);
-  };
+  const filteredMedicines = medicines.filter(medicine =>
+    medicine.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    medicine.category?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const openEditModal = (product) => {
-    setEditingProduct(product);
-    setIsModalOpen(true);
-  };
-
-  // Use the products from the API directly since filtering is handled server-side
-  const filteredProducts = products;
-
-  // Extract unique categories for the filter dropdown
-  const categories = ['All', ...new Set(products.map((p) => p.category))];
+  const lowStockMedicines = medicines.filter(medicine => medicine.stock_quantity <= 5);
 
   return (
-    <div className='space-y-4 sm:space-y-6'>
-      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4'>
-        <div>
-          <h2 className='text-2xl sm:text-3xl font-bold tracking-tight'>Inventory & Products</h2>
-          <p className='text-sm text-muted-foreground mt-1'>
-            Manage your product catalog and stock levels.
-          </p>
-        </div>
-        {!readOnly && (
-          <Button onClick={openAddModal} className='w-full sm:w-auto'>
-            <Plus className='mr-2 h-4 w-4' /> Add Product
-          </Button>
-        )}
+    <div className='space-y-6 p-4 md:p-8'>
+      <div className='space-y-2'>
+        <h2 className='text-3xl font-bold tracking-tight'>Inventory Management</h2>
+        <p className='text-muted-foreground'>
+          Manage your pharmacy's medicine inventory
+        </p>
       </div>
 
-      <Card>
-        <CardHeader className='space-y-4'>
-          <CardTitle className='text-lg sm:text-xl'>Product Catalog</CardTitle>
-          <div className='flex flex-col sm:flex-row gap-3'>
-            <div className='relative flex-1'>
-              <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
-              <Input
-                placeholder='Search products...'
-                className='pl-9'
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <Select
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className='w-full sm:w-[180px]'
-            >
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </Select>
-          </div>
-        </CardHeader>
-        <CardContent className='p-0'>
-          {}
-          <div className='md:hidden space-y-3 p-4'>
-            {filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
-                <Card key={product.id} className='overflow-hidden'>
-                  <CardContent className='p-4'>
-                    <div className='flex items-start justify-between mb-3'>
-                      <div className='flex-1'>
-                        <div className='flex items-center gap-2 mb-1'>
-                          <Package className='h-4 w-4 text-muted-foreground' />
-                          <h3 className='font-semibold text-base'>{product.name}</h3>
-                        </div>
-                        <p className='text-sm text-muted-foreground'>{product.category}</p>
-                      </div>
-                      <Badge
-                        className={`${product.status === 'In Stock' ? 'bg-green-100 text-green-800 hover:bg-green-100' : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100'}`}
-                      >
-                        {product.status}
-                      </Badge>
-                    </div>
+      {/* Low Stock Alert */}
+      {lowStockMedicines.length > 0 && (
+        <Card className='border-l-4 border-l-yellow-500'>
+          <CardHeader>
+            <CardTitle className='flex items-center gap-2'>
+              <AlertTriangle className='h-5 w-5 text-yellow-500' />
+              Low Stock Alert
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className='text-sm text-muted-foreground'>
+              {lowStockMedicines.length} medicine{lowStockMedicines.length > 1 ? 's' : ''} running low on stock.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
-                    <div className='grid grid-cols-2 gap-3 mb-3'>
-                      <div>
-                        <p className='text-xs text-muted-foreground mb-1'>Stock Level</p>
-                        <p className='font-medium'>{product.stock}</p>
-                      </div>
-                      <div>
-                        <p className='text-xs text-muted-foreground mb-1'>Price</p>
-                        <p className='font-medium'>{product.price}</p>
-                      </div>
-                    </div>
-
-                    {!readOnly && (
-                      <Button
-                        variant='outline'
-                        size='sm'
-                        className='w-full'
-                        onClick={() => openEditModal(product)}
-                      >
-                        <Edit className='h-4 w-4 mr-2' />
-                        Edit Product
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <div className='text-center py-12 text-muted-foreground'>
-                <Package className='h-12 w-12 mx-auto mb-3 opacity-50' />
-                <p>No products found matching "{searchTerm}"</p>
-              </div>
-            )}
-          </div>
-
-          {}
-          <div className='hidden md:block overflow-x-auto'>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Product Name</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Stock Level</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className='text-right'>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredProducts.length > 0 ? (
-                  filteredProducts.map((product) => (
-                    <TableRow key={product.id}>
-                      <TableCell className='font-medium'>{product.name}</TableCell>
-                      <TableCell>{product.category}</TableCell>
-                      <TableCell>{product.stock}</TableCell>
-                      <TableCell>{product.price}</TableCell>
-                      <TableCell>
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            product.status === 'In Stock'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-yellow-100 text-yellow-800'
-                          } `}
-                        >
-                          {product.status}
-                        </span>
-                      </TableCell>
-                      <TableCell className='text-right'>
-                        {!readOnly && (
-                          <Button variant='ghost' size='sm' onClick={() => openEditModal(product)}>
-                            Edit
-                          </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={6} className='text-center py-8 text-muted-foreground'>
-                      No products found matching "{searchTerm}"
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
-
-      {}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className='p-0 bg-transparent border-none shadow-none w-full max-w-lg'>
-          <ProductForm
-            initialData={editingProduct}
-            onSubmit={editingProduct ? handleEditProduct : handleAddProduct}
-            onCancel={() => {
-              setIsModalOpen(false);
-              setEditingProduct(null);
-            }}
+      {/* Search and Add Medicine */}
+      <div className='flex flex-col sm:flex-row gap-4'>
+        <div className='relative flex-1'>
+          <Search className='absolute left-2.5 top-3 h-4 w-4 text-muted-foreground' />
+          <Input
+            placeholder='Search medicines...'
+            className='pl-8'
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
-        </DialogContent>
-      </Dialog>
+        </div>
+        <Button onClick={() => setShowAddMedicineForm(!showAddMedicineForm)}>
+          <Plus className='h-4 w-4 mr-2' />
+          Add Medicine
+        </Button>
+      </div>
+
+      {/* Add Medicine Form */}
+      {showAddMedicineForm && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Add New Medicine</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleAddMedicine} className='space-y-4'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div>
+                  <label className='text-sm font-medium'>Name</label>
+                  <Input
+                    value={newMedicine.name}
+                    onChange={(e) => setNewMedicine({ ...newMedicine, name: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className='text-sm font-medium'>Category</label>
+                  <Input
+                    value={newMedicine.category}
+                    onChange={(e) => setNewMedicine({ ...newMedicine, category: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className='text-sm font-medium'>Price (ETB)</label>
+                  <Input
+                    type='number'
+                    value={newMedicine.price}
+                    onChange={(e) => setNewMedicine({ ...newMedicine, price: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className='text-sm font-medium'>Stock Quantity</label>
+                  <Input
+                    type='number'
+                    value={newMedicine.stock_quantity}
+                    onChange={(e) => setNewMedicine({ ...newMedicine, stock_quantity: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className='text-sm font-medium'>Expiry Date</label>
+                  <Input
+                    type='date'
+                    value={newMedicine.expiry_date}
+                    onChange={(e) => setNewMedicine({ ...newMedicine, expiry_date: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <label className='text-sm font-medium'>Description</label>
+                <Input
+                  value={newMedicine.description}
+                  onChange={(e) => setNewMedicine({ ...newMedicine, description: e.target.value })}
+                />
+              </div>
+              <div className='flex gap-2'>
+                <Button type='submit'>Add Medicine</Button>
+                <Button type='button' variant='outline' onClick={() => setShowAddMedicineForm(false)}>
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Medicine List */}
+      {loading ? (
+        <div className='flex justify-center items-center h-64'>
+          <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary'></div>
+        </div>
+      ) : (
+        <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+          {filteredMedicines.map((medicine) => (
+            <Card key={medicine.id || medicine._id} className='overflow-hidden'>
+              <CardHeader className='pb-2'>
+                <div className='flex justify-between items-start'>
+                  <CardTitle className='text-lg'>{medicine.name}</CardTitle>
+                  <Pill className='h-5 w-5 text-blue-500' />
+                </div>
+                <div className='text-sm text-muted-foreground'>{medicine.category}</div>
+              </CardHeader>
+              <CardContent>
+                <div className='space-y-2'>
+                  <div className='flex justify-between'>
+                    <span className='text-sm text-muted-foreground'>Price:</span>
+                    <span className='font-medium'>ETB {medicine.price?.toFixed(2) || '0.00'}</span>
+                  </div>
+                  <div className='flex justify-between'>
+                    <span className='text-sm text-muted-foreground'>Stock:</span>
+                    <span className={`font-medium ${medicine.stock_quantity <= 5 ? 'text-red-500' : 'text-green-500'}`}>
+                      {medicine.stock_quantity} {medicine.stock_quantity <= 5 ? '(Low)' : ''}
+                    </span>
+                  </div>
+                  <div className='flex justify-between'>
+                    <span className='text-sm text-muted-foreground'>Expiry:</span>
+                    <span className='font-medium'>{medicine.expiry_date || 'N/A'}</span>
+                  </div>
+                  <div className='text-sm text-muted-foreground line-clamp-2'>
+                    {medicine.description || 'No description available'}
+                  </div>
+                </div>
+                <div className='flex gap-2 mt-4'>
+                  <Button size='sm' variant='outline' className='flex-1'>
+                    <Edit className='h-4 w-4 mr-1' />
+                    Edit
+                  </Button>
+                  <Button
+                    size='sm'
+                    variant='outline'
+                    className='flex-1'
+                    onClick={() => handleDeleteMedicine(medicine.id || medicine._id)}
+                  >
+                    <Trash2 className='h-4 w-4 mr-1' />
+                    Delete
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {filteredMedicines.length === 0 && !loading && (
+        <div className='text-center py-12'>
+          <Package className='h-12 w-12 mx-auto text-muted-foreground' />
+          <h3 className='mt-2 text-sm font-medium'>No medicines found</h3>
+          <p className='mt-1 text-sm text-muted-foreground'>
+            {searchTerm ? 'Try a different search term.' : 'Get started by adding a new medicine.'}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

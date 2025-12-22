@@ -1,141 +1,356 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import FloatingPaths from '@/components/shared/FloatingPaths';
-import { useSignupStore } from '../../store/signupStore';
-import { signup } from '@/api/auth.api';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { useSignupStore } from '@/store/useSignupStore';
 import {
   ChevronLeftIcon,
-  Building2Icon,
-  UserIcon,
-  MapPinIcon,
-  PhoneIcon,
   MailIcon,
   LockIcon,
-  FileTextIcon,
+  BuildingIcon,
+  PhoneIcon,
+  MapPinIcon,
+  CheckCircleIcon,
+  UserRoundIcon,
 } from 'lucide-react';
 
+// Step 1 - Manager Information Component
+const Step1ManagerInfo = () => {
+  const {
+    managerInfo,
+    errors,
+    setManagerInfo,
+    goToNextStep,
+    validateCurrentStep,
+  } = useSignupStore();
+
+  const canProceed = validateCurrentStep(1, false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      className='space-y-4'
+    >
+      <div className='relative h-max'>
+        <Input
+          name='fullName'
+          value={managerInfo.fullName}
+          onChange={(e) => setManagerInfo('fullName', e.target.value)}
+          placeholder='Full Name'
+          className={`peer ps-9 ${errors.fullName ? 'border-red-500' : ''}`}
+        />
+        <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
+          <UserRoundIcon className='size-4' aria-hidden='true' />
+        </div>
+      </div>
+      {errors.fullName && (
+        <p className='text-red-500 text-xs'>{errors.fullName}</p>
+      )}
+
+      <div className='relative h-max'>
+        <Input
+          name='email'
+          value={managerInfo.email}
+          onChange={(e) => setManagerInfo('email', e.target.value)}
+          placeholder='Email Address'
+          type='email'
+          className={`peer ps-9 ${errors.email ? 'border-red-500' : ''}`}
+        />
+        <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
+          <MailIcon className='size-4' aria-hidden='true' />
+        </div>
+      </div>
+      {errors.email && (
+        <p className='text-red-500 text-xs'>{errors.email}</p>
+      )}
+
+      <div className='relative h-max'>
+        <Input
+          name='password'
+          value={managerInfo.password}
+          onChange={(e) => setManagerInfo('password', e.target.value)}
+          placeholder='Password'
+          type='password'
+          className={`peer ps-9 ${errors.password ? 'border-red-500' : ''}`}
+        />
+        <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
+          <LockIcon className='size-4' aria-hidden='true' />
+        </div>
+      </div>
+      {errors.password && (
+        <p className='text-red-500 text-xs'>{errors.password}</p>
+      )}
+
+      <div className='relative h-max'>
+        <Input
+          name='confirmPassword'
+          value={managerInfo.confirmPassword}
+          onChange={(e) => setManagerInfo('confirmPassword', e.target.value)}
+          placeholder='Confirm Password'
+          type='password'
+          className={`peer ps-9 ${errors.confirmPassword ? 'border-red-500' : ''}`}
+        />
+        <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
+          <LockIcon className='size-4' aria-hidden='true' />
+        </div>
+      </div>
+      {errors.confirmPassword && (
+        <p className='text-red-500 text-xs'>{errors.confirmPassword}</p>
+      )}
+
+      <Button
+        type='button'
+        onClick={goToNextStep}
+        className='w-full'
+        disabled={!canProceed}
+      >
+        Continue
+      </Button>
+    </motion.div>
+  );
+};
+
+// Step 2 - Pharmacy/Branch Information Component
+const Step2BranchInfo = () => {
+  const {
+    branchInfo,
+    errors,
+    setBranchInfo,
+    goToNextStep,
+    goToPreviousStep,
+    validateCurrentStep,
+  } = useSignupStore();
+
+  const canProceed = validateCurrentStep(2, false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      className='space-y-4'
+    >
+      <div className='relative h-max'>
+        <Input
+          name='pharmacyName'
+          value={branchInfo.pharmacyName}
+          onChange={(e) => setBranchInfo('pharmacyName', e.target.value)}
+          placeholder='Pharmacy Name'
+          className={`peer ps-9 ${errors.pharmacyName ? 'border-red-500' : ''}`}
+        />
+        <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
+          <BuildingIcon className='size-4' aria-hidden='true' />
+        </div>
+      </div>
+      {errors.pharmacyName && (
+        <p className='text-red-500 text-xs'>{errors.pharmacyName}</p>
+      )}
+
+      <div className='relative h-max'>
+        <Input
+          name='branchName'
+          value={branchInfo.branchName}
+          onChange={(e) => setBranchInfo('branchName', e.target.value)}
+          placeholder='Branch Name'
+          className={`peer ps-9 ${errors.branchName ? 'border-red-500' : ''}`}
+        />
+        <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
+          <BuildingIcon className='size-4' aria-hidden='true' />
+        </div>
+      </div>
+      {errors.branchName && (
+        <p className='text-red-500 text-xs'>{errors.branchName}</p>
+      )}
+
+      <div className='relative h-max'>
+        <Input
+          name='branchLocation'
+          value={branchInfo.branchLocation}
+          onChange={(e) => setBranchInfo('branchLocation', e.target.value)}
+          placeholder='Branch Location'
+          className={`peer ps-9 ${errors.branchLocation ? 'border-red-500' : ''}`}
+        />
+        <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
+          <MapPinIcon className='size-4' aria-hidden='true' />
+        </div>
+      </div>
+      {errors.branchLocation && (
+        <p className='text-red-500 text-xs'>{errors.branchLocation}</p>
+      )}
+
+      <div className='relative h-max'>
+        <Input
+          name='phone'
+          value={branchInfo.phone}
+          onChange={(e) => setBranchInfo('phone', e.target.value)}
+          placeholder='Phone Number'
+          className={`peer ps-9 ${errors.phone ? 'border-red-500' : ''}`}
+        />
+        <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
+          <PhoneIcon className='size-4' aria-hidden='true' />
+        </div>
+      </div>
+      {errors.phone && (
+        <p className='text-red-500 text-xs'>{errors.phone}</p>
+      )}
+
+      <div className='relative h-max'>
+        <Input
+          name='branchEmail'
+          value={branchInfo.branchEmail}
+          onChange={(e) => setBranchInfo('branchEmail', e.target.value)}
+          placeholder='Branch Email (Optional)'
+          type='email'
+          className={`peer ps-9 ${errors.branchEmail ? 'border-red-500' : ''}`}
+        />
+        <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
+          <MailIcon className='size-4' aria-hidden='true' />
+        </div>
+      </div>
+      {errors.branchEmail && (
+        <p className='text-red-500 text-xs'>{errors.branchEmail}</p>
+      )}
+
+      {errors.general && <p className='text-red-500 text-sm'>{errors.general}</p>}
+
+      <div className='flex gap-2'>
+        <Button type='button' variant='outline' onClick={goToPreviousStep} className='w-full'>
+          Back
+        </Button>
+        <Button
+          type='button'
+          onClick={goToNextStep}
+          className='w-full'
+          disabled={!canProceed}
+        >
+          Continue
+        </Button>
+      </div>
+    </motion.div>
+  );
+};
+
+// Step 3 - Review and Submit Component
+const Step3Review = () => {
+  const {
+    managerInfo,
+    branchInfo,
+    submitSignup,
+    goToPreviousStep,
+    isLoading,
+    error
+  } = useSignupStore();
+
+  const handleSubmit = async () => {
+    const result = await submitSignup();
+
+    if (result.success) {
+      toast.success('Request submitted! An admin will review your application.');
+      // Navigate to verify email page after successful registration
+      setTimeout(() => {
+        window.location.href = '/auth/login'; // Redirect to login instead of verify-email since it's a request
+      }, 2000);
+    } else {
+      toast.error(result.message || 'Registration failed. Please try again.');
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      className='space-y-4'
+    >
+      <div className='bg-muted p-4 rounded-lg'>
+        <h3 className='font-semibold mb-2 flex items-center gap-2'>
+          <UserRoundIcon className='size-4' />
+          Manager Information
+        </h3>
+        <div className='space-y-1 text-sm'>
+          <p><span className='font-medium'>Full Name:</span> {managerInfo.fullName}</p>
+          <p><span className='font-medium'>Email:</span> {managerInfo.email}</p>
+          <p><span className='font-medium'>Role:</span> Manager</p>
+        </div>
+      </div>
+
+      <div className='bg-muted p-4 rounded-lg'>
+        <h3 className='font-semibold mb-2 flex items-center gap-2'>
+          <BuildingIcon className='size-4' />
+          Pharmacy Information
+        </h3>
+        <div className='space-y-1 text-sm'>
+          <p><span className='font-medium'>Pharmacy Name:</span> {branchInfo.pharmacyName}</p>
+          <p><span className='font-medium'>Branch Name:</span> {branchInfo.branchName}</p>
+          <p><span className='font-medium'>Branch Location:</span> {branchInfo.branchLocation}</p>
+          <p><span className='font-medium'>Phone:</span> {branchInfo.phone}</p>
+          {branchInfo.branchEmail && <p><span className='font-medium'>Branch Email:</span> {branchInfo.branchEmail}</p>}
+        </div>
+      </div>
+
+      {error && <p className='text-red-500 text-sm'>{error}</p>}
+
+      <div className='flex gap-2'>
+        <Button type='button' variant='outline' onClick={goToPreviousStep} className='w-full'>
+          Back
+        </Button>
+        <Button
+          type='button'
+          onClick={handleSubmit}
+          className='w-full'
+          disabled={isLoading}
+        >
+          {isLoading ? 'Submitting Request...' : 'Submit Request'}
+        </Button>
+      </div>
+    </motion.div>
+  );
+};
+
 export function SignupPage() {
+  const { currentStep, resetSignup, isSuccess } = useSignupStore();
   const navigate = useNavigate();
-  const { step, formData, setFormData, nextStep, prevStep } = useSignupStore();
-  const [errors, setErrors] = useState({});
 
-  const [isLoading, setIsLoading] = useState(false);
+  // Reset the signup flow when component mounts
+  useEffect(() => {
+    resetSignup();
+  }, [resetSignup]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ [name]: value });
+  // Handle successful registration
+  useEffect(() => {
+    if (isSuccess) {
+      // Navigate to login
+      navigate('/auth/login');
+    }
+  }, [isSuccess, navigate]);
 
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
+  // Determine which step component to render
+  const renderCurrentStep = () => {
+    switch (currentStep) {
+      case 1:
+        return <Step1ManagerInfo />;
+      case 2:
+        return <Step2BranchInfo />;
+      case 3:
+        return <Step3Review />;
+      default:
+        return <Step1ManagerInfo />;
     }
   };
 
-  const validateEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-
-  const handleNextStep = () => {
-    const newErrors = {};
-    let isValid = true;
-
-    if (step === 1) {
-      if (!formData.pharmacyName.trim()) {
-        newErrors.pharmacyName = 'Pharmacy Name is required';
-        isValid = false;
-      }
-      if (!formData.licenseNumber.trim()) {
-        newErrors.licenseNumber = 'License Number is required';
-        isValid = false;
-      }
-    } else if (step === 2) {
-      if (!formData.managerName.trim()) {
-        newErrors.managerName = 'Manager Name is required';
-        isValid = false;
-      }
-      if (!formData.managerEmail.trim()) {
-        newErrors.managerEmail = 'Manager Email is required';
-        isValid = false;
-      } else if (!validateEmail(formData.managerEmail)) {
-        newErrors.managerEmail = 'Invalid email format';
-        isValid = false;
-      }
-      if (!formData.managerPassword.trim()) {
-        newErrors.managerPassword = 'Password is required';
-        isValid = false;
-      }
-      if (!formData.managerPhone.trim()) {
-        newErrors.managerPhone = 'Phone Number is required';
-        isValid = false;
-      }
-    }
-
-    setErrors(newErrors);
-
-    if (isValid) {
-      nextStep();
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const newErrors = {};
-    let isValid = true;
-
-    if (step === 3) {
-      if (!formData.branchAddress.trim()) {
-        newErrors.branchAddress = 'Branch Address is required';
-        isValid = false;
-      }
-      if (!formData.branchContact.trim()) {
-        newErrors.branchContact = 'Branch Contact is required';
-        isValid = false;
-      }
-    }
-
-    setErrors(newErrors);
-
-    if (isValid) {
-      setIsLoading(true);
-      // Call the actual signup API
-      try {
-        const response = await signup(
-          formData.managerName,
-          formData.managerEmail,
-          formData.managerPassword,
-          {
-            name: formData.pharmacyName,
-            license_number: formData.licenseNumber,
-            branches: [
-              {
-                name: `${formData.pharmacyName} - Main Branch`,
-                address: formData.branchAddress,
-                contact: formData.branchContact,
-              },
-            ],
-            branch_id: 1, // Workaround: Backend requires branch_id even for new pharmacy creation
-          }
-        );
-
-        if (response.success) {
-          // Registration successful - navigate to login or show success message
-          alert('Registration successful! You can now log in.');
-          // Redirect to login page
-          navigate('/auth/login');
-        } else {
-          setErrors({ general: response.message || 'Registration failed. Please try again.' });
-        }
-      } catch (error) {
-        setErrors({ general: error.message || 'An error occurred during registration.' });
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
+  // Step titles
+  const stepTitles = [
+    'Manager Information',
+    'Pharmacy Information',
+    'Review & Submit'
+  ];
 
   return (
     <main className='relative md:h-screen md:overflow-hidden lg:grid lg:grid-cols-2'>
@@ -175,197 +390,33 @@ export function SignupPage() {
             <p className='text-xl font-semibold'>PharmaCare</p>
           </div>
           <div className='flex flex-col space-y-1'>
-            <h1 className='font-heading text-2xl font-bold tracking-wide'>Create Account</h1>
+            <h1 className='font-heading text-2xl font-bold tracking-wide'>Request Manager Account</h1>
             <p className='text-muted-foreground text-base'>
-              Step {step} of 3:{' '}
-              {step === 1
-                ? 'Pharmacy Details'
-                : step === 2
-                  ? 'Manager Details'
-                  : 'Main Branch Details'}
+              Step {currentStep} of 3: {stepTitles[currentStep - 1]}
             </p>
+            {/* Progress indicator */}
+            <div className='flex items-center mt-4'>
+              {[1, 2, 3].map((step) => (
+                <React.Fragment key={step}>
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= step ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                    }`}>
+                    {currentStep > step ? (
+                      <CheckCircleIcon className='size-4' />
+                    ) : (
+                      <span className='text-xs font-medium'>{step}</span>
+                    )}
+                  </div>
+                  {step < 3 && (
+                    <div className={`flex-1 h-0.5 mx-2 ${currentStep > step ? 'bg-primary' : 'bg-muted'
+                      }`}></div>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
           </div>
 
-          <form onSubmit={handleSubmit} className='space-y-4'>
-            {step === 1 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className='space-y-4'
-              >
-                <div className='relative h-max'>
-                  <Input
-                    name='pharmacyName'
-                    value={formData.pharmacyName}
-                    onChange={handleInputChange}
-                    placeholder='Pharmacy Name'
-                    className={`peer ps-9 ${errors.pharmacyName ? 'border-red-500' : ''}`}
-                  />
-                  <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
-                    <Building2Icon className='size-4' aria-hidden='true' />
-                  </div>
-                </div>
-                {errors.pharmacyName && (
-                  <p className='text-red-500 text-xs'>{errors.pharmacyName}</p>
-                )}
-
-                <div className='relative h-max'>
-                  <Input
-                    name='licenseNumber'
-                    value={formData.licenseNumber}
-                    onChange={handleInputChange}
-                    placeholder='License Number'
-                    className={`peer ps-9 ${errors.licenseNumber ? 'border-red-500' : ''}`}
-                  />
-                  <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
-                    <FileTextIcon className='size-4' aria-hidden='true' />
-                  </div>
-                </div>
-                {errors.licenseNumber && (
-                  <p className='text-red-500 text-xs'>{errors.licenseNumber}</p>
-                )}
-
-                <Button type='button' onClick={handleNextStep} className='w-full'>
-                  Next
-                </Button>
-              </motion.div>
-            )}
-
-            {step === 2 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className='space-y-4'
-              >
-                <div className='relative h-max'>
-                  <Input
-                    name='managerName'
-                    value={formData.managerName}
-                    onChange={handleInputChange}
-                    placeholder='Manager Name'
-                    className={`peer ps-9 ${errors.managerName ? 'border-red-500' : ''}`}
-                  />
-                  <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
-                    <UserIcon className='size-4' aria-hidden='true' />
-                  </div>
-                </div>
-                {errors.managerName && <p className='text-red-500 text-xs'>{errors.managerName}</p>}
-
-                <div className='relative h-max'>
-                  <Input
-                    name='managerEmail'
-                    value={formData.managerEmail}
-                    onChange={handleInputChange}
-                    placeholder='Manager Email'
-                    type='email'
-                    className={`peer ps-9 ${errors.managerEmail ? 'border-red-500' : ''}`}
-                  />
-                  <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
-                    <MailIcon className='size-4' aria-hidden='true' />
-                  </div>
-                </div>
-                {errors.managerEmail && (
-                  <p className='text-red-500 text-xs'>{errors.managerEmail}</p>
-                )}
-
-                <div className='relative h-max'>
-                  <Input
-                    name='managerPassword'
-                    value={formData.managerPassword}
-                    onChange={handleInputChange}
-                    placeholder='Password'
-                    type='password'
-                    className={`peer ps-9 ${errors.managerPassword ? 'border-red-500' : ''}`}
-                  />
-                  <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
-                    <LockIcon className='size-4' aria-hidden='true' />
-                  </div>
-                </div>
-                {errors.managerPassword && (
-                  <p className='text-red-500 text-xs'>{errors.managerPassword}</p>
-                )}
-
-                <div className='relative h-max'>
-                  <Input
-                    name='managerPhone'
-                    value={formData.managerPhone}
-                    onChange={handleInputChange}
-                    placeholder='Phone Number'
-                    className={`peer ps-9 ${errors.managerPhone ? 'border-red-500' : ''}`}
-                  />
-                  <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
-                    <PhoneIcon className='size-4' aria-hidden='true' />
-                  </div>
-                </div>
-                {errors.managerPhone && (
-                  <p className='text-red-500 text-xs'>{errors.managerPhone}</p>
-                )}
-
-                <div className='flex gap-2'>
-                  <Button type='button' variant='outline' onClick={prevStep} className='w-full'>
-                    Back
-                  </Button>
-                  <Button type='button' onClick={handleNextStep} className='w-full'>
-                    Next
-                  </Button>
-                </div>
-              </motion.div>
-            )}
-
-            {step === 3 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className='space-y-4'
-              >
-                <div className='relative h-max'>
-                  <Input
-                    name='branchAddress'
-                    value={formData.branchAddress}
-                    onChange={handleInputChange}
-                    placeholder='Main Branch Address'
-                    className={`peer ps-9 ${errors.branchAddress ? 'border-red-500' : ''}`}
-                  />
-                  <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
-                    <MapPinIcon className='size-4' aria-hidden='true' />
-                  </div>
-                </div>
-                {errors.branchAddress && (
-                  <p className='text-red-500 text-xs'>{errors.branchAddress}</p>
-                )}
-
-                <div className='relative h-max'>
-                  <Input
-                    name='branchContact'
-                    value={formData.branchContact}
-                    onChange={handleInputChange}
-                    placeholder='Branch Contact Number'
-                    className={`peer ps-9 ${errors.branchContact ? 'border-red-500' : ''}`}
-                  />
-                  <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
-                    <PhoneIcon className='size-4' aria-hidden='true' />
-                  </div>
-                </div>
-                {errors.branchContact && (
-                  <p className='text-red-500 text-xs'>{errors.branchContact}</p>
-                )}
-
-                {errors.general && <p className='text-red-500 text-sm'>{errors.general}</p>}
-
-                <div className='flex gap-2'>
-                  <Button type='button' variant='outline' onClick={prevStep} className='w-full'>
-                    Back
-                  </Button>
-                  <Button type='submit' className='w-full' disabled={isLoading}>
-                    {isLoading ? 'Registering...' : 'Complete Registration'}
-                  </Button>
-                </div>
-              </motion.div>
-            )}
-          </form>
+          {/* Render the current step component */}
+          {renderCurrentStep()}
 
           <div className='text-center text-sm'>
             Already have an account?{' '}

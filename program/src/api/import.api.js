@@ -1,4 +1,5 @@
-import { makeApiCall } from './auth.api';
+import { apiClient, makeApiCall } from './apiClient';
+
 
 export const importMedications = async (data) => {
   return await makeApiCall('/manager/import/medications', {

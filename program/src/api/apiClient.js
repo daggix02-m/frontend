@@ -45,8 +45,8 @@ export const apiClient = async (endpoint, options = {}) => {
     if (error.name === 'AbortError') {
       throw new Error(
         'Request to the server took too long and was cancelled. Please check that the backend is reachable at ' +
-          API_BASE_URL +
-          ' and try again.'
+        API_BASE_URL +
+        ' and try again.'
       );
     }
 
@@ -57,6 +57,27 @@ export const apiClient = async (endpoint, options = {}) => {
 
     // Re-throw everything else so callers can show the message
     throw error;
+  }
+};
+
+/**
+ * Generic API call wrapper with consistent error handling
+ * @param {string} endpoint - The API endpoint to call
+ * @param {Object} options - Request options
+ * @returns {Promise<Object>} Response object with success status and data
+ */
+export const makeApiCall = async (endpoint, options = {}) => {
+  try {
+    const response = await apiClient(endpoint, options);
+    return {
+      success: true,
+      ...response,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message || 'An error occurred during the API call',
+    };
   }
 };
 

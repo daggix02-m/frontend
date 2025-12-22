@@ -1,20 +1,37 @@
-import { makeApiCall } from '../api/auth.api';
+import {
+  getPharmacistDashboard,
+  getPharmacistMedicines,
+  getPharmacistSales,
+  getPharmacistReports,
+  getPharmacistPrescriptions,
+  validatePrescription,
+  dispensePrescription,
+  getPharmacistStockTransfers,
+  requestPharmacistStockTransfer
+} from '../api/dashboard.api';
+import { makeApiCall } from '../api/apiClient';
 
 /**
  * Pharmacist Service
- * Handles all pharmacist-related API calls
+ * Handles all pharmacist-related API calls for PharmaCare backend
  */
 
 export const pharmacistService = {
+  /**
+   * Get pharmacist dashboard overview
+   * @returns {Promise}
+   */
+  async getOverview() {
+    return await getPharmacistDashboard();
+  },
+
   /**
    * Get branch inventory
    * @param {Object} params - Query parameters (search, category, status)
    * @returns {Promise}
    */
   async getInventory(params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    const endpoint = queryString ? `/pharmacist/inventory?${queryString}` : '/pharmacist/inventory';
-    return await makeApiCall(endpoint, { method: 'GET' });
+    return await getPharmacistMedicines();
   },
 
   /**
@@ -68,11 +85,7 @@ export const pharmacistService = {
    * @returns {Promise}
    */
   async getPrescriptions(params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    const endpoint = queryString
-      ? `/pharmacist/prescriptions?${queryString}`
-      : '/pharmacist/prescriptions';
-    return await makeApiCall(endpoint, { method: 'GET' });
+    return await getPharmacistPrescriptions();
   },
 
   /**
@@ -81,7 +94,7 @@ export const pharmacistService = {
    * @returns {Promise}
    */
   async validatePrescription(id) {
-    return await makeApiCall(`/pharmacist/prescriptions/${id}/validate`, { method: 'PATCH' });
+    return await validatePrescription(id);
   },
 
   /**
@@ -90,7 +103,7 @@ export const pharmacistService = {
    * @returns {Promise}
    */
   async dispensePrescription(id) {
-    return await makeApiCall(`/pharmacist/prescriptions/${id}/dispense`, { method: 'PATCH' });
+    return await dispensePrescription(id);
   },
 
   /**
@@ -116,10 +129,7 @@ export const pharmacistService = {
    * @returns {Promise}
    */
   async requestStockTransfer(transferData) {
-    return await makeApiCall('/pharmacist/stock-transfers', {
-      method: 'POST',
-      body: JSON.stringify(transferData),
-    });
+    return await requestPharmacistStockTransfer(transferData);
   },
 
   /**
@@ -127,7 +137,7 @@ export const pharmacistService = {
    * @returns {Promise}
    */
   async getStockTransfers() {
-    return await makeApiCall('/pharmacist/stock-transfers', { method: 'GET' });
+    return await getPharmacistStockTransfers();
   },
 
   /**

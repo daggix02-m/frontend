@@ -1,8 +1,20 @@
-import { makeApiCall } from '../api/auth.api';
+import {
+  getManagerDashboard,
+  getManagerStaff,
+  createManagerStaff,
+  updateManagerStaff,
+  deleteManagerStaff,
+  getManagerMedicines,
+  createManagerMedicine,
+  updateManagerMedicine,
+  deleteManagerMedicine,
+  createCashierSale
+} from '../api/dashboard.api';
+import { makeApiCall } from '../api/apiClient';
 
 /**
  * Manager Service
- * Handles all manager-related API calls
+ * Handles all manager-related API calls for PharmaCare backend
  */
 
 export const managerService = {
@@ -11,7 +23,16 @@ export const managerService = {
    * @returns {Promise}
    */
   async getOverview() {
-    return await makeApiCall('/manager/overview', { method: 'GET' });
+    return await getManagerDashboard();
+  },
+
+  /**
+   * Process a sale transaction
+   * @param {Object} saleData - Sale data (items, subtotal, discount, total, payment_method)
+   * @returns {Promise}
+   */
+  async processSale(saleData) {
+    return await createCashierSale(saleData);
   },
 
   /**
@@ -65,9 +86,7 @@ export const managerService = {
    * @returns {Promise}
    */
   async getStaff(params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    const endpoint = queryString ? `/manager/staff?${queryString}` : '/manager/staff';
-    return await makeApiCall(endpoint, { method: 'GET' });
+    return await getManagerStaff();
   },
 
   /**
@@ -76,10 +95,7 @@ export const managerService = {
    * @returns {Promise}
    */
   async createStaff(staffData) {
-    return await makeApiCall('/manager/staff', {
-      method: 'POST',
-      body: JSON.stringify(staffData),
-    });
+    return await createManagerStaff(staffData);
   },
 
   /**
@@ -89,10 +105,7 @@ export const managerService = {
    * @returns {Promise}
    */
   async updateStaff(id, staffData) {
-    return await makeApiCall(`/manager/staff/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(staffData),
-    });
+    return await updateManagerStaff(id, staffData);
   },
 
   /**
@@ -101,7 +114,7 @@ export const managerService = {
    * @returns {Promise}
    */
   async deleteStaff(id) {
-    return await makeApiCall(`/manager/staff/${id}`, { method: 'DELETE' });
+    return await deleteManagerStaff(id);
   },
 
   /**
@@ -148,14 +161,12 @@ export const managerService = {
   },
 
   /**
-   * Get all products/inventory
+   * Get all medicines/inventory
    * @param {Object} params - Query parameters (search, category, status)
    * @returns {Promise}
    */
   async getProducts(params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    const endpoint = queryString ? `/manager/products?${queryString}` : '/manager/products';
-    return await makeApiCall(endpoint, { method: 'GET' });
+    return await getManagerMedicines();
   },
 
   /**
@@ -164,41 +175,35 @@ export const managerService = {
    * @returns {Promise}
    */
   async getInventory(params = {}) {
-    return await this.getProducts(params);
+    return await this.getProducts();
   },
 
   /**
-   * Create new product
-   * @param {Object} productData - Product data
+   * Create new medicine
+   * @param {Object} medicineData - Medicine data
    * @returns {Promise}
    */
-  async createProduct(productData) {
-    return await makeApiCall('/manager/products', {
-      method: 'POST',
-      body: JSON.stringify(productData),
-    });
+  async createProduct(medicineData) {
+    return await createManagerMedicine(medicineData);
   },
 
   /**
-   * Update product
-   * @param {string} id - Product ID
-   * @param {Object} productData - Updated product data
+   * Update medicine
+   * @param {string} id - Medicine ID
+   * @param {Object} medicineData - Updated medicine data
    * @returns {Promise}
    */
-  async updateProduct(id, productData) {
-    return await makeApiCall(`/manager/products/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(productData),
-    });
+  async updateProduct(id, medicineData) {
+    return await updateManagerMedicine(id, medicineData);
   },
 
   /**
-   * Delete product
-   * @param {string} id - Product ID
+   * Delete medicine
+   * @param {string} id - Medicine ID
    * @returns {Promise}
    */
   async deleteProduct(id) {
-    return await makeApiCall(`/manager/products/${id}`, { method: 'DELETE' });
+    return await deleteManagerMedicine(id);
   },
 
   /**

@@ -1,20 +1,36 @@
-import { makeApiCall } from '../api/auth.api';
+import {
+  getCashierDashboard,
+  getCashierSales,
+  createCashierSale,
+  getCashierReceipts,
+  getCashierProducts,
+  processCashierReturn,
+  getCashierSessions,
+  closeCashierSession
+} from '../api/dashboard.api';
+import { makeApiCall } from '../api/apiClient';
 
 /**
  * Cashier Service
- * Handles all cashier-related API calls
+ * Handles all cashier-related API calls for PharmaCare backend
  */
 
 export const cashierService = {
+  /**
+   * Get cashier dashboard overview
+   * @returns {Promise}
+   */
+  async getOverview() {
+    return await getCashierDashboard();
+  },
+
   /**
    * Get products for POS
    * @param {Object} params - Query parameters (search)
    * @returns {Promise}
    */
   async getProducts(params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    const endpoint = queryString ? `/cashier/products?${queryString}` : '/cashier/products';
-    return await makeApiCall(endpoint, { method: 'GET' });
+    return await getCashierProducts();
   },
 
   /**
@@ -34,7 +50,7 @@ export const cashierService = {
    * @returns {Promise}
    */
   async getReceipts() {
-    return await makeApiCall('/cashier/receipts', { method: 'GET' });
+    return await getCashierReceipts();
   },
 
   /**
@@ -64,7 +80,7 @@ export const cashierService = {
    * @returns {Promise}
    */
   async getSessions() {
-    return await makeApiCall('/cashier/sessions', { method: 'GET' });
+    return await getCashierSessions();
   },
 
   /**
@@ -73,10 +89,7 @@ export const cashierService = {
    * @returns {Promise}
    */
   async closeSession(closingCash) {
-    return await makeApiCall('/cashier/sessions/close', {
-      method: 'POST',
-      body: JSON.stringify({ closingCash }),
-    });
+    return await closeCashierSession({ closingCash });
   },
 
   /**
@@ -116,10 +129,7 @@ export const cashierService = {
    * @returns {Promise}
    */
   async processReturn(returnData) {
-    return await makeApiCall('/cashier/returns', {
-      method: 'POST',
-      body: JSON.stringify(returnData),
-    });
+    return await processCashierReturn(returnData);
   },
 };
 
