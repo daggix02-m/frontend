@@ -43,7 +43,17 @@ export function LoginPage() {
       console.log('LOGIN RESPONSE:', response);
 
       if (!response.success) {
-        setError(response.message || 'Login failed. Please check your credentials and try again.');
+        // Provide more specific error messages based on the response
+        let errorMessage = response.message || 'Login failed. Please check your credentials and try again.';
+        
+        // Check for CORS-related errors
+        if (errorMessage.includes('CORS') || errorMessage.includes('cross-origin')) {
+          errorMessage = 'Connection error: Unable to reach the authentication server. This may be due to network restrictions or browser security settings. Please try using a different browser or network.';
+        } else if (errorMessage.includes('Network error')) {
+          errorMessage = 'Network error: Unable to connect to the authentication server. Please check your internet connection.';
+        }
+        
+        setError(errorMessage);
         setIsLoading(false);
         return;
       }

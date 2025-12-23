@@ -1,10 +1,10 @@
-import { apiClient, makeApiCall } from './apiClient';
+import { apiClient, makeApiCall, setToken } from './apiClient';
 
 
 /**
  * Login function with token storage
  * @param {string} email - User's email address
- * @param {string} password - User's password
+* @param {string} password - User's password
  * @returns {Promise<Object>} Response object with success status and user data
  */
 export const login = async (email, password) => {
@@ -15,10 +15,10 @@ export const login = async (email, password) => {
 
   if (response.success) {
     if (response.token) {
-      localStorage.setItem('accessToken', response.token);
+      setToken('accessToken', response.token);
     }
     if (response.refreshToken) {
-      localStorage.setItem('refreshToken', response.refreshToken);
+      setToken('refreshToken', response.refreshToken);
     }
 
     // Get user role from the response based on PharmaCare backend specification
@@ -50,16 +50,16 @@ export const login = async (email, password) => {
     }
 
     if (userRole) {
-      localStorage.setItem('userRole', userRole);
+      setToken('userRole', userRole);
       response.role = userRole;
     }
 
     // Store other user information from PharmaCare backend
     if (userData) {
-      localStorage.setItem('userId', userData.id || userData.user_id || '');
-      localStorage.setItem('userName', userData.full_name || userData.name || '');
-      localStorage.setItem('userEmail', userData.email || '');
-      localStorage.setItem('roleId', userData.role_id || '');
+      setToken('userId', userData.id || userData.user_id || '');
+      setToken('userName', userData.full_name || userData.name || '');
+      setToken('userEmail', userData.email || '');
+      setToken('roleId', userData.role_id || '');
     }
   }
 
@@ -141,7 +141,7 @@ export const resetPassword = async (token, newPassword) => {
  */
 export const logout = async () => {
   try {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken'); // Fallback to localStorage for logout
     if (token) {
       await apiClient('/auth/logout', {
         method: 'POST',
@@ -153,8 +153,25 @@ export const logout = async () => {
   } catch (error) {
     console.warn('Server logout failed:', error.message);
   } finally {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    // Use new token management functions for removal
+    import('./apiClient').then(({ removeToken }) => {
+      removeToken('accessToken');
+      removeToken('refreshToken');
+      removeToken('userRole');
+      removeToken('userId');
+      removeToken('userName');
+      removeToken('userEmail');
+      removeToken('roleId');
+    }).catch(() => {
+      // Fallback to localStorage if import fails
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('roleId');
+    });
   }
 };
 
@@ -164,7 +181,7 @@ export const logout = async () => {
  * @throws {Error} If refresh token is not available or refresh fails
  */
 export const refreshToken = async () => {
-  const refreshToken = localStorage.getItem('refreshToken');
+  const refreshToken = localStorage.getItem('refreshToken'); // Fallback to localStorage for refresh
   if (!refreshToken) {
     throw new Error('No refresh token available');
   }
@@ -175,11 +192,22 @@ export const refreshToken = async () => {
   });
 
   if (response.success && response.token) {
-    localStorage.setItem('accessToken', response.token);
+    import('./apiClient').then(({ setToken }) => {
+      setToken('accessToken', response.token);
+    }).catch(() => {
+      // Fallback to localStorage if import fails
+      localStorage.setItem('accessToken', response.token);
+    });
     return response.token;
   } else {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    import('./apiClient').then(({ removeToken }) => {
+      removeToken('accessToken');
+      removeToken('refreshToken');
+    }).catch(() => {
+      // Fallback to localStorage if import fails
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+    });
     throw new Error(response.message || 'Token refresh failed');
   }
 };

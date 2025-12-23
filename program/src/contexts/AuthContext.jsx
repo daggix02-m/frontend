@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { getProfile, logout as apiLogout } from '@/api/auth.api';
+import { getToken, removeToken } from '@/api/apiClient';
 
 const AuthContext = createContext();
 
@@ -19,7 +20,7 @@ export const AuthProvider = ({ children }) => {
   // Check if user is authenticated on app load
   useEffect(() => {
     const checkAuthStatus = async () => {
-      const token = localStorage.getItem('accessToken');
+      const token = getToken('accessToken');
       if (token) {
         try {
           const response = await getProfile();
@@ -30,30 +31,30 @@ export const AuthProvider = ({ children }) => {
               full_name: response.user?.full_name,
               role_id: response.user?.role_id,
               branch_id: response.user?.branch_id,
-              role: localStorage.getItem('userRole') || 'user'
+              role: getToken('userRole') || 'user'
             });
             setIsAuthenticated(true);
           } else {
             // Token is invalid, clear it
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('userRole');
-            localStorage.removeItem('userId');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userEmail');
-            localStorage.removeItem('roleId');
+            removeToken('accessToken');
+            removeToken('refreshToken');
+            removeToken('userRole');
+            removeToken('userId');
+            removeToken('userName');
+            removeToken('userEmail');
+            removeToken('roleId');
             setIsAuthenticated(false);
           }
         } catch (error) {
           console.error('Error checking auth status:', error);
           // Clear invalid token
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
-          localStorage.removeItem('userRole');
-          localStorage.removeItem('userId');
-          localStorage.removeItem('userName');
-          localStorage.removeItem('userEmail');
-          localStorage.removeItem('roleId');
+          removeToken('accessToken');
+          removeToken('refreshToken');
+          removeToken('userRole');
+          removeToken('userId');
+          removeToken('userName');
+          removeToken('userEmail');
+          removeToken('roleId');
           setIsAuthenticated(false);
         }
       } else {
@@ -79,13 +80,13 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setUser(null);
       setIsAuthenticated(false);
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('userName');
-      localStorage.removeItem('userEmail');
-      localStorage.removeItem('roleId');
+      removeToken('accessToken');
+      removeToken('refreshToken');
+      removeToken('userRole');
+      removeToken('userId');
+      removeToken('userName');
+      removeToken('userEmail');
+      removeToken('roleId');
     }
   };
 
