@@ -47,8 +47,8 @@
   ],
   "redirects": [
     {
-      "source": "/api/(.*)",
-      "destination": "https://pharmacare-api.onrender.com/api/:1",
+      "source": "/api/:path*",
+      "destination": "https://pharmacare-api.onrender.com/api/:path*",
       "permanent": true
     }
   ],
