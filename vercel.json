@@ -45,13 +45,6 @@
       ]
     }
   ],
-  "redirects": [
-    {
-      "source": "/api/:path*",
-      "destination": "https://pharmacare-api.onrender.com/api/:path*",
-      "permanent": true
-    }
-  ],
   "git": {
     "deploymentEnabled": {
       "main": false,
