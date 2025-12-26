@@ -1,30 +1,10 @@
-import { apiClient } from './apiClient';
+import { apiClient, makeApiCall, setToken } from './apiClient';
 
-/**
- * Generic API call wrapper with consistent error handling
- * @param {string} endpoint - The API endpoint to call
- * @param {Object} options - Request options
- * @returns {Promise<Object>} Response object with success status and data
- */
-export const makeApiCall = async (endpoint, options = {}) => {
-  try {
-    const response = await apiClient(endpoint, options);
-    return {
-      success: true,
-      ...response,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      message: error.message || 'An error occurred during the API call',
-    };
-  }
-};
 
 /**
  * Login function with token storage
  * @param {string} email - User's email address
- * @param {string} password - User's password
+* @param {string} password - User's password
  * @returns {Promise<Object>} Response object with success status and user data
  */
 export const login = async (email, password) => {
@@ -35,73 +15,51 @@ export const login = async (email, password) => {
 
   if (response.success) {
     if (response.token) {
-      localStorage.setItem('accessToken', response.token);
+      setToken('accessToken', response.token);
     }
     if (response.refreshToken) {
-      localStorage.setItem('refreshToken', response.refreshToken);
+      setToken('refreshToken', response.refreshToken);
     }
 
-    // Get user role from the response.
-    // Support different backend conventions:
-    // - response.users.role_name      e.g. "Admin" (current backend)
-    // - response.user.role           e.g. "Super Admin"
-    // - response.role                e.g. "admin"
-    // - response.user.role_name      e.g. "Support Admin"
-    // - response.user.role_id === 1  => treat as an admin role
-    // - boolean flags like is_superuser / is_admin / is_root
-    let userRole =
-      response.users?.role_name || // Backend uses "users" not "user"
-      response.user?.role ||
-      response.role ||
-      response.user?.role_name ||
-      null;
+    // Get user role from the response based on PharmaCare backend specification
+    // Backend response format: { token, refreshToken, user: { id, email, full_name, role_id }, mustChangePassword }
+    // Note: Backend might return 'users' instead of 'user'
+    let userRole = 'user'; // default fallback
+    const userData = response.user || response.users;
 
-    // Normalize any admin-like role to just 'admin'
-    if (userRole) {
-      const normalizedRole = userRole.toLowerCase();
-      if (
-        normalizedRole.includes('admin') ||
-        normalizedRole === 'root' ||
-        normalizedRole === 'superuser' ||
-        normalizedRole === 'owner'
-      ) {
-        userRole = 'admin';
-      }
-    }
-
-    // Fallbacks for root/admin-style flags
-    if (!userRole) {
-      if (response.users?.role_id === 1) {
-        // Backend uses "users" not "user"
-        userRole = 'admin';
-      } else if (response.user?.role_id === 1) {
-        userRole = 'admin';
-      } else if (
-        response.users?.is_superuser ||
-        response.users?.is_admin ||
-        response.users?.is_root
-      ) {
-        userRole = 'admin';
-      } else if (response.user?.is_superuser || response.user?.is_admin || response.user?.is_root) {
-        userRole = 'admin';
-      } else if (response.is_superuser || response.is_admin || response.is_root) {
-        userRole = 'admin';
+    // Check for user role in response
+    if (userData) {
+      // According to PharmaCare spec, role_id determines the role:
+      // role_id=1: Admin, role_id=2: Manager, role_id=3: Pharmacist, role_id=4: Cashier
+      switch (userData.role_id) {
+        case 1:
+          userRole = 'admin';
+          break;
+        case 2:
+          userRole = 'manager';
+          break;
+        case 3:
+          userRole = 'pharmacist';
+          break;
+        case 4:
+          userRole = 'cashier';
+          break;
+        default:
+          userRole = 'user';
       }
     }
 
     if (userRole) {
-      localStorage.setItem('userRole', userRole);
+      setToken('userRole', userRole);
       response.role = userRole;
     }
 
-    // Also store other user information if available
-    // Backend uses "users" instead of "user"
-    if (response.users) {
-      localStorage.setItem('userId', response.users.user_id || '');
-      localStorage.setItem('userName', response.users.full_name || '');
-    } else if (response.user) {
-      localStorage.setItem('userId', response.user.id || '');
-      localStorage.setItem('userName', response.user.name || response.user.full_name || '');
+    // Store other user information from PharmaCare backend
+    if (userData) {
+      setToken('userId', userData.id || userData.user_id || '');
+      setToken('userName', userData.full_name || userData.name || '');
+      setToken('userEmail', userData.email || '');
+      setToken('roleId', userData.role_id || '');
     }
   }
 
@@ -109,24 +67,46 @@ export const login = async (email, password) => {
 };
 
 /**
- * Signup function to register a new manager and create pharmacy
- * @param {string} full_name - Manager's full name
- * @param {string} email - Manager's email address
- * @param {string} password - Manager's password
- * @param {Object} pharmacyData - Pharmacy and branch data
+ * Signup function to register a new user
+ * @param {string} full_name - User's full name
+ * @param {string} email - User's email address
+ * @param {string} password - User's password
+ * @param {number} role_id - User's role ID (2=Manager, 3=Pharmacist, 4=Cashier)
+ * @param {number} branch_id - Branch ID (required for non-admin roles)
  * @returns {Promise<Object>} Response object with success status
  */
-export const signup = async (full_name, email, password, pharmacyData) => {
+export const signup = async (full_name, email, password, role_id, branch_id) => {
   return await makeApiCall('/auth/register', {
     method: 'POST',
     body: JSON.stringify({
       full_name,
       email,
       password,
-      role_id: 2,
-      branch_id: pharmacyData.branch_id, // Extract branch_id from pharmacyData
-      pharmacy: pharmacyData,
+      role_id,
+      branch_id
     }),
+  });
+};
+
+/**
+ * Manager signup function to register a new manager with branch information
+ * @param {Object} managerData - Manager and branch data
+ * @param {string} managerData.full_name - User's full name
+ * @param {string} managerData.email - User's email address
+ * @param {string} managerData.password - User's password
+ * @param {number} managerData.role_id - User's role ID (should be 2 for Manager)
+ * @param {string} managerData.branch_id - Dummy branch ID (backend will create new branch)
+ * @param {string} managerData.pharmacy_name - Name of the pharmacy
+ * @param {string} managerData.branch_name - Name of the branch
+ * @param {string} managerData.branch_location - Location of the branch
+ * @param {string} managerData.phone - Phone number of the branch
+ * @param {string} [managerData.branch_email] - Email of the branch (optional)
+ * @returns {Promise<Object>} Response object with success status
+ */
+export const signupManager = async (managerData) => {
+  return await makeApiCall('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(managerData),
   });
 };
 
@@ -161,7 +141,7 @@ export const resetPassword = async (token, newPassword) => {
  */
 export const logout = async () => {
   try {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken'); // Fallback to localStorage for logout
     if (token) {
       await apiClient('/auth/logout', {
         method: 'POST',
@@ -173,8 +153,25 @@ export const logout = async () => {
   } catch (error) {
     console.warn('Server logout failed:', error.message);
   } finally {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    // Use new token management functions for removal
+    import('./apiClient').then(({ removeToken }) => {
+      removeToken('accessToken');
+      removeToken('refreshToken');
+      removeToken('userRole');
+      removeToken('userId');
+      removeToken('userName');
+      removeToken('userEmail');
+      removeToken('roleId');
+    }).catch(() => {
+      // Fallback to localStorage if import fails
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('roleId');
+    });
   }
 };
 
@@ -184,7 +181,7 @@ export const logout = async () => {
  * @throws {Error} If refresh token is not available or refresh fails
  */
 export const refreshToken = async () => {
-  const refreshToken = localStorage.getItem('refreshToken');
+  const refreshToken = localStorage.getItem('refreshToken'); // Fallback to localStorage for refresh
   if (!refreshToken) {
     throw new Error('No refresh token available');
   }
@@ -195,11 +192,22 @@ export const refreshToken = async () => {
   });
 
   if (response.success && response.token) {
-    localStorage.setItem('accessToken', response.token);
+    import('./apiClient').then(({ setToken }) => {
+      setToken('accessToken', response.token);
+    }).catch(() => {
+      // Fallback to localStorage if import fails
+      localStorage.setItem('accessToken', response.token);
+    });
     return response.token;
   } else {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    import('./apiClient').then(({ removeToken }) => {
+      removeToken('accessToken');
+      removeToken('refreshToken');
+    }).catch(() => {
+      // Fallback to localStorage if import fails
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+    });
     throw new Error(response.message || 'Token refresh failed');
   }
 };
@@ -324,7 +332,7 @@ export const changePassword = async (currentPassword, newPassword) => {
  * @returns {Promise<Object>} Response object with user profile data
  */
 export const getProfile = async () => {
-  return await makeApiCall('/auth/profile', {
+  return await makeApiCall('/auth/me', {
     method: 'GET',
   });
 };

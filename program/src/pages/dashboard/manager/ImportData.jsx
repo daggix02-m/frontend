@@ -13,9 +13,9 @@ import {
   TableHead,
   TableCell,
   Button,
-  Select,
   Alert,
 } from '@/components/ui/ui';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Database, Upload, AlertTriangle, CheckCircle } from 'lucide-react';
 import { importMedications, importEmployees, importBranches } from '@/api/import.api';
 import { toast } from 'sonner';
@@ -103,17 +103,22 @@ export function ImportData() {
                 <label className='text-sm font-medium'>Data Type</label>
                 <Select
                   value={selectedType}
-                  onChange={(e) => {
-                    setSelectedType(e.target.value);
+                  onValueChange={(value) => {
+                    setSelectedType(value);
                     setImportedData([]);
                     setValidationError('');
                   }}
                 >
-                  {Object.entries(DATA_TYPES).map(([key, value]) => (
-                    <option key={key} value={key}>
-                      {value.label}
-                    </option>
-                  ))}
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select data type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(DATA_TYPES).map(([key, value]) => (
+                      <SelectItem key={key} value={key}>
+                        {value.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </div>
 

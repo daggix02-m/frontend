@@ -77,14 +77,22 @@ export function AuditLogs() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {logs.map((log) => (
-                  <TableRow key={log.id}>
-                    <TableCell className='font-medium'>{log.action}</TableCell>
-                    <TableCell>{log.user}</TableCell>
-                    <TableCell>{log.timestamp}</TableCell>
-                    <TableCell className='text-muted-foreground'>{log.details}</TableCell>
+                {logs.length > 0 ? (
+                  logs.map((log) => (
+                    <TableRow key={log.id}>
+                      <TableCell className='font-medium'>{log.action}</TableCell>
+                      <TableCell>{log.user}</TableCell>
+                      <TableCell>{log.timestamp}</TableCell>
+                      <TableCell className='text-muted-foreground'>{log.details}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className='text-center py-8 text-muted-foreground'>
+                      No audit logs found.
+                    </TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </div>

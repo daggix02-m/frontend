@@ -1,10 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginPage } from './pages/auth/login';
 import { SignupPage } from './pages/auth/signup';
 import { ForgotPasswordPage } from './pages/auth/forgot-password';
 import { ResetPasswordPage } from './pages/auth/reset-password';
 import { ChangePasswordPage } from './pages/auth/change-password';
+import { VerifyEmailPage } from './pages/auth/verify-email'; // New page to be created
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { Overview } from './pages/dashboard/manager/Overview';
 import { BranchManagement } from './pages/dashboard/manager/BranchManagement';
@@ -28,7 +30,6 @@ import { StockCheck } from './pages/dashboard/cashier/StockCheck';
 import { BillingManagement } from './pages/dashboard/admin/BillingManagement';
 import { SupportTickets } from './pages/dashboard/admin/SupportTickets';
 import { SystemStatistics } from './pages/dashboard/admin/SystemStatistics';
-import { PlatformUsers } from './pages/dashboard/admin/PlatformUsers';
 import { StockTransferApproval } from './pages/dashboard/manager/StockTransferApproval';
 import { RefundsDiscounts } from './pages/dashboard/manager/RefundsDiscounts';
 import { ManagerPOSSales } from './pages/dashboard/manager/POSSales';
@@ -41,17 +42,20 @@ import { Receipts } from './pages/dashboard/cashier/Receipts';
 import { Notifications } from './pages/dashboard/manager/Notifications';
 
 const RoleProtectedRoute = ({ children, allowedRoles }) => {
-  const token = localStorage.getItem('accessToken');
-  const userRole = localStorage.getItem('userRole');
+  const { user, isAuthenticated, loading } = useAuth();
 
-  if (!token) {
+  if (loading) {
+    return <div>Loading...</div>; // You can replace this with a proper loading component
+  }
+
+  if (!isAuthenticated) {
     return <Navigate to='/auth/login' replace />;
   }
 
-  const normalizedUserRole = userRole ? userRole.toLowerCase() : '';
+  const userRole = user?.role;
 
   // Check if the current role is admin
-  const isAdmin = normalizedUserRole === 'admin';
+  const isAdmin = userRole === 'admin';
 
   const isAllowed =
     !allowedRoles ||
@@ -60,111 +64,125 @@ const RoleProtectedRoute = ({ children, allowedRoles }) => {
       if (role === 'admin') {
         return isAdmin;
       }
-      return normalizedUserRole === role;
+      return userRole === role;
     });
 
   if (!isAllowed) {
     if (isAdmin) return <Navigate to='/admin/overview' replace />;
-    if (normalizedUserRole === 'manager') return <Navigate to='/manager/overview' replace />;
-    if (normalizedUserRole === 'pharmacist') return <Navigate to='/pharmacist/overview' replace />;
-    if (normalizedUserRole === 'cashier') return <Navigate to='/cashier/overview' replace />;
+    if (userRole === 'manager') return <Navigate to='/manager/overview' replace />;
+    if (userRole === 'pharmacist') return <Navigate to='/pharmacist/overview' replace />;
+    if (userRole === 'cashier') return <Navigate to='/cashier/overview' replace />;
     return <Navigate to='/auth/login' replace />;
   }
 
   return children;
 };
 
+const AppContent = () => {
+  const { loading } = useAuth();
+
+  if (loading) {
+    return <div>Loading...</div>; // You can replace this with a proper loading component
+  }
+
+  return (
+    <Routes>
+      <Route path='/' element={<LoginPage />} />
+      <Route path='/auth/login' element={<LoginPage />} />
+      <Route path='/auth/signup' element={<SignupPage />} />
+      <Route path='/auth/forgot-password' element={<ForgotPasswordPage />} />
+      <Route path='/auth/reset-password' element={<ResetPasswordPage />} />
+      <Route path='/auth/change-password' element={<ChangePasswordPage />} />
+      <Route path='/auth/verify-email' element={<VerifyEmailPage />} />
+
+      <Route
+        path='/admin'
+        element={
+          <RoleProtectedRoute allowedRoles={['admin']}>
+            <DashboardLayout />
+          </RoleProtectedRoute>
+        }
+      >
+        <Route index element={<Navigate to='/admin/overview' replace />} />
+        <Route path='overview' element={<AdminOverview />} />
+        <Route path='pharmacies' element={<PharmacyManagement />} />
+        <Route path='subscriptions' element={<SubscriptionManagement />} />
+        <Route path='audit-logs' element={<AuditLogs />} />
+        <Route path='settings' element={<AdminSettings />} />
+        <Route path='billing' element={<BillingManagement />} />
+        <Route path='support-tickets' element={<SupportTickets />} />
+        <Route path='statistics' element={<SystemStatistics />} />
+      </Route>
+
+      <Route
+        path='/manager'
+        element={
+          <RoleProtectedRoute allowedRoles={['manager']}>
+            <DashboardLayout />
+          </RoleProtectedRoute>
+        }
+      >
+        <Route index element={<Navigate to='/manager/overview' replace />} />
+        <Route path='overview' element={<Overview />} />
+        <Route path='branches' element={<BranchManagement />} />
+        <Route path='staff' element={<StaffManagement />} />
+        <Route path='inventory' element={<InventoryManagement />} />
+        <Route path='reports' element={<Reports />} />
+        <Route path='settings' element={<Settings />} />
+        <Route path='import' element={<ImportData />} />
+        <Route path='stock-transfers' element={<StockTransferApproval />} />
+        <Route path='refunds-discounts' element={<RefundsDiscounts />} />
+        <Route path='notifications' element={<Notifications />} />
+        <Route path='pos-sales' element={<ManagerPOSSales />} />
+      </Route>
+
+      <Route
+        path='/pharmacist'
+        element={
+          <RoleProtectedRoute allowedRoles={['pharmacist']}>
+            <DashboardLayout />
+          </RoleProtectedRoute>
+        }
+      >
+        <Route index element={<Navigate to='/pharmacist/overview' replace />} />
+        <Route path='overview' element={<PharmacistOverview />} />
+        <Route path='inventory' element={<PharmacistInventory />} />
+        <Route path='transfers' element={<StockTransfers />} />
+        <Route path='prescriptions' element={<Prescriptions />} />
+        <Route path='reports' element={<BranchReports />} />
+        <Route path='stock-receiving' element={<StockReceiving />} />
+        <Route path='settings' element={<PharmacistSettings />} />
+      </Route>
+
+      <Route
+        path='/cashier'
+        element={
+          <RoleProtectedRoute allowedRoles={['cashier']}>
+            <DashboardLayout />
+          </RoleProtectedRoute>
+        }
+      >
+        <Route index element={<Navigate to='/cashier/overview' replace />} />
+        <Route path='overview' element={<CashierOverview />} />
+        <Route path='sessions' element={<Sessions />} />
+        <Route path='stock' element={<StockCheck />} />
+        <Route path='pos-sales' element={<CashierPOSSales />} />
+        <Route path='receipts' element={<Receipts />} />
+        <Route path='settings' element={<CashierSettings />} />
+      </Route>
+
+      <Route path='*' element={<Navigate to='/auth/login' replace />} />
+    </Routes>
+  );
+};
+
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path='/' element={<LoginPage />} />
-        <Route path='/auth/login' element={<LoginPage />} />
-        <Route path='/auth/signup' element={<SignupPage />} />
-        <Route path='/auth/forgot-password' element={<ForgotPasswordPage />} />
-        <Route path='/auth/reset-password' element={<ResetPasswordPage />} />
-        <Route path='/auth/change-password' element={<ChangePasswordPage />} />
-
-        <Route
-          path='/admin'
-          element={
-            <RoleProtectedRoute allowedRoles={['admin']}>
-              <DashboardLayout role='admin' />
-            </RoleProtectedRoute>
-          }
-        >
-          <Route index element={<Navigate to='/admin/overview' replace />} />
-          <Route path='overview' element={<AdminOverview />} />
-          <Route path='pharmacies' element={<PharmacyManagement />} />
-          <Route path='subscriptions' element={<SubscriptionManagement />} />
-          <Route path='audit-logs' element={<AuditLogs />} />
-          <Route path='settings' element={<AdminSettings />} />
-          <Route path='billing' element={<BillingManagement />} />
-          <Route path='support-tickets' element={<SupportTickets />} />
-          <Route path='statistics' element={<SystemStatistics />} />
-          <Route path='platform-users' element={<PlatformUsers />} />
-        </Route>
-
-        <Route
-          path='/manager'
-          element={
-            <RoleProtectedRoute allowedRoles={['manager']}>
-              <DashboardLayout role='manager' />
-            </RoleProtectedRoute>
-          }
-        >
-          <Route index element={<Navigate to='/manager/overview' replace />} />
-          <Route path='overview' element={<Overview />} />
-          <Route path='branches' element={<BranchManagement />} />
-          <Route path='staff' element={<StaffManagement />} />
-          <Route path='inventory' element={<InventoryManagement />} />
-          <Route path='reports' element={<Reports />} />
-          <Route path='settings' element={<Settings />} />
-          <Route path='import' element={<ImportData />} />
-          <Route path='stock-transfers' element={<StockTransferApproval />} />
-          <Route path='refunds-discounts' element={<RefundsDiscounts />} />
-          <Route path='notifications' element={<Notifications />} />
-          <Route path='pos-sales' element={<ManagerPOSSales />} />
-        </Route>
-
-        <Route
-          path='/pharmacist'
-          element={
-            <RoleProtectedRoute allowedRoles={['pharmacist']}>
-              <DashboardLayout role='pharmacist' />
-            </RoleProtectedRoute>
-          }
-        >
-          <Route index element={<Navigate to='/pharmacist/overview' replace />} />
-          <Route path='overview' element={<PharmacistOverview />} />
-          <Route path='inventory' element={<PharmacistInventory />} />
-          <Route path='transfers' element={<StockTransfers />} />
-          <Route path='prescriptions' element={<Prescriptions />} />
-          <Route path='reports' element={<BranchReports />} />
-          <Route path='stock-receiving' element={<StockReceiving />} />
-          <Route path='settings' element={<PharmacistSettings />} />
-        </Route>
-
-        <Route
-          path='/cashier'
-          element={
-            <RoleProtectedRoute allowedRoles={['cashier']}>
-              <DashboardLayout role='cashier' />
-            </RoleProtectedRoute>
-          }
-        >
-          <Route index element={<Navigate to='/cashier/overview' replace />} />
-          <Route path='overview' element={<CashierOverview />} />
-          <Route path='sessions' element={<Sessions />} />
-          <Route path='stock' element={<StockCheck />} />
-          <Route path='pos-sales' element={<CashierPOSSales />} />
-          <Route path='receipts' element={<Receipts />} />
-          <Route path='settings' element={<CashierSettings />} />
-        </Route>
-
-        <Route path='*' element={<Navigate to='/auth/login' replace />} />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </AuthProvider>
   );
 }
 

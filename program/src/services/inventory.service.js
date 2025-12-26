@@ -1,4 +1,4 @@
-import { makeApiCall } from '../api/auth.api';
+import { makeApiCall } from '../api/apiClient';
 
 /**
  * Inventory Service

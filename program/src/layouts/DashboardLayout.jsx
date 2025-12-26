@@ -1,5 +1,6 @@
 import React from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   LayoutDashboard,
   Building2,
@@ -40,13 +41,14 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 
-function DashboardContent({ role }) {
+function DashboardContent() {
+  const { userRole, user, logout: authLogout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { setOpenMobile } = useSidebar();
 
   const handleLogout = async () => {
-    await logout();
+    await authLogout();
     navigate('/auth/login');
   };
 
@@ -54,51 +56,64 @@ function DashboardContent({ role }) {
     setOpenMobile(false);
   };
 
-  const roleNavItems = {
-    admin: [
-      { label: 'System Overview', path: '/admin/overview', icon: LayoutDashboard },
-      { label: 'Pharmacy Management', path: '/admin/pharmacies', icon: Building2 },
-      { label: 'Subscriptions', path: '/admin/subscriptions', icon: CreditCard },
-      { label: 'Global Settings', path: '/admin/settings', icon: Settings },
-      { label: 'Audit Logs', path: '/admin/audit-logs', icon: ClipboardList },
-      { label: 'Billing', path: '/admin/billing', icon: CreditCard },
-      { label: 'Support Tickets', path: '/admin/support-tickets', icon: LifeBuoy },
-      { label: 'System Statistics', path: '/admin/statistics', icon: Activity },
-      { label: 'Platform Users', path: '/admin/platform-users', icon: Users },
-    ],
-    manager: [
-      { label: 'Overview', path: '/manager/overview', icon: LayoutDashboard },
-      { label: 'Branches', path: '/manager/branches', icon: Building2 },
-      { label: 'Staff', path: '/manager/staff', icon: Users },
-      { label: 'Inventory & Products', path: '/manager/inventory', icon: Pill },
-      { label: 'Reports', path: '/manager/reports', icon: BarChart3 },
-      { label: 'Settings', path: '/manager/settings', icon: Settings },
-      { label: 'Import Data', path: '/manager/import', icon: FileText },
-      { label: 'Stock Transfers', path: '/manager/stock-transfers', icon: ArrowRightLeft },
-      { label: 'Refunds & Discounts', path: '/manager/refunds-discounts', icon: Percent },
-      { label: 'Notifications', path: '/manager/notifications', icon: Bell },
-      { label: 'POS Sales', path: '/manager/pos-sales', icon: ShoppingCart },
-    ],
-    pharmacist: [
-      { label: 'Dashboard', path: '/pharmacist/overview', icon: LayoutDashboard },
-      { label: 'Inventory', path: '/pharmacist/inventory', icon: Pill },
-      { label: 'Prescriptions', path: '/pharmacist/prescriptions', icon: FileText },
-      { label: 'Stock Transfers', path: '/pharmacist/transfers', icon: ArrowRightLeft },
-      { label: 'Reports', path: '/pharmacist/reports', icon: BarChart3 },
-      { label: 'Stock Receiving', path: '/pharmacist/stock-receiving', icon: PackagePlus },
-      { label: 'Settings', path: '/pharmacist/settings', icon: Settings },
-    ],
-    cashier: [
-      { label: 'Dashboard', path: '/cashier/overview', icon: LayoutDashboard },
-      { label: 'POS', path: '/cashier/pos-sales', icon: ShoppingCart },
-      { label: 'Sales History', path: '/cashier/receipts', icon: Activity },
-      { label: 'Sessions', path: '/cashier/sessions', icon: Clock },
-      { label: 'Stock Check', path: '/cashier/stock', icon: Search },
-      { label: 'Settings', path: '/cashier/settings', icon: Settings },
-    ],
+  // Define navigation items based on role
+  const getNavItems = () => {
+    switch (userRole) {
+      case 'admin':
+        return [
+          { label: 'System Overview', path: '/admin/overview', icon: LayoutDashboard },
+          { label: 'Pharmacy Management', path: '/admin/pharmacies', icon: Building2 },
+          { label: 'Subscriptions', path: '/admin/subscriptions', icon: CreditCard },
+          { label: 'Global Settings', path: '/admin/settings', icon: Settings },
+          { label: 'Audit Logs', path: '/admin/audit-logs', icon: ClipboardList },
+          { label: 'Billing', path: '/admin/billing', icon: CreditCard },
+          { label: 'Support Tickets', path: '/admin/support-tickets', icon: LifeBuoy },
+          { label: 'System Statistics', path: '/admin/statistics', icon: Activity },
+        ];
+      case 'manager':
+        return [
+          { label: 'Overview', path: '/manager/overview', icon: LayoutDashboard },
+          { label: 'Branches', path: '/manager/branches', icon: Building2 },
+          { label: 'Staff', path: '/manager/staff', icon: Users },
+          { label: 'Inventory & Products', path: '/manager/inventory', icon: Pill },
+          { label: 'Reports', path: '/manager/reports', icon: BarChart3 },
+          { label: 'Settings', path: '/manager/settings', icon: Settings },
+          { label: 'Import Data', path: '/manager/import', icon: FileText },
+          { label: 'Stock Transfers', path: '/manager/stock-transfers', icon: ArrowRightLeft },
+          { label: 'Refunds & Discounts', path: '/manager/refunds-discounts', icon: Percent },
+          { label: 'Notifications', path: '/manager/notifications', icon: Bell },
+          { label: 'POS Sales', path: '/manager/pos-sales', icon: ShoppingCart },
+        ];
+      case 'pharmacist':
+        return [
+          { label: 'Dashboard', path: '/pharmacist/overview', icon: LayoutDashboard },
+          { label: 'Inventory', path: '/pharmacist/inventory', icon: Pill },
+          { label: 'Prescriptions', path: '/pharmacist/prescriptions', icon: FileText },
+          { label: 'Stock Transfers', path: '/pharmacist/transfers', icon: ArrowRightLeft },
+          { label: 'Reports', path: '/pharmacist/reports', icon: BarChart3 },
+          { label: 'Stock Receiving', path: '/pharmacist/stock-receiving', icon: PackagePlus },
+          { label: 'Settings', path: '/pharmacist/settings', icon: Settings },
+        ];
+      case 'cashier':
+        return [
+          { label: 'Dashboard', path: '/cashier/overview', icon: LayoutDashboard },
+          { label: 'POS', path: '/cashier/pos-sales', icon: ShoppingCart },
+          { label: 'Sales History', path: '/cashier/receipts', icon: Activity },
+          { label: 'Sessions', path: '/cashier/sessions', icon: Clock },
+          { label: 'Stock Check', path: '/cashier/stock', icon: Search },
+          { label: 'Settings', path: '/cashier/settings', icon: Settings },
+        ];
+      default:
+        return [
+          { label: 'Overview', path: '/manager/overview', icon: LayoutDashboard },
+          { label: 'Staff', path: '/manager/staff', icon: Users },
+          { label: 'Inventory & Products', path: '/manager/inventory', icon: Pill },
+          { label: 'Settings', path: '/manager/settings', icon: Settings },
+        ];
+    }
   };
 
-  const navItems = roleNavItems[role] || roleNavItems.manager;
+  const navItems = getNavItems();
 
   return (
     <>
@@ -156,13 +171,13 @@ function DashboardContent({ role }) {
           <div className='flex items-center gap-4 ml-auto'>
             <div className='flex items-center gap-2'>
               <div className='w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold capitalize'>
-                {role.charAt(0)}
+                {userRole?.charAt(0)}
               </div>
               <div className='hidden md:block'>
                 <p className='text-sm font-medium text-gray-700 dark:text-gray-200 capitalize'>
-                  {role}
+                  {userRole}
                 </p>
-                <p className='text-xs text-gray-500 dark:text-gray-400'>user@pharmacare.com</p>
+                <p className='text-xs text-gray-500 dark:text-gray-400'>{user?.email}</p>
               </div>
             </div>
           </div>
@@ -182,7 +197,8 @@ function DashboardContent({ role }) {
             });
             // Add root dashboard if not present
             if (paths.length > 0 && paths[0].name.toLowerCase() !== 'dashboard') {
-              paths.unshift({ name: 'Dashboard', href: `/${role}/overview` });
+              const dashboardPath = userRole ? `/${userRole}/overview` : '/manager/overview';
+              paths.unshift({ name: 'Dashboard', href: dashboardPath });
             }
             return <Breadcrumb paths={paths} />;
           })()}
@@ -193,10 +209,10 @@ function DashboardContent({ role }) {
   );
 }
 
-export function DashboardLayout({ role = 'manager' }) {
+export function DashboardLayout() {
   return (
     <SidebarProvider>
-      <DashboardContent role={role} />
+      <DashboardContent />
     </SidebarProvider>
   );
 }

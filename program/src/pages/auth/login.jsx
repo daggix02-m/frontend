@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +16,7 @@ export function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login: authLogin } = useAuth();
 
   const validateEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -41,41 +43,54 @@ export function LoginPage() {
       console.log('LOGIN RESPONSE:', response);
 
       if (!response.success) {
-        setError(response.message || 'Login failed. Please check your credentials and try again.');
+        // Provide more specific error messages based on the response
+        let errorMessage = response.message || 'Login failed. Please check your credentials and try again.';
+        
+        // Check for CORS-related errors
+        if (errorMessage.includes('CORS') || errorMessage.includes('cross-origin')) {
+          errorMessage = 'Connection error: Unable to reach the authentication server. This may be due to network restrictions or browser security settings. Please try using a different browser or network.';
+        } else if (errorMessage.includes('Network error')) {
+          errorMessage = 'Network error: Unable to connect to the authentication server. Please check your internet connection.';
+        }
+        
+        setError(errorMessage);
         setIsLoading(false);
         return;
       }
 
-      // Determine user role from response or stored value.
-      // Admin role is now normalized to 'admin' in the login API
-      const rawRole = response.role || localStorage.getItem('userRole') || 'manager';
-      const normalizedRole = rawRole.toLowerCase();
-
-      // Check if user needs to change password (first time login)
+      // Check if user needs to change password (first time login or temporary password)
       // Backend returns "mustChangePassword" boolean
-      const isFirstTimeLogin =
-        response.mustChangePassword ||
-        response.firstTimeLogin ||
-        email.includes('new') ||
-        email.includes('first');
-
-      if (isFirstTimeLogin) {
+      if (response.mustChangePassword) {
         localStorage.setItem('requiresPasswordChange', 'true');
         navigate('/auth/change-password');
         return;
       }
 
-      // Redirect based on role - admin role is now simply 'admin'
-      if (normalizedRole === 'admin') {
+      // Update Auth Context
+      const userData = response.user || response.users;
+      const userRole = localStorage.getItem('userRole');
+
+      if (userData) {
+        authLogin({
+          id: userData.id || userData.user_id,
+          email: userData.email,
+          full_name: userData.full_name,
+          role_id: userData.role_id,
+          role: userRole
+        });
+      }
+
+      // Redirect based on role
+      if (userRole === 'admin') {
         navigate('/admin/overview');
-      } else if (normalizedRole === 'manager') {
+      } else if (userRole === 'manager') {
         navigate('/manager/overview');
-      } else if (normalizedRole === 'pharmacist') {
+      } else if (userRole === 'pharmacist') {
         navigate('/pharmacist/overview');
-      } else if (normalizedRole === 'cashier') {
+      } else if (userRole === 'cashier') {
         navigate('/cashier/overview');
       } else {
-        navigate('/manager/overview');
+        navigate('/manager/overview'); // default fallback
       }
     } catch (err) {
       setError(err.message || 'An unexpected error occurred. Please try again.');

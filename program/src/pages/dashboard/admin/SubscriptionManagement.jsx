@@ -261,49 +261,62 @@ export function SubscriptionManagement() {
           </div>
 
           <div className='grid gap-6 grid-cols-1 md:grid-cols-3'>
-            {plans.map((plan) => (
-              <Card
-                key={plan.id || plan._id}
-                className={plan.popular ? 'border-primary shadow-lg' : ''}
-              >
-                <CardHeader>
-                  <CardTitle className='flex justify-between items-center'>
-                    {plan.name}
-                    {plan.popular && (
-                      <span className='text-xs bg-primary/10 text-primary px-2 py-1 rounded-full'>
-                        Popular
-                      </span>
-                    )}
-                  </CardTitle>
-                  <CardDescription>
-                    <span className='text-3xl font-bold text-gray-900 dark:text-white'>
-                      {plan.price}
-                    </span>{' '}
-                    / month
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className='space-y-2 mb-4'>
-                    {plan.features?.map((feature, index) => (
-                      <li
-                        key={index}
-                        className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400'
-                      >
-                        <Check size={16} className='text-green-600' />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button
-                    className='w-full'
-                    variant={plan.popular ? 'default' : 'outline'}
-                    onClick={() => handleEditPlan(plan)}
-                  >
-                    Edit Plan
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+            {plans.length > 0 ? (
+              plans.map((plan) => (
+                <Card
+                  key={plan.id || plan._id}
+                  className={plan.popular ? 'border-primary shadow-lg' : ''}
+                >
+                  <CardHeader>
+                    <CardTitle className='flex justify-between items-center'>
+                      {plan.name}
+                      {plan.popular && (
+                        <span className='text-xs bg-primary/10 text-primary px-2 py-1 rounded-full'>
+                          Popular
+                        </span>
+                      )}
+                    </CardTitle>
+                    <CardDescription>
+                      <span className='text-3xl font-bold text-gray-900 dark:text-white'>
+                        {plan.price}
+                      </span>{' '}
+                      / month
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className='space-y-2 mb-4'>
+                      {plan.features?.map((feature, index) => (
+                        <li
+                          key={index}
+                          className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400'
+                        >
+                          <Check size={16} className='text-green-600' />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                    <Button
+                      className='w-full'
+                      variant={plan.popular ? 'default' : 'outline'}
+                      onClick={() => handleEditPlan(plan)}
+                    >
+                      Edit Plan
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className='col-span-full text-center py-12 text-muted-foreground bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-dashed'>
+                <p>No subscription plans found.</p>
+                <Button
+                  variant='link'
+                  onClick={() => toast.info('Create new plan functionality coming soon')}
+                  className='mt-2'
+                >
+                  Create your first plan
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}
