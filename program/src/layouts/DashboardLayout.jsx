@@ -21,6 +21,12 @@ import {
   Percent,
   PackagePlus,
   Bell,
+  UserCog,
+  DollarSign,
+  Receipt,
+  RotateCcw,
+  TrendingUp,
+  Package,
 } from 'lucide-react';
 import { logout } from '@/api/auth.api';
 import Breadcrumb from '@/components/shared/Breadcrumb';
@@ -61,14 +67,10 @@ function DashboardContent() {
     switch (userRole) {
       case 'admin':
         return [
-          { label: 'System Overview', path: '/admin/overview', icon: LayoutDashboard },
-          { label: 'Pharmacy Management', path: '/admin/pharmacies', icon: Building2 },
-          { label: 'Subscriptions', path: '/admin/subscriptions', icon: CreditCard },
-          { label: 'Global Settings', path: '/admin/settings', icon: Settings },
-          { label: 'Audit Logs', path: '/admin/audit-logs', icon: ClipboardList },
-          { label: 'Billing', path: '/admin/billing', icon: CreditCard },
-          { label: 'Support Tickets', path: '/admin/support-tickets', icon: LifeBuoy },
-          { label: 'System Statistics', path: '/admin/statistics', icon: Activity },
+          { label: 'Dashboard', path: '/admin/overview', icon: LayoutDashboard },
+          { label: 'Managers', path: '/admin/managers', icon: UserCog },
+          { label: 'Branches', path: '/admin/branches', icon: Building2 },
+          { label: 'Settings', path: '/admin/settings', icon: Settings },
         ];
       case 'manager':
         return [
@@ -79,7 +81,6 @@ function DashboardContent() {
           { label: 'Reports', path: '/manager/reports', icon: BarChart3 },
           { label: 'Settings', path: '/manager/settings', icon: Settings },
           { label: 'Import Data', path: '/manager/import', icon: FileText },
-          { label: 'Stock Transfers', path: '/manager/stock-transfers', icon: ArrowRightLeft },
           { label: 'Refunds & Discounts', path: '/manager/refunds-discounts', icon: Percent },
           { label: 'Notifications', path: '/manager/notifications', icon: Bell },
           { label: 'POS Sales', path: '/manager/pos-sales', icon: ShoppingCart },
@@ -88,19 +89,20 @@ function DashboardContent() {
         return [
           { label: 'Dashboard', path: '/pharmacist/overview', icon: LayoutDashboard },
           { label: 'Inventory', path: '/pharmacist/inventory', icon: Pill },
-          { label: 'Prescriptions', path: '/pharmacist/prescriptions', icon: FileText },
-          { label: 'Stock Transfers', path: '/pharmacist/transfers', icon: ArrowRightLeft },
-          { label: 'Reports', path: '/pharmacist/reports', icon: BarChart3 },
-          { label: 'Stock Receiving', path: '/pharmacist/stock-receiving', icon: PackagePlus },
+          { label: 'Medicines', path: '/pharmacist/medicines', icon: Package },
+          { label: 'Sale', path: '/pharmacist/sale', icon: ShoppingCart },
+          { label: 'Reports', path: '/pharmacist/medicines-reports', icon: BarChart3 },
           { label: 'Settings', path: '/pharmacist/settings', icon: Settings },
         ];
       case 'cashier':
         return [
           { label: 'Dashboard', path: '/cashier/overview', icon: LayoutDashboard },
-          { label: 'POS', path: '/cashier/pos-sales', icon: ShoppingCart },
-          { label: 'Sales History', path: '/cashier/receipts', icon: Activity },
-          { label: 'Sessions', path: '/cashier/sessions', icon: Clock },
-          { label: 'Stock Check', path: '/cashier/stock', icon: Search },
+          { label: 'POS', path: '/cashier/pos', icon: ShoppingCart },
+          { label: 'Pending Payments', path: '/cashier/payments/pending', icon: Clock },
+          { label: 'Receipts', path: '/cashier/receipts', icon: Receipt },
+          { label: 'Returns', path: '/cashier/returns', icon: RotateCcw },
+          { label: 'Transactions', path: '/cashier/transactions', icon: Activity },
+          { label: 'Sales', path: '/cashier/sales', icon: TrendingUp },
           { label: 'Settings', path: '/cashier/settings', icon: Settings },
         ];
       default:

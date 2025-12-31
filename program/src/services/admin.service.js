@@ -17,132 +17,6 @@ export const adminService = {
   },
 
   /**
-   * Get all pharmacies
-   * @param {Object} params - Query parameters (search, status)
-   * @returns {Promise}
-   */
-  async getPharmacies(params = {}) {
-    // Use the working dashboard endpoint for now as /admin/pharmacies is missing
-    return await this.getDashboardBranchesList();
-  },
-
-  /**
-   * Approve pharmacy
-   * @param {string} id - Pharmacy ID
-   * @returns {Promise}
-   */
-  async approvePharmacy(id) {
-    return await makeApiCall(`/admin/pharmacies/${id}/approve`, { method: 'PATCH' });
-  },
-
-  /**
-   * Reject pharmacy
-   * @param {string} id - Pharmacy ID
-   * @returns {Promise}
-   */
-  async rejectPharmacy(id) {
-    return await makeApiCall(`/admin/pharmacies/${id}/reject`, { method: 'PATCH' });
-  },
-
-  /**
-   * Suspend pharmacy
-   * @param {string} id - Pharmacy ID
-   * @returns {Promise}
-   */
-  async suspendPharmacy(id) {
-    return await makeApiCall(`/admin/pharmacies/${id}/suspend`, { method: 'PATCH' });
-  },
-
-  /**
-   * Reactivate pharmacy
-   * @param {string} id - Pharmacy ID
-   * @returns {Promise}
-   */
-  async reactivatePharmacy(id) {
-    return await makeApiCall(`/admin/pharmacies/${id}/reactivate`, { method: 'PATCH' });
-  },
-
-  /**
-   * Get all subscriptions
-   * @param {Object} params - Query parameters (search, status)
-   * @returns {Promise}
-   */
-  async getSubscriptions(params = {}) {
-    // Return empty success response for now as endpoint is missing
-    return { success: true, data: [] };
-  },
-
-  /**
-   * Update subscription
-   * @param {string} id - Subscription ID
-   * @param {Object} data - Subscription data
-   * @returns {Promise}
-   */
-  async updateSubscription(id, data) {
-    return await makeApiCall(`/admin/subscriptions/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
-  },
-
-  /**
-   * Get billing issues
-   * @param {Object} params - Query parameters (status, search)
-   * @returns {Promise}
-   */
-  async getBillingIssues(params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    const endpoint = queryString ? `/admin/billing?${queryString}` : '/admin/billing';
-    return await makeApiCall(endpoint, { method: 'GET' });
-  },
-
-  /**
-   * Resolve billing issue
-   * @param {string} id - Issue ID
-   * @returns {Promise}
-   */
-  async resolveBillingIssue(id) {
-    return await makeApiCall(`/admin/billing/${id}/resolve`, { method: 'PATCH' });
-  },
-
-  /**
-   * Get support tickets
-   * @param {Object} params - Query parameters (status, priority, search)
-   * @returns {Promise}
-   */
-  async getSupportTickets(params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    const endpoint = queryString
-      ? `/admin/support-tickets?${queryString}`
-      : '/admin/support-tickets';
-    return await makeApiCall(endpoint, { method: 'GET' });
-  },
-
-  /**
-   * Update support ticket
-   * @param {string} id - Ticket ID
-   * @param {Object} data - Ticket data (status, response, etc.)
-   * @returns {Promise}
-   */
-  async updateSupportTicket(id, data) {
-    return await makeApiCall(`/admin/support-tickets/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
-  },
-
-  /**
-   * Get system statistics
-   * (If your backend exposes specific dashboard stats endpoints like
-   * /api/admin/dashboard/branches, /users, /sales, /branches-list, you can
-   * either use this method for a combined response or the dedicated helpers below.)
-   * @returns {Promise}
-   */
-  async getSystemStatistics() {
-    return await makeApiCall('/admin/statistics', { method: 'GET' });
-  },
-
-  /**
    * Dashboard helpers matching backend format:
    * GET /api/admin/dashboard/branches      - total branches count
    * GET /api/admin/dashboard/users         - total users count
@@ -203,16 +77,6 @@ export const adminService = {
   },
 
   /**
-   * Get audit logs
-   * @param {Object} params - Query parameters (search, action, user, dateFrom, dateTo)
-   * @returns {Promise}
-   */
-  async getAuditLogs(params = {}) {
-    // Return empty success response for now as endpoint is missing
-    return { success: true, data: [] };
-  },
-
-  /**
    * Get sales data for live dashboard
    * @returns {Promise}
    */
@@ -220,60 +84,15 @@ export const adminService = {
     return await makeApiCall('/admin/sales-data', { method: 'GET' });
   },
 
-  /**
-   * Get transactions
-   * @param {Object} params - Query parameters (limit, page)
-   * @returns {Promise}
-   */
-  async getTransactions(params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    const endpoint = queryString ? `/admin/transactions?${queryString}` : '/admin/transactions';
-    return await makeApiCall(endpoint, { method: 'GET' });
-  },
-
-  /**
-   * Get platform settings
-   * @returns {Promise}
-   */
-  async getPlatformSettings() {
-    return await makeApiCall('/admin/platform-settings', { method: 'GET' });
-  },
-
-  /**
-   * Update platform settings
-   * @param {Object} settingsData - Updated settings data
-   * @returns {Promise}
-   */
-  async updatePlatformSettings(settingsData) {
-    return await makeApiCall('/admin/platform-settings', {
-      method: 'PUT',
-      body: JSON.stringify(settingsData),
-    });
-  },
-
-  /**
-   * Assign subscription to user
-   * @param {string} userId - User ID
-   * @param {Object} subscriptionData - Subscription assignment data
-   * @returns {Promise}
-   */
-  async assignUserSubscription(userId, subscriptionData) {
-    return await makeApiCall(`/admin/users/${userId}/subscription`, {
-      method: 'POST',
-      body: JSON.stringify(subscriptionData),
-    });
-  },
-
-  /**
-   * Get user subscription details
-   * @param {string} userId - User ID
-   * @returns {Promise}
-   */
-  async getUserSubscription(userId) {
-    return await makeApiCall(`/admin/users/${userId}/subscription`, {
-      method: 'GET',
-    });
-  },
+  // REMOVED ENDPOINTS (not supported by backend):
+  // - /admin/pharmacies
+  // - /admin/subscriptions
+  // - /admin/billing
+  // - /admin/support-tickets
+  // - /admin/statistics
+  // - /admin/transactions
+  // - /admin/platform-settings
+  // - /admin/audit-logs
 };
 
 export default adminService;

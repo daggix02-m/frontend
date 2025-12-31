@@ -14,131 +14,84 @@ import { managerService } from '@/services/manager.service';
 import { toast } from 'sonner';
 
 import { LiveSalesDashboard } from '@/components/dashboard/LiveSalesDashboard';
-import { LowStockAlert } from './components/LowStockAlert';
-import { NearToExpireAlert } from './components/NearToExpireAlert';
 import { QuickActionsCard } from './components/QuickActionsCard';
-import { BranchPerformanceCard } from './components/BranchPerformanceCard';
-import PendingStockTransfersCard from '@/components/dashboard/PendingStockTransfersCard';
 
 export function Overview() {
   const navigate = useNavigate();
   const [metrics, setMetrics] = useState({
     todayRevenue: 0,
     revenueChange: 0,
+    totalStaff: 0,
     activeStaff: 0,
-    pendingApprovals: 0,
-    branchHealth: 'Loading...',
+    inactiveStaff: 0,
+    totalMedicines: 0,
+    lowStockCount: 0,
+    expiredCount: 0,
   });
-  const [pendingStockTransfers, setPendingStockTransfers] = useState([]);
-  const [recentRefunds, setRecentRefunds] = useState([]);
-  const [branches, setBranches] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
+        setError(null);
 
-        // Fetch all necessary data in parallel
-        const [overviewData, stockTransfersData, branchesData] = await Promise.allSettled([
-          managerService.getOverview(),
-          managerService.getStockTransfers(),
-          managerService.getBranches(),
-        ]);
+        // Fetch manager dashboard data
+        const response = await managerService.getOverview();
 
-        if (overviewData.status === 'fulfilled' && overviewData.value.success) {
+        if (response.success) {
+          const data = response.data || response;
+          
           setMetrics({
-            todayRevenue: overviewData.value.revenue || overviewData.value.todayRevenue || 0,
-            revenueChange: overviewData.value.revenueChange || 0,
-            activeStaff: overviewData.value.activeStaff || 0,
-            pendingApprovals: overviewData.value.pendingApprovals || 0,
-            branchHealth: overviewData.value.branchHealth || 'Good',
+            todayRevenue: data.todayRevenue || data.revenue || 0,
+            revenueChange: data.revenueChange || 0,
+            totalStaff: data.totalStaff || 0,
+            activeStaff: data.activeStaff || 0,
+            inactiveStaff: data.inactiveStaff || 0,
+            totalMedicines: data.totalMedicines || 0,
+            lowStockCount: data.lowStockCount || 0,
+            expiredCount: data.expiredCount || 0,
           });
+
+          // Fetch notifications separately
+          const notificationsResponse = await managerService.getNotifications();
+          if (notificationsResponse.success) {
+            const notificationsList = notificationsResponse.data || notificationsResponse.notifications || [];
+            setNotifications(Array.isArray(notificationsList) ? notificationsList.slice(0, 5) : []);
+          }
         } else {
           // Set defaults for failed response
           setMetrics({
             todayRevenue: 0,
             revenueChange: 0,
+            totalStaff: 0,
             activeStaff: 0,
-            pendingApprovals: 0,
-            branchHealth: 'Good',
+            inactiveStaff: 0,
+            totalMedicines: 0,
+            lowStockCount: 0,
+            expiredCount: 0,
           });
+          setError(response.message || 'Failed to load dashboard data');
+          toast.error(response.message || 'Failed to load dashboard data');
         }
-
-        if (stockTransfersData.status === 'fulfilled' && stockTransfersData.value.success) {
-          // Format stock transfers data to match the expected structure
-          const transfers = stockTransfersData.value.data || stockTransfersData.value;
-
-          const formattedTransfers = Array.isArray(transfers)
-            ? transfers
-                .map((transfer) => ({
-                  id: transfer.id || transfer._id,
-                  title: `${transfer.productName || transfer.name || ''} - ${transfer.quantity || 0} units`,
-                  subtitle: `From ${transfer.sourceBranch || 'Unknown'} to ${transfer.destinationBranch || 'Unknown'}`,
-                  badge: transfer.status === 'urgent' ? 'Urgent' : transfer.status || 'Pending',
-                  badgeVariant: transfer.status === 'urgent' ? 'destructive' : 'secondary',
-                }))
-                .slice(0, 3) // Limit to 3 for the dashboard
-            : [];
-
-          setPendingStockTransfers(formattedTransfers);
-        }
-
-        if (branchesData.status === 'fulfilled' && branchesData.value.success) {
-          // Format branches data to match the expected structure
-          const branchesList = branchesData.value.data || branchesData.value;
-
-          const formattedBranches = Array.isArray(branchesList)
-            ? branchesList
-                .map((branch) => ({
-                  id: branch.id || branch._id,
-                  branchName: branch.name || branch.branchName || 'Unknown',
-                  location: branch.address || branch.location || 'Unknown',
-                  revenue: branch.revenue || 0,
-                  salesCount: branch.salesCount || branch.saleCount || 0,
-                  inventoryStatus: branch.inventoryStatus || 'healthy',
-                  revenueChange: branch.revenueChange || 0,
-                }))
-                .slice(0, 3) // Limit to 3 for the dashboard
-            : [];
-
-          setBranches(formattedBranches);
-        }
-
-        // Fetch refunds data
-        const refundsResponse = await managerService.getRefunds({ limit: 2 });
-        if (refundsResponse && refundsResponse.success) {
-          const refunds = refundsResponse.data || refundsResponse.refunds || [];
-          const formattedRefunds = Array.isArray(refunds)
-            ? refunds
-                .map((refund) => ({
-                  id: refund.id || refund._id,
-                  title: `${refund.type === 'refund' ? 'Refund' : 'Discount'} Request - ETB ${refund.amount || 0}`,
-                  subtitle: `${refund.customer || 'Customer'} - ${refund.reason || 'No reason'}`,
-                  badge: refund.status || 'New',
-                  badgeVariant: refund.status === 'new' ? 'default' : 'secondary',
-                }))
-                .slice(0, 2)
-            : [];
-          setRecentRefunds(formattedRefunds);
-        } else {
-          setRecentRefunds([]);
-        }
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-        toast.error('Failed to load dashboard data.');
-
-        // Set default values in case of error
+      } catch (err) {
+        console.error('Error fetching manager dashboard data:', err);
+        setError(err.message || 'Failed to load dashboard data');
+        toast.error('Failed to load dashboard data');
+        
+        // Set default values on error
         setMetrics({
           todayRevenue: 0,
           revenueChange: 0,
+          totalStaff: 0,
           activeStaff: 0,
-          pendingApprovals: 0,
-          branchHealth: 'Good',
+          inactiveStaff: 0,
+          totalMedicines: 0,
+          lowStockCount: 0,
+          expiredCount: 0,
         });
-        setPendingStockTransfers([]);
-        setBranches([]);
-        setRecentRefunds([]);
       } finally {
         setLoading(false);
       }
@@ -147,21 +100,82 @@ export function Overview() {
     fetchDashboardData();
   }, []);
 
-  const handleStockTransferClick = (item) => {
-    navigate('/manager/stock-transfer-approval');
+  const handleStaffClick = () => {
+    navigate('/manager/staff-management');
   };
 
-  const handleRefundClick = (item) => {
-    navigate('/manager/refunds-discounts');
+  const handleMedicinesClick = () => {
+    navigate('/manager/inventory-management');
   };
 
-  const handleBranchClick = (branch) => {
-    navigate('/manager/branch-management');
+  const handleNotificationsClick = () => {
+    navigate('/manager/notifications');
   };
+
+  const metricCards = [
+    {
+      title: "Today's Revenue",
+      value: `ETB ${metrics.todayRevenue.toLocaleString()}`,
+      icon: DollarSign,
+      color: "text-green-600"
+    },
+    {
+      title: "Revenue Change",
+      value: `${metrics.revenueChange > 0 ? '+' : ''}${metrics.revenueChange}%`,
+      icon: TrendingUp,
+      color: metrics.revenueChange >= 0 ? "text-green-600" : "text-red-600"
+    },
+    {
+      title: "Total Staff",
+      value: metrics.totalStaff,
+      icon: Users,
+      color: "text-blue-600"
+    },
+    {
+      title: "Active Staff",
+      value: metrics.activeStaff,
+      icon: Users,
+      color: "text-green-600"
+    },
+    {
+      title: "Total Medicines",
+      value: metrics.totalMedicines,
+      icon: PackageCheck,
+      color: "text-purple-600"
+    },
+    {
+      title: "Low Stock Items",
+      value: metrics.lowStockCount,
+      icon: FileText,
+      color: "text-yellow-600"
+    },
+    {
+      title: "Expired Items",
+      value: metrics.expiredCount,
+      icon: FileText,
+      color: "text-red-600"
+    },
+  ];
+
+  if (error) {
+    return (
+      <div className='space-y-6 p-4 md:p-8'>
+        <div className='space-y-2'>
+          <h2 className='text-3xl font-bold tracking-tight text-red-600'>Error Loading Dashboard</h2>
+          <p className='text-muted-foreground'>{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className='px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90'
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-6 p-4 md:p-8'>
-      {}
       <div className='space-y-2'>
         <h2 className='text-3xl font-bold tracking-tight'>Manager Dashboard</h2>
         <p className='text-muted-foreground'>
@@ -175,116 +189,76 @@ export function Overview() {
         </div>
       ) : (
         <>
-          {}
-          <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5'>
-            <Card>
-              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
-                <CardTitle className='text-sm font-medium'>Total Revenue</CardTitle>
-                <DollarSign className='h-4 w-4 text-muted-foreground' />
+          {/* Metric Cards */}
+          <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'>
+            {metricCards.map((metric, index) => {
+              const Icon = metric.icon;
+              return (
+                <Card key={index}>
+                  <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
+                    <CardTitle className='text-sm font-medium'>{metric.title}</CardTitle>
+                    <Icon className={`h-4 w-4 ${metric.color}`} />
+                  </CardHeader>
+                  <CardContent className='px-6 pb-6'>
+                    <div className='text-2xl font-bold'>{metric.value}</div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          {/* Notifications */}
+          {notifications.length > 0 && (
+            <Card className='mt-4'>
+              <CardHeader>
+                <CardTitle>Recent Notifications</CardTitle>
               </CardHeader>
-              <CardContent className='px-6 pb-6'>
-                <div className='text-2xl font-bold'>
-                  ETB {metrics.todayRevenue.toLocaleString()}
+              <CardContent>
+                <div className='space-y-2'>
+                  {notifications.map((notification, index) => (
+                    <div key={index} className='flex items-start gap-3 p-3 border-b last:border-0'>
+                      <div className={`flex-shrink-0 w-2 h-2 rounded-full ${
+                        notification.type === 'error' ? 'bg-red-100' :
+                        notification.type === 'warning' ? 'bg-yellow-100' :
+                        'bg-blue-100'
+                      }`}></div>
+                      <div className='flex-1'>
+                        <p className='text-sm font-medium'>{notification.title}</p>
+                        <p className='text-xs text-muted-foreground'>{notification.message}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <p className='text-xs text-muted-foreground flex items-center gap-1 mt-1'>
-                  <TrendingUp className='h-3 w-3 text-green-600' />
-                  <span className='text-green-600'>+{metrics.revenueChange}%</span> from yesterday
-                </p>
               </CardContent>
             </Card>
+          )}
 
-            <Card>
-              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
-                <CardTitle className='text-sm font-medium'>Active Staff</CardTitle>
-                <Users className='h-4 w-4 text-muted-foreground' />
-              </CardHeader>
-              <CardContent className='px-6 pb-6'>
-                <div className='text-2xl font-bold'>{metrics.activeStaff}</div>
-                <p className='text-xs text-muted-foreground'>Currently on duty</p>
-              </CardContent>
-            </Card>
+          {/* Quick Actions */}
+          <QuickActionsCard
+            title='Quick Actions'
+            actions={[
+              {
+                label: 'Manage Staff',
+                icon: Users,
+                onClick: handleStaffClick,
+                color: 'bg-blue-50 text-blue-700 border-blue-200'
+              },
+              {
+                label: 'Manage Medicines',
+                icon: PackageCheck,
+                onClick: handleMedicinesClick,
+                color: 'bg-purple-50 text-purple-700 border-purple-200'
+              },
+              {
+                label: 'View Notifications',
+                icon: ClipboardCheck,
+                onClick: handleNotificationsClick,
+                color: notifications.length > 0 ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-gray-50 text-gray-700 border-gray-200'
+              },
+            ]}
+          />
 
-            <Card>
-              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
-                <CardTitle className='text-sm font-medium'>Pending Approvals</CardTitle>
-                <ClipboardCheck className='h-4 w-4 text-muted-foreground' />
-              </CardHeader>
-              <CardContent className='px-6 pb-6'>
-                <div className='text-2xl font-bold'>{metrics.pendingApprovals}</div>
-                <p className='text-xs text-muted-foreground'>Require your attention</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
-                <CardTitle className='text-sm font-medium'>Branch Health</CardTitle>
-                <Store className='h-4 w-4 text-muted-foreground' />
-              </CardHeader>
-              <CardContent className='px-6 pb-6'>
-                <div className='text-2xl font-bold text-green-600'>{metrics.branchHealth}</div>
-                <p className='text-xs text-muted-foreground'>Overall performance</p>
-              </CardContent>
-            </Card>
-
-            {/* Pending Stock Transfers Card */}
-            <PendingStockTransfersCard />
-          </div>
-
-          {}
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-            <QuickActionsCard
-              title='Pending Stock Transfers'
-              icon={PackageCheck}
-              items={pendingStockTransfers}
-              emptyMessage='No pending stock transfers'
-              onItemClick={handleStockTransferClick}
-              onViewAll={() => navigate('/manager/stock-transfer-approval')}
-              viewAllText='View All Transfers'
-              badgeColor='bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800'
-              iconColor='text-blue-700 dark:text-blue-500'
-            />
-
-            <QuickActionsCard
-              title='Recent Refund Requests'
-              icon={FileText}
-              items={recentRefunds}
-              emptyMessage='No refund requests'
-              onItemClick={handleRefundClick}
-              onViewAll={() => navigate('/manager/refunds-discounts')}
-              viewAllText='View All Requests'
-              badgeColor='bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800'
-              iconColor='text-purple-700 dark:text-purple-500'
-            />
-          </div>
-
-          {}
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-            <LowStockAlert />
-            <NearToExpireAlert />
-          </div>
-
-          {}
-          <div className='space-y-4'>
-            <div className='flex items-center justify-between'>
-              <h3 className='text-xl font-semibold'>Branch Performance</h3>
-            </div>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-              {branches.map((branch) => (
-                <BranchPerformanceCard
-                  key={branch.id}
-                  branchName={branch.branchName}
-                  location={branch.location}
-                  revenue={branch.revenue}
-                  salesCount={branch.salesCount}
-                  inventoryStatus={branch.inventoryStatus}
-                  revenueChange={branch.revenueChange}
-                  onClick={() => handleBranchClick(branch)}
-                />
-              ))}
-            </div>
-          </div>
-
-          {}
+          {/* Live Sales Dashboard */}
           <LiveSalesDashboard />
         </>
       )}

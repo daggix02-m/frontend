@@ -3,11 +3,6 @@ import {
   getPharmacistMedicines,
   getPharmacistSales,
   getPharmacistReports,
-  getPharmacistPrescriptions,
-  validatePrescription,
-  dispensePrescription,
-  getPharmacistStockTransfers,
-  requestPharmacistStockTransfer
 } from '../api/dashboard.api';
 import { makeApiCall } from '../api/apiClient';
 
@@ -35,15 +30,155 @@ export const pharmacistService = {
   },
 
   /**
-   * Update product stock level
-   * @param {string} id - Product ID
-   * @param {number} stock - New stock level
+   * Search medicines
+   * Matches backend: GET /api/pharmacist/medicines/search
+   * @param {string} query - Search query
    * @returns {Promise}
    */
-  async updateStock(id, stock) {
+  async searchMedicines(query) {
+    return await makeApiCall(`/pharmacist/medicines/search?q=${encodeURIComponent(query)}`, { method: 'GET' });
+  },
+
+  /**
+   * Get medicines by category
+   * Matches backend: GET /api/pharmacist/medicines/category/:category_id
+   * @param {string} categoryId - Category ID
+   * @returns {Promise}
+   */
+  async getMedicinesByCategory(categoryId) {
+    return await makeApiCall(`/pharmacist/medicines/category/${categoryId}`, { method: 'GET' });
+  },
+
+  /**
+   * Get medicine by ID
+   * Matches backend: GET /api/pharmacist/medicines/:medicine_id
+   * @param {string} medicineId - Medicine ID
+   * @returns {Promise}
+   */
+  async getMedicineById(medicineId) {
+    return await makeApiCall(`/pharmacist/medicines/${medicineId}`, { method: 'GET' });
+  },
+
+  /**
+   * Request restock
+   * Matches backend: POST /api/pharmacist/inventory/request-restock
+   * @param {Object} restockData - Restock data { medicine_id, quantity, notes }
+   * @returns {Promise}
+   */
+  async requestRestock(restockData) {
+    return await makeApiCall('/pharmacist/inventory/request-restock', {
+      method: 'POST',
+      body: JSON.stringify(restockData),
+    });
+  },
+
+  /**
+   * Mark low stock
+   * Matches backend: POST /api/pharmacist/inventory/mark-low-stock
+   * @param {Object} lowStockData - Low stock data { medicine_id, threshold, notes }
+   * @returns {Promise}
+   */
+  async markLowStock(lowStockData) {
+    return await makeApiCall('/pharmacist/inventory/mark-low-stock', {
+      method: 'POST',
+      body: JSON.stringify(lowStockData),
+    });
+  },
+
+  /**
+   * Get stock history
+   * Matches backend: GET /api/pharmacist/inventory/stock-history
+   * @returns {Promise}
+   */
+  async getStockHistory() {
+    return await makeApiCall('/pharmacist/inventory/stock-history', { method: 'GET' });
+  },
+
+  /**
+   * Update medicine stock
+   * Matches backend: PUT /api/pharmacist/medicines/:medicine_id/stock
+   * @param {string} medicineId - Medicine ID
+   * @param {Object} stockData - Stock data { action, quantity_change }
+   * @returns {Promise}
+   */
+  async updateMedicineStock(medicineId, stockData) {
+    return await makeApiCall(`/pharmacist/medicines/${medicineId}/stock`, {
+      method: 'PUT',
+      body: JSON.stringify(stockData),
+    });
+  },
+
+  /**
+   * Delete medicine
+   * Matches backend: DELETE /api/pharmacist/medicines/:medicine_id
+   * @param {string} medicineId - Medicine ID
+   * @returns {Promise}
+   */
+  async deleteMedicine(medicineId) {
+    return await makeApiCall(`/pharmacist/medicines/${medicineId}`, { method: 'DELETE' });
+  },
+
+  /**
+   * Create sale
+   * Matches backend: POST /api/pharmacist/sales
+   * @param {Object} saleData - Sale data { items, subtotal, discount, total, payment_method }
+   * @returns {Promise}
+   */
+  async createSale(saleData) {
+    return await makeApiCall('/pharmacist/sales', {
+      method: 'POST',
+      body: JSON.stringify(saleData),
+    });
+  },
+
+  /**
+   * Get sale by ID
+   * Matches backend: GET /api/pharmacist/sales/:sale_id
+   * @param {string} saleId - Sale ID
+   * @returns {Promise}
+   */
+  async getSaleById(saleId) {
+    return await makeApiCall(`/pharmacist/sales/${saleId}`, { method: 'GET' });
+  },
+
+  /**
+   * Get low stock report
+   * Matches backend: GET /api/pharmacist/reports/low-stock
+   * @returns {Promise}
+   */
+  async getLowStockReport() {
+    return await makeApiCall('/pharmacist/reports/low-stock', { method: 'GET' });
+  },
+
+  /**
+   * Get expiry report
+   * Matches backend: GET /api/pharmacist/reports/expiry
+   * @returns {Promise}
+   */
+  async getExpiryReport() {
+    return await makeApiCall('/pharmacist/reports/expiry', { method: 'GET' });
+  },
+
+  /**
+   * Get inventory summary report
+   * Matches backend: GET /api/pharmacist/reports/inventory-summary
+   * @returns {Promise}
+   */
+  async getInventorySummaryReport() {
+    return await makeApiCall('/pharmacist/reports/inventory-summary', { method: 'GET' });
+  },
+
+  /**
+   * Update product stock level
+   * Matches backend: PUT /api/pharmacist/inventory/:id
+   * @param {string} id - Product ID
+   * @param {number} quantityInStock - New stock level
+   * @returns {Promise}
+   */
+  async updateStock(id, quantityInStock) {
     return await makeApiCall(`/pharmacist/inventory/${id}`, {
       method: 'PUT',
-      body: JSON.stringify({ stock }),
+      body: JSON.stringify({ quantity_in_stock: quantityInStock }),
     });
   },
 
@@ -80,64 +215,24 @@ export const pharmacistService = {
   },
 
   /**
-   * Get prescriptions
-   * @param {Object} params - Query parameters (status)
+   * Process a sale transaction
+   * Matches backend: POST /api/pharmacist/sales
+   * @param {Object} saleData - Sale data (items, subtotal, discount, total, payment_method)
    * @returns {Promise}
    */
-  async getPrescriptions(params = {}) {
-    return await getPharmacistPrescriptions();
+  async processSale(saleData) {
+    return await makeApiCall('/pharmacist/sales', {
+      method: 'POST',
+      body: JSON.stringify(saleData),
+    });
   },
 
   /**
-   * Validate prescription
-   * @param {string} id - Prescription ID
+   * Get sales data
    * @returns {Promise}
    */
-  async validatePrescription(id) {
-    return await validatePrescription(id);
-  },
-
-  /**
-   * Dispense prescription
-   * @param {string} id - Prescription ID
-   * @returns {Promise}
-   */
-  async dispensePrescription(id) {
-    return await dispensePrescription(id);
-  },
-
-  /**
-   * Get expected deliveries
-   * @returns {Promise}
-   */
-  async getDeliveries() {
-    return await makeApiCall('/pharmacist/deliveries', { method: 'GET' });
-  },
-
-  /**
-   * Mark delivery as received
-   * @param {string} id - Delivery ID
-   * @returns {Promise}
-   */
-  async receiveDelivery(id) {
-    return await makeApiCall(`/pharmacist/deliveries/${id}/receive`, { method: 'PATCH' });
-  },
-
-  /**
-   * Request stock transfer
-   * @param {Object} transferData - Transfer data (fromBranch, toBranch, items)
-   * @returns {Promise}
-   */
-  async requestStockTransfer(transferData) {
-    return await requestPharmacistStockTransfer(transferData);
-  },
-
-  /**
-   * Get stock transfer history
-   * @returns {Promise}
-   */
-  async getStockTransfers() {
-    return await getPharmacistStockTransfers();
+  async getSales() {
+    return await getPharmacistSales();
   },
 
   /**
@@ -145,33 +240,14 @@ export const pharmacistService = {
    * @returns {Promise}
    */
   async getReports() {
-    return await makeApiCall('/pharmacist/reports', { method: 'GET' });
+    return await getPharmacistReports();
   },
 
-  /**
-   * Get drug interaction alerts
-   * @returns {Promise}
-   */
-  async getAlerts() {
-    return await makeApiCall('/pharmacist/alerts', { method: 'GET' });
-  },
-
-  /**
-   * Get receipts
-   * @returns {Promise}
-   */
-  async getReceipts() {
-    return await makeApiCall('/pharmacist/receipts', { method: 'GET' });
-  },
-
-  /**
-   * Get delivery items
-   * @param {string} id - Delivery ID
-   * @returns {Promise}
-   */
-  async getDeliveryItems(id) {
-    return await makeApiCall(`/pharmacist/deliveries/${id}/items`, { method: 'GET' });
-  },
+  // REMOVED ENDPOINTS (not supported by backend):
+  // - /pharmacist/prescriptions
+  // - /pharmacist/deliveries
+  // - /pharmacist/alerts
+  // - /pharmacist/receipts
 };
 
 export default pharmacistService;

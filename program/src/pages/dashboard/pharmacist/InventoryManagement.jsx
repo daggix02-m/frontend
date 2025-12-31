@@ -44,10 +44,10 @@ export function InventoryManagement() {
               id: item.id || item._id,
               name: item.name || item.product_name || 'Unknown',
               category: item.category || 'General',
-              stock: item.stock || item.quantity || 0,
+              stock: item.quantity_in_stock || item.stock || item.quantity || 0,
               minStock: item.minStock || item.min_stock || item.minimum_stock || 100,
               expiryDate:
-                item.expiryDate || item.expiry_date || item.expiration_date || '2026-12-31',
+                item.expiry_date || item.expiryDate || item.expiration_date || '2026-12-31',
               location: item.location || item.shelf_location || 'N/A',
             }))
           : [];

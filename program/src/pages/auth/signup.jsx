@@ -17,6 +17,8 @@ import {
   MapPinIcon,
   CheckCircleIcon,
   UserRoundIcon,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 
 // Step 1 - Manager Information Component
@@ -28,6 +30,9 @@ const Step1ManagerInfo = () => {
     goToNextStep,
     validateCurrentStep,
   } = useSignupStore();
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const canProceed = validateCurrentStep(1, false);
 
@@ -77,12 +82,19 @@ const Step1ManagerInfo = () => {
           value={managerInfo.password}
           onChange={(e) => setManagerInfo('password', e.target.value)}
           placeholder='Password'
-          type='password'
+          type={showPassword ? 'text' : 'password'}
           className={`peer ps-9 ${errors.password ? 'border-red-500' : ''}`}
         />
         <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
           <LockIcon className='size-4' aria-hidden='true' />
         </div>
+        <button
+          type='button'
+          onClick={() => setShowPassword(!showPassword)}
+          className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground'
+        >
+          {showPassword ? <EyeOff className='size-4' /> : <Eye className='size-4' />}
+        </button>
       </div>
       {errors.password && (
         <p className='text-red-500 text-xs'>{errors.password}</p>
@@ -94,12 +106,19 @@ const Step1ManagerInfo = () => {
           value={managerInfo.confirmPassword}
           onChange={(e) => setManagerInfo('confirmPassword', e.target.value)}
           placeholder='Confirm Password'
-          type='password'
+          type={showConfirmPassword ? 'text' : 'password'}
           className={`peer ps-9 ${errors.confirmPassword ? 'border-red-500' : ''}`}
         />
         <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
           <LockIcon className='size-4' aria-hidden='true' />
         </div>
+        <button
+          type='button'
+          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground'
+        >
+          {showConfirmPassword ? <EyeOff className='size-4' /> : <Eye className='size-4' />}
+        </button>
       </div>
       {errors.confirmPassword && (
         <p className='text-red-500 text-xs'>{errors.confirmPassword}</p>

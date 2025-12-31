@@ -6,6 +6,7 @@ import React, {
   useContext,
   createContext,
   forwardRef,
+  useRef,
 } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva } from 'class-variance-authority';
@@ -183,7 +184,6 @@ const Sidebar = forwardRef(
         data-variant={variant}
         data-side={side}
       >
-        {}
         <div
           className={cn(
             'duration-200 relative h-svh w-[--sidebar-width] bg-transparent transition-[width] ease-linear',

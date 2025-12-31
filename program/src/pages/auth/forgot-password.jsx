@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import FloatingPaths from '@/components/shared/FloatingPaths';
-import { ChevronLeftIcon, AtSignIcon } from 'lucide-react';
+import { ChevronLeftIcon, AtSignIcon, AlertCircle, CheckCircle2, Info } from 'lucide-react';
 import { forgotPassword } from '@/api/auth.api';
 
 export function ForgotPasswordPage() {
@@ -12,6 +12,8 @@ export function ForgotPasswordPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [verificationCode, setVerificationCode] = useState(null);
+  const [isDevelopmentMode, setIsDevelopmentMode] = useState(false);
 
   const validateEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -21,6 +23,8 @@ export function ForgotPasswordPage() {
     e.preventDefault();
     setError('');
     setSuccess('');
+    setVerificationCode(null);
+    setIsDevelopmentMode(false);
 
     if (!email.trim()) {
       setError('Email is required');
@@ -37,14 +41,42 @@ export function ForgotPasswordPage() {
     try {
       const response = await forgotPassword(email);
 
-      if (response.success) {
+      // Check if email service is unavailable (503 error or service unavailable message)
+      if (response.message && (
+        response.message.includes('503') ||
+        response.message.toLowerCase().includes('service unavailable') ||
+        response.message.toLowerCase().includes('email service') ||
+        response.message.toLowerCase().includes('smtp')
+      )) {
+        setError('Email service is not configured. Please contact your administrator to reset your password.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Check if backend returned a verification code (development mode)
+      if (response.verificationCode || response.code || response.verification_code) {
+        const code = response.verificationCode || response.code || response.verification_code;
+        setVerificationCode(code);
+        setIsDevelopmentMode(true);
+        setSuccess(`Password reset code generated (Development Mode): ${code}`);
+        setEmail('');
+      } else if (response.success) {
         setSuccess('Password reset link has been sent to your email address.');
         setEmail('');
       } else {
         setError(response.message || 'Failed to send reset link. Please try again.');
       }
     } catch (err) {
-      setError(err.message || 'An unexpected error occurred. Please try again.');
+      // Handle 503 Service Unavailable error
+      if (err.message && (
+        err.message.includes('503') ||
+        err.message.toLowerCase().includes('service unavailable') ||
+        err.message.toLowerCase().includes('email service')
+      )) {
+        setError('Email service is not configured. Please contact your administrator to reset your password.');
+      } else {
+        setError(err.message || 'An unexpected error occurred. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -110,13 +142,44 @@ export function ForgotPasswordPage() {
               </div>
             </div>
 
-            {error && <p className='text-red-500 text-sm'>{error}</p>}
-            {success && <p className='text-green-500 text-sm'>{success}</p>}
+            {error && (
+              <div className='flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg'>
+                <AlertCircle className='size-4 text-red-600 mt-0.5 flex-shrink-0' />
+                <p className='text-red-700 text-sm'>{error}</p>
+              </div>
+            )}
+            
+            {success && (
+              <div className='flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg'>
+                <CheckCircle2 className='size-4 text-green-600 mt-0.5 flex-shrink-0' />
+                <p className='text-green-700 text-sm'>{success}</p>
+              </div>
+            )}
+
+            {isDevelopmentMode && verificationCode && (
+              <div className='flex items-start gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg'>
+                <Info className='size-4 text-blue-600 mt-0.5 flex-shrink-0' />
+                <div className='flex-1'>
+                  <p className='text-blue-700 text-sm font-medium mb-1'>Development Mode</p>
+                  <p className='text-blue-600 text-xs'>Use this code to reset your password:</p>
+                  <code className='block mt-2 p-2 bg-white border border-blue-300 rounded text-blue-800 font-mono text-sm'>
+                    {verificationCode}
+                  </code>
+                </div>
+              </div>
+            )}
 
             <Button type='submit' className='w-full' disabled={isLoading}>
               {isLoading ? 'Sending...' : 'Send Reset Link'}
             </Button>
           </form>
+
+          <div className='mt-6 p-4 bg-muted/50 rounded-lg border border-border'>
+            <p className='text-xs text-muted-foreground'>
+              <strong>Having trouble?</strong> If you don't receive the email within a few minutes,
+              please check your spam folder or contact your administrator for assistance.
+            </p>
+          </div>
         </div>
       </div>
     </main>

@@ -6,46 +6,41 @@ import { SignupPage } from './pages/auth/signup';
 import { ForgotPasswordPage } from './pages/auth/forgot-password';
 import { ResetPasswordPage } from './pages/auth/reset-password';
 import { ChangePasswordPage } from './pages/auth/change-password';
-import { VerifyEmailPage } from './pages/auth/verify-email'; // New page to be created
+import { VerifyEmailPage } from './pages/auth/verify-email';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { Overview } from './pages/dashboard/manager/Overview';
-import { BranchManagement } from './pages/dashboard/manager/BranchManagement';
 import { StaffManagement } from './pages/dashboard/manager/StaffManagement';
 import { ImportData } from './pages/dashboard/manager/ImportData';
 import { InventoryManagement } from './pages/dashboard/manager/InventoryManagement';
-import { Reports } from './pages/dashboard/manager/Reports';
 import { Settings } from './pages/dashboard/manager/Settings';
 import { Settings as PharmacistSettings } from './pages/dashboard/pharmacist/Settings';
 import { Settings as CashierSettings } from './pages/dashboard/cashier/Settings';
 import { AdminOverview } from './pages/dashboard/admin/AdminOverview';
-import { PharmacyManagement } from './pages/dashboard/admin/PharmacyManagement';
-import { SubscriptionManagement } from './pages/dashboard/admin/SubscriptionManagement';
-import { AuditLogs } from './pages/dashboard/admin/AuditLogs';
 import { AdminSettings } from './pages/dashboard/admin/AdminSettings';
 import { PharmacistOverview } from './pages/dashboard/pharmacist/PharmacistOverview';
-import { StockTransfers } from './pages/dashboard/pharmacist/StockTransfers';
 import { CashierOverview } from './pages/dashboard/cashier/CashierOverview';
-import { Sessions } from './pages/dashboard/cashier/Sessions';
 import { StockCheck } from './pages/dashboard/cashier/StockCheck';
-import { BillingManagement } from './pages/dashboard/admin/BillingManagement';
-import { SupportTickets } from './pages/dashboard/admin/SupportTickets';
-import { SystemStatistics } from './pages/dashboard/admin/SystemStatistics';
-import { StockTransferApproval } from './pages/dashboard/manager/StockTransferApproval';
-import { RefundsDiscounts } from './pages/dashboard/manager/RefundsDiscounts';
 import { ManagerPOSSales } from './pages/dashboard/manager/POSSales';
-import { Prescriptions } from './pages/dashboard/pharmacist/Prescriptions';
 import { InventoryManagement as PharmacistInventory } from './pages/dashboard/pharmacist/InventoryManagement';
 import { BranchReports } from './pages/dashboard/pharmacist/BranchReports';
-import { StockReceiving } from './pages/dashboard/pharmacist/StockReceiving';
-import { CashierPOSSales } from './pages/dashboard/cashier/POSSales';
 import { Receipts } from './pages/dashboard/cashier/Receipts';
 import { Notifications } from './pages/dashboard/manager/Notifications';
+import { AdminManagers } from './pages/dashboard/admin/AdminManagers';
+import { AdminBranches } from './pages/dashboard/admin/AdminBranches';
+import { Medicines } from './pages/dashboard/pharmacist/Medicines';
+import { SaleCreation } from './pages/dashboard/pharmacist/SaleCreation';
+import { Reports } from './pages/dashboard/pharmacist/Reports';
+import { PendingPayments } from './pages/dashboard/cashier/PendingPayments';
+import { Returns } from './pages/dashboard/cashier/Returns';
+import { Transactions } from './pages/dashboard/cashier/Transactions';
+import { POSOperations } from './pages/dashboard/cashier/POSOperations';
+import { FinancialOperations } from './pages/dashboard/cashier/FinancialOperations';
 
 const RoleProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>; // You can replace this with a proper loading component
+    return <div>Loading...</div>;
   }
 
   if (!isAuthenticated) {
@@ -54,13 +49,15 @@ const RoleProtectedRoute = ({ children, allowedRoles }) => {
 
   const userRole = user?.role;
 
-  // Check if the current role is admin
+  if (user?.must_change_password && window.location.pathname !== '/auth/change-password') {
+    return <Navigate to='/auth/change-password' replace />;
+  }
+
   const isAdmin = userRole === 'admin';
 
   const isAllowed =
     !allowedRoles ||
     allowedRoles.some((role) => {
-      // If "admin" is an allowed role, check for the admin role
       if (role === 'admin') {
         return isAdmin;
       }
@@ -82,7 +79,7 @@ const AppContent = () => {
   const { loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>; // You can replace this with a proper loading component
+    return <div>Loading...</div>;
   }
 
   return (
@@ -105,13 +102,9 @@ const AppContent = () => {
       >
         <Route index element={<Navigate to='/admin/overview' replace />} />
         <Route path='overview' element={<AdminOverview />} />
-        <Route path='pharmacies' element={<PharmacyManagement />} />
-        <Route path='subscriptions' element={<SubscriptionManagement />} />
-        <Route path='audit-logs' element={<AuditLogs />} />
         <Route path='settings' element={<AdminSettings />} />
-        <Route path='billing' element={<BillingManagement />} />
-        <Route path='support-tickets' element={<SupportTickets />} />
-        <Route path='statistics' element={<SystemStatistics />} />
+        <Route path='managers' element={<AdminManagers />} />
+        <Route path='branches' element={<AdminBranches />} />
       </Route>
 
       <Route
@@ -124,14 +117,10 @@ const AppContent = () => {
       >
         <Route index element={<Navigate to='/manager/overview' replace />} />
         <Route path='overview' element={<Overview />} />
-        <Route path='branches' element={<BranchManagement />} />
         <Route path='staff' element={<StaffManagement />} />
         <Route path='inventory' element={<InventoryManagement />} />
-        <Route path='reports' element={<Reports />} />
         <Route path='settings' element={<Settings />} />
         <Route path='import' element={<ImportData />} />
-        <Route path='stock-transfers' element={<StockTransferApproval />} />
-        <Route path='refunds-discounts' element={<RefundsDiscounts />} />
         <Route path='notifications' element={<Notifications />} />
         <Route path='pos-sales' element={<ManagerPOSSales />} />
       </Route>
@@ -147,11 +136,11 @@ const AppContent = () => {
         <Route index element={<Navigate to='/pharmacist/overview' replace />} />
         <Route path='overview' element={<PharmacistOverview />} />
         <Route path='inventory' element={<PharmacistInventory />} />
-        <Route path='transfers' element={<StockTransfers />} />
-        <Route path='prescriptions' element={<Prescriptions />} />
         <Route path='reports' element={<BranchReports />} />
-        <Route path='stock-receiving' element={<StockReceiving />} />
         <Route path='settings' element={<PharmacistSettings />} />
+        <Route path='medicines' element={<Medicines />} />
+        <Route path='sale' element={<SaleCreation />} />
+        <Route path='medicines-reports' element={<Reports />} />
       </Route>
 
       <Route
@@ -164,11 +153,14 @@ const AppContent = () => {
       >
         <Route index element={<Navigate to='/cashier/overview' replace />} />
         <Route path='overview' element={<CashierOverview />} />
-        <Route path='sessions' element={<Sessions />} />
         <Route path='stock' element={<StockCheck />} />
-        <Route path='pos-sales' element={<CashierPOSSales />} />
         <Route path='receipts' element={<Receipts />} />
         <Route path='settings' element={<CashierSettings />} />
+        <Route path='payments/pending' element={<PendingPayments />} />
+        <Route path='returns' element={<Returns />} />
+        <Route path='transactions' element={<Transactions />} />
+        <Route path='pos' element={<POSOperations />} />
+        <Route path='sales' element={<FinancialOperations />} />
       </Route>
 
       <Route path='*' element={<Navigate to='/auth/login' replace />} />
@@ -178,11 +170,11 @@ const AppContent = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <AuthProvider>
         <AppContent />
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

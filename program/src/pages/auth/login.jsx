@@ -6,13 +6,14 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import FloatingPaths from '@/components/shared/FloatingPaths';
-import { AppleIcon, AtSignIcon, GithubIcon, LockIcon } from 'lucide-react';
+import { AtSignIcon, LockIcon, Eye, EyeOff } from 'lucide-react';
 import { login } from '@/api/auth.api';
 import { toast } from 'sonner';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -40,7 +41,6 @@ export function LoginPage() {
 
     try {
       const response = await login(email, password);
-      console.log('LOGIN RESPONSE:', response);
 
       if (!response.success) {
         // Provide more specific error messages based on the response
@@ -59,8 +59,8 @@ export function LoginPage() {
       }
 
       // Check if user needs to change password (first time login or temporary password)
-      // Backend returns "mustChangePassword" boolean
-      if (response.mustChangePassword) {
+      // Backend returns "must_change_password" boolean
+      if (response.must_change_password) {
         localStorage.setItem('requiresPasswordChange', 'true');
         navigate('/auth/change-password');
         return;
@@ -97,10 +97,6 @@ export function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleSocialLogin = (provider) => {
-    toast.info(`${provider} login is coming soon!`);
   };
 
   return (
@@ -144,44 +140,6 @@ export function LoginPage() {
             <h1 className='font-heading text-2xl font-bold tracking-wide'>Welcome Back!</h1>
             <p className='text-muted-foreground text-base'>Login to your PharmaCare account.</p>
           </div>
-          <div className='space-y-2'>
-            <Button
-              type='button'
-              size='lg'
-              className='w-full'
-              onClick={() => handleSocialLogin('Google')}
-            >
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                viewBox='0 0 24 24'
-                fill='currentColor'
-                className='size-4 me-2'
-              >
-                <g>
-                  <path d='M12.479,14.265v-3.279h11.049c0.108,0.571,0.164,1.247,0.164,1.979c0,2.46-0.672,5.502-2.84,7.669   C18.744,22.829,16.051,24,12.483,24C5.869,24,0.308,18.613,0.308,12S5.869,0,12.483,0c3.659,0,6.265,1.436,8.223,3.307L18.392,5.62   c-1.404-1.317-3.307-2.341-5.913-2.341C7.65,3.279,3.873,7.171,3.873,12s3.777,8.721,8.606,8.721c3.132,0,4.916-1.258,6.059-2.401   c0.927-0.927,1.537-2.251,1.777-4.059L12.479,14.265z' />
-                </g>
-              </svg>
-              Continue with Google
-            </Button>
-            <Button
-              type='button'
-              size='lg'
-              className='w-full'
-              onClick={() => handleSocialLogin('Apple')}
-            >
-              <AppleIcon className='size-4 me-2' />
-              Continue with Apple
-            </Button>
-            <Button
-              type='button'
-              size='lg'
-              className='w-full'
-              onClick={() => handleSocialLogin('GitHub')}
-            >
-              <GithubIcon className='size-4 me-2' />
-              Continue with GitHub
-            </Button>
-          </div>
 
           <div className='flex w-full items-center justify-center'>
             <div className='bg-border h-px w-full' />
@@ -220,13 +178,20 @@ export function LoginPage() {
                 <Input
                   placeholder='Password'
                   className={`peer ps-9 ${error && error.includes('Password') ? 'border-red-500' : ''}`}
-                  type='password'
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
                   <LockIcon className='size-4' aria-hidden='true' />
                 </div>
+                <button
+                  type='button'
+                  onClick={() => setShowPassword(!showPassword)}
+                  className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground'
+                >
+                  {showPassword ? <EyeOff className='size-4' /> : <Eye className='size-4' />}
+                </button>
               </div>
             </div>
 

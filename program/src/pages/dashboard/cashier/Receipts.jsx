@@ -1,363 +1,312 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, Button, Input } from '@/components/ui/ui';
-import { Printer, Mail, Download, FileText, Eye } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { cashierService } from '@/services/cashier.service';
 import { toast } from 'sonner';
+import {
+  Receipt,
+  Search,
+  Printer,
+  Eye,
+  Loader2,
+  DollarSign,
+  Calendar,
+  CreditCard,
+} from 'lucide-react';
 
 export function Receipts() {
-  const [recentReceipts, setRecentReceipts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [receipts, setReceipts] = useState([]);
+  const [filteredReceipts, setFilteredReceipts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedReceipt, setSelectedReceipt] = useState(null);
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [stats, setStats] = useState({
-    todayReceipts: 0,
-    printed: 0,
-    emailed: 0,
-    totalAmount: 0,
-  });
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   useEffect(() => {
     fetchReceipts();
   }, []);
 
+  useEffect(() => {
+    filterReceipts();
+  }, [searchQuery, receipts]);
+
   const fetchReceipts = async () => {
     try {
       setLoading(true);
-      const response = await cashierService.getReceipts();
-
+      const response = await cashierService.getTransactions();
+      
       if (response.success) {
-        const receiptsData = response.data || response.receipts || [];
-        setRecentReceipts(Array.isArray(receiptsData) ? receiptsData : []);
-
-        // Calculate stats
-        const totalAmount = receiptsData.reduce((sum, r) => sum + (r.amount || 0), 0);
-        setStats({
-          todayReceipts: receiptsData.length,
-          printed: receiptsData.filter((r) => r.printed).length,
-          emailed: receiptsData.filter((r) => r.emailed).length,
-          totalAmount,
-        });
+        const receiptsList = response.data || response.transactions || [];
+        setReceipts(Array.isArray(receiptsList) ? receiptsList : []);
       } else {
-        toast.error('Failed to load receipts');
-        setRecentReceipts([]);
+        toast.error(response.message || 'Failed to fetch receipts');
+        setReceipts([]);
       }
     } catch (error) {
       console.error('Error fetching receipts:', error);
-      toast.error('Failed to load receipts');
-      setRecentReceipts([]);
+      toast.error('Failed to fetch receipts');
+      setReceipts([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSelectReceipt = async (receipt) => {
-    try {
-      setPreviewLoading(true);
-      // If the receipt object already has items, use it directly
-      if (receipt.items && Array.isArray(receipt.items)) {
-        setSelectedReceipt(receipt);
-      } else {
-        // Otherwise fetch full details
-        const response = await cashierService.getReceipt(receipt.id);
-        if (response.success) {
-          setSelectedReceipt(response.data || response.receipt);
-        } else {
-          toast.error('Failed to load receipt details');
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching receipt details:', error);
-      toast.error('Failed to load receipt details');
-    } finally {
-      setPreviewLoading(false);
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      fetchReceipts();
+      return;
     }
+
+    const query = searchQuery.toLowerCase();
+    const filtered = receipts.filter(r =>
+      r.sale_id?.toString().includes(query) ||
+      r.receipt_number?.toLowerCase().includes(query)
+    );
+    setFilteredReceipts(filtered);
   };
 
-  const handlePrint = async (receiptId) => {
-    toast.info(`Printing receipt ${receiptId}...`);
-    // Actual print logic would go here
+  const handleViewDetails = (receipt) => {
+    setSelectedReceipt(receipt);
+    setShowDetailsModal(true);
   };
 
-  const handleEmail = async (receiptId) => {
-    const email = prompt('Enter customer email:');
-    if (email) {
-      try {
-        const response = await cashierService.emailReceipt(receiptId, email);
-        if (response.success) {
-          toast.success(`Receipt sent to ${email}`);
-          await fetchReceipts();
-        } else {
-          toast.error(response.message || 'Failed to send email');
-        }
-      } catch (error) {
-        console.error('Error emailing receipt:', error);
-        toast.error('Failed to send email');
-      }
-    }
+  const handlePrint = (receipt) => {
+    toast.info(`Printing receipt for sale #${receipt.sale_id}...`);
   };
 
-  const handleDownload = async (receiptId) => {
-    toast.info(`Downloading receipt ${receiptId} as PDF...`);
-    // Actual download logic would go here
+  const getPaymentMethodBadge = (paymentMethod) => {
+    const methods = {
+      cash: { label: 'Cash', icon: DollarSign, color: 'bg-green-100 text-green-800' },
+      card: { label: 'Card', icon: CreditCard, color: 'bg-blue-100 text-blue-800' },
+      mobile: { label: 'Mobile', icon: CreditCard, color: 'bg-purple-100 text-purple-800' },
+      bank_transfer: { label: 'Bank Transfer', icon: CreditCard, color: 'bg-orange-100 text-orange-800' },
+    };
+    const method = methods[paymentMethod] || { label: 'Unknown', icon: CreditCard, color: 'bg-gray-100 text-gray-800' };
+    const Icon = method.icon;
+    
+    return (
+      <span className={`px-2 py-1 rounded text-xs font-medium ${method.color}`}>
+        <Icon className="h-3 w-3 mr-1" />
+        {method.label}
+      </span>
+    );
   };
-
-  const filteredReceipts = recentReceipts.filter(
-    (receipt) =>
-      receipt.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      receipt.customer?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   if (loading) {
     return (
-      <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
-        <h1 className='text-3xl font-bold tracking-tight'>Receipts & Invoices</h1>
-        <div className='flex justify-center items-center h-64'>
-          <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary'></div>
-        </div>
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className='space-y-4 sm:space-y-6 p-4 sm:p-6'>
-      <div>
-        <h1 className='text-3xl font-bold tracking-tight'>Receipts & Invoices</h1>
-        <p className='text-muted-foreground mt-2'>Print, email, and manage customer receipts</p>
+    <div className="space-y-6 p-4 md:p-8">
+      <div className="space-y-2">
+        <h2 className="text-3xl font-bold tracking-tight">Receipts</h2>
+        <p className="text-muted-foreground">
+          View and print receipts for completed sales
+        </p>
       </div>
 
-      {/* Stats Cards */}
-      <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
-            <CardTitle className='text-sm font-medium'>Today's Receipts</CardTitle>
-            <FileText className='h-4 w-4 text-muted-foreground' />
-          </CardHeader>
-          <CardContent className='px-6 pb-6'>
-            <div className='text-2xl font-bold'>{stats.todayReceipts}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
-            <CardTitle className='text-sm font-medium'>Printed</CardTitle>
-            <Printer className='h-4 w-4 text-muted-foreground' />
-          </CardHeader>
-          <CardContent className='px-6 pb-6'>
-            <div className='text-2xl font-bold'>{stats.printed}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
-            <CardTitle className='text-sm font-medium'>Emailed</CardTitle>
-            <Mail className='h-4 w-4 text-muted-foreground' />
-          </CardHeader>
-          <CardContent className='px-6 pb-6'>
-            <div className='text-2xl font-bold'>{stats.emailed}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 px-6 pt-6'>
-            <CardTitle className='text-sm font-medium'>Total Amount</CardTitle>
-            <Download className='h-4 w-4 text-muted-foreground' />
-          </CardHeader>
-          <CardContent className='px-6 pb-6'>
-            <div className='text-2xl font-bold'>ETB {stats.totalAmount.toFixed(2)}</div>
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardContent className="pt-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search by sale ID or receipt number..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              className="pl-10"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className='grid gap-6 md:grid-cols-2'>
-        {/* Recent Receipts List */}
-        <Card className='h-full'>
-          <CardHeader>
-            <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
-              <CardTitle>Recent Receipts</CardTitle>
-              <Input
-                placeholder='Search receipts...'
-                className='max-w-sm'
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            All Receipts
+            <span className="text-sm font-normal text-muted-foreground ml-2">
+              ({filteredReceipts.length})
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {filteredReceipts.length === 0 ? (
+            <div className="text-center py-12">
+              <Receipt className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">No receipts found</p>
             </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Receipt #</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Sale ID</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Date</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Items</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Total</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Payment</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredReceipts.map((receipt) => (
+                    <tr key={receipt.sale_id} className="border-b hover:bg-muted/50">
+                      <td className="py-3 px-4 font-medium">
+                        {receipt.receipt_number || `REC-${receipt.sale_id}`}
+                      </td>
+                      <td className="py-3 px-4">#{receipt.sale_id}</td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          {receipt.sale_date
+                            ? new Date(receipt.sale_date).toLocaleString()
+                            : 'N/A'}
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{receipt.item_count || 0} items</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-medium">ETB {receipt.total_amount?.toFixed(2)}</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        {getPaymentMethodBadge(receipt.payment_method)}
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewDetails(receipt)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePrint(receipt)}
+                          >
+                            <Printer className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {selectedReceipt && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Receipt Details - {selectedReceipt.receipt_number || `REC-${selectedReceipt.sale_id}`}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className='space-y-4 max-h-[600px] overflow-y-auto pr-2'>
-              {filteredReceipts.length > 0 ? (
-                filteredReceipts.map((receipt) => (
-                  <div
-                    key={receipt.id}
-                    className={`border rounded-lg p-4 cursor-pointer transition-colors hover:bg-muted/50 ${selectedReceipt?.id === receipt.id ? 'border-primary bg-muted/30' : ''}`}
-                    onClick={() => handleSelectReceipt(receipt)}
-                  >
-                    <div className='flex items-start justify-between mb-3'>
-                      <div>
-                        <p className='font-bold text-lg'>{receipt.id}</p>
-                        <p className='text-sm text-muted-foreground'>
-                          {receipt.customer || 'Walk-in Customer'}
-                        </p>
-                        <p className='text-xs text-muted-foreground'>{receipt.date}</p>
-                      </div>
-                      <div className='text-right'>
-                        <p className='font-bold text-xl'>ETB {receipt.amount?.toFixed(2)}</p>
-                        <p className='text-sm text-muted-foreground'>
-                          {receipt.items?.length || receipt.itemCount || 0} items
-                        </p>
-                        <p className='text-xs text-muted-foreground'>{receipt.method}</p>
-                      </div>
-                    </div>
-                    <div className='flex gap-2 justify-end'>
-                      <Button
-                        size='sm'
-                        variant='ghost'
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSelectReceipt(receipt);
-                        }}
-                      >
-                        <Eye className='mr-2 h-3 w-3' />
-                        View
-                      </Button>
-                      <Button
-                        size='sm'
-                        variant='outline'
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handlePrint(receipt.id);
-                        }}
-                      >
-                        <Printer className='mr-2 h-3 w-3' />
-                        Print
-                      </Button>
-                      <Button
-                        size='sm'
-                        variant='outline'
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEmail(receipt.id);
-                        }}
-                      >
-                        <Mail className='mr-2 h-3 w-3' />
-                        Email
-                      </Button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className='text-center py-8 text-muted-foreground'>
-                  No receipts found matching &quot;{searchTerm}&quot;
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Receipt Preview */}
-        <Card className='h-full'>
-          <CardHeader>
-            <CardTitle>Receipt Preview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {previewLoading ? (
-              <div className='flex justify-center items-center h-64'>
-                <div className='animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary'></div>
+            <div className="space-y-4">
+              <div className="text-center py-4 border-b">
+                <h3 className="text-xl font-bold">PharmaCare</h3>
+                <p className="text-sm text-muted-foreground">Receipt</p>
+                <p className="text-sm">{selectedReceipt.receipt_number || `REC-${selectedReceipt.sale_id}`}</p>
+                <p className="text-sm text-muted-foreground">
+                  {selectedReceipt.sale_date
+                    ? new Date(selectedReceipt.sale_date).toLocaleString()
+                    : 'N/A'}
+                </p>
               </div>
-            ) : selectedReceipt ? (
-              <div className='border rounded-lg p-6 max-w-md mx-auto bg-white text-black shadow-sm'>
-                <div className='text-center mb-6'>
-                  <h2 className='text-xl font-bold'>PharmaCare</h2>
-                  <p className='text-sm'>Main Branch</p>
-                  <p className='text-xs text-gray-500'>123 Health Street, Medical City</p>
-                  <p className='text-xs text-gray-500'>Tel: (555) 123-4567</p>
-                </div>
-                <div className='border-t border-b py-3 my-4 space-y-1'>
-                  <div className='flex justify-between'>
-                    <span className='text-xs font-medium'>Receipt #:</span>
-                    <span className='text-xs'>{selectedReceipt.id}</span>
-                  </div>
-                  <div className='flex justify-between'>
-                    <span className='text-xs font-medium'>Date:</span>
-                    <span className='text-xs'>{selectedReceipt.date}</span>
-                  </div>
-                  <div className='flex justify-between'>
-                    <span className='text-xs font-medium'>Cashier:</span>
-                    <span className='text-xs'>{selectedReceipt.cashier || 'Current User'}</span>
-                  </div>
-                  <div className='flex justify-between'>
-                    <span className='text-xs font-medium'>Customer:</span>
-                    <span className='text-xs'>{selectedReceipt.customer || 'Walk-in'}</span>
-                  </div>
-                </div>
 
-                <div className='space-y-2 mb-4 min-h-[100px]'>
-                  <div className='flex justify-between text-xs font-bold border-b pb-1'>
-                    <span>Item</span>
-                    <span>Price</span>
-                  </div>
-                  {selectedReceipt.items &&
+              <div className="grid grid-cols-2 gap-4 py-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Sale ID</p>
+                  <p className="font-medium">#{selectedReceipt.sale_id}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Cashier</p>
+                  <p className="font-medium">{selectedReceipt.cashier_name || 'N/A'}</p>
+                </div>
+              </div>
+
+              <div className="py-4 border-t">
+                <h4 className="font-semibold mb-3">Items</h4>
+                <div className="space-y-2">
+                  {selectedReceipt.items && selectedReceipt.items.length > 0 ? (
                     selectedReceipt.items.map((item, index) => (
-                      <div key={index} className='flex justify-between text-sm'>
-                        <span>
-                          {item.name} x{item.quantity}
+                      <div key={index} className="flex justify-between py-2 border-b last:border-0">
+                        <span className="flex-1">
+                          {item.medicine_name} x {item.quantity}
                         </span>
-                        <span>ETB {(item.price * item.quantity).toFixed(2)}</span>
+                        <span className="font-medium">
+                          ETB {(item.unit_price * item.quantity).toFixed(2)}
+                        </span>
                       </div>
-                    ))}
-                  {(!selectedReceipt.items || selectedReceipt.items.length === 0) && (
-                    <p className='text-center text-gray-400 text-sm py-4'>
-                      No items details available
-                    </p>
+                    ))
+                  ) : (
+                    <p className="text-muted-foreground">No items available</p>
                   )}
                 </div>
-
-                <div className='border-t pt-3 space-y-1'>
-                  <div className='flex justify-between text-sm'>
-                    <span>Subtotal:</span>
-                    <span>
-                      ETB {(selectedReceipt.subtotal || selectedReceipt.amount).toFixed(2)}
-                    </span>
-                  </div>
-                  <div className='flex justify-between text-sm text-red-600'>
-                    <span>Discount:</span>
-                    <span>-ETB {(selectedReceipt.discount || 0).toFixed(2)}</span>
-                  </div>
-                  <div className='flex justify-between font-bold text-lg mt-2 pt-2 border-t border-dashed'>
-                    <span>Total:</span>
-                    <span>ETB {(selectedReceipt.total || selectedReceipt.amount).toFixed(2)}</span>
-                  </div>
-                  <div className='flex justify-between text-xs text-gray-500 mt-2'>
-                    <span>Payment Method:</span>
-                    <span className='capitalize'>
-                      {selectedReceipt.method || selectedReceipt.paymentMethod}
-                    </span>
-                  </div>
-                </div>
-                <div className='text-center mt-6 text-xs text-gray-500'>
-                  <p>Thank you for your purchase!</p>
-                  <p>Please keep this receipt for your records</p>
-                </div>
-
-                <div className='mt-6 flex gap-2 justify-center print:hidden'>
-                  <Button size='sm' onClick={() => handlePrint(selectedReceipt.id)}>
-                    <Printer className='h-4 w-4 mr-1' /> Print
-                  </Button>
-                  <Button
-                    size='sm'
-                    variant='outline'
-                    onClick={() => handleDownload(selectedReceipt.id)}
-                  >
-                    <Download className='h-4 w-4 mr-1' /> PDF
-                  </Button>
-                </div>
               </div>
-            ) : (
-              <div className='flex flex-col items-center justify-center h-64 text-muted-foreground border-2 border-dashed rounded-lg'>
-                <FileText className='h-12 w-12 mb-2 opacity-20' />
-                <p>Select a receipt to view details</p>
+
+              <div className="py-4 border-t space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="font-medium">ETB {(selectedReceipt.subtotal || 0).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Discount</span>
+                  <span className="font-medium">ETB {(selectedReceipt.discount || 0).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-lg font-bold pt-2 border-t">
+                  <span>Total</span>
+                  <span className="text-primary">ETB {(selectedReceipt.total_amount || 0).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>Payment Method</span>
+                  <span>{getPaymentMethodBadge(selectedReceipt.payment_method)}</span>
+                </div>
+                {selectedReceipt.reference_number && (
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>Reference</span>
+                    <span>{selectedReceipt.reference_number}</span>
+                  </div>
+                )}
               </div>
-            )}
+
+              <div className="text-center py-4 border-t">
+                <p className="text-sm text-muted-foreground">Thank you for your purchase!</p>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowDetailsModal(false);
+                    setSelectedReceipt(null);
+                  }}
+                >
+                  Close
+                </Button>
+                <Button onClick={() => handlePrint(selectedReceipt)}>
+                  <Printer className="h-4 w-4 mr-2" />
+                  Print Receipt
+                </Button>
+              </div>
+            </div>
           </CardContent>
         </Card>
-      </div>
+      )}
     </div>
   );
 }

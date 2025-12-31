@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { FileSpreadsheet, AlertCircle, CheckCircle } from 'lucide-react';
 
 export function ExcelImport({ onImport }) {
@@ -16,7 +16,9 @@ export function ExcelImport({ onImport }) {
     if (file) {
       if (
         file.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' &&
-        file.type !== 'application/vnd.ms-excel'
+        file.type !== 'application/vnd.ms-excel' &&
+        !file.name.endsWith('.xlsx') &&
+        !file.name.endsWith('.xls')
       ) {
         setError('Please upload a valid Excel file (.xlsx or .xls)');
         setFileName('');
@@ -27,30 +29,52 @@ export function ExcelImport({ onImport }) {
     }
   };
 
-  const parseExcel = (file) => {
+  const parseExcel = async (file) => {
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
-        const data = e.target.result;
-        const workbook = XLSX.read(data, { type: 'binary' });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const parsedData = XLSX.utils.sheet_to_json(sheet);
+        const data = new Uint8Array(e.target.result);
+        const workbook = new ExcelJS.Workbook();
+        await workbook.xlsx.load(data);
 
-        if (parsedData.length === 0) {
+        const worksheet = workbook.getWorksheet(1); // Get first worksheet
+        if (!worksheet) {
+          setError('The Excel file appears to be empty or invalid.');
+          return;
+        }
+
+        // Convert worksheet to JSON
+        const jsonData = [];
+        let headers = [];
+
+        worksheet.eachRow((row, rowNumber) => {
+          const rowValues = row.values; // row.values is 1-indexed, so skip index 0
+          if (rowNumber === 1) {
+            // Use first row as headers
+            headers = Array.from(row.values).slice(1);
+          } else {
+            const rowData = {};
+            headers.forEach((header, index) => {
+              rowData[header] = rowValues[index + 1] || '';
+            });
+            jsonData.push(rowData);
+          }
+        });
+
+        if (jsonData.length === 0) {
           setError('The Excel file appears to be empty.');
           return;
         }
 
-        setSuccess(`Successfully parsed ${parsedData.length} rows.`);
+        setSuccess(`Successfully parsed ${jsonData.length} rows.`);
         if (onImport) {
-          onImport(parsedData);
+          onImport(jsonData);
         }
       } catch (err) {
         setError('Failed to parse Excel file. Please ensure it is formatted correctly.');
       }
     };
-    reader.readAsBinaryString(file);
+    reader.readAsArrayBuffer(file);
   };
 
   const triggerFileInput = () => {

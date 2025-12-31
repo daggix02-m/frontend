@@ -5,12 +5,14 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import FloatingPaths from '@/components/shared/FloatingPaths';
-import { ChevronLeftIcon, LockIcon } from 'lucide-react';
+import { ChevronLeftIcon, LockIcon, Eye, EyeOff } from 'lucide-react';
 import { resetPassword } from '@/api/auth.api';
 
 export function ResetPasswordPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -110,13 +112,20 @@ export function ResetPasswordPage() {
                 <Input
                   placeholder='New Password'
                   className={`peer ps-9 ${error && error.includes('Password') ? 'border-red-500' : ''}`}
-                  type='password'
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
                   <LockIcon className='size-4' aria-hidden='true' />
                 </div>
+                <button
+                  type='button'
+                  onClick={() => setShowPassword(!showPassword)}
+                  className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground'
+                >
+                  {showPassword ? <EyeOff className='size-4' /> : <Eye className='size-4' />}
+                </button>
               </div>
             </div>
             <div className='space-y-2'>
@@ -124,13 +133,20 @@ export function ResetPasswordPage() {
                 <Input
                   placeholder='Confirm New Password'
                   className={`peer ps-9 ${error && error.includes('match') ? 'border-red-500' : ''}`}
-                  type='password'
+                  type={showConfirmPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
                 <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
                   <LockIcon className='size-4' aria-hidden='true' />
                 </div>
+                <button
+                  type='button'
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground'
+                >
+                  {showConfirmPassword ? <EyeOff className='size-4' /> : <Eye className='size-4' />}
+                </button>
               </div>
             </div>
 

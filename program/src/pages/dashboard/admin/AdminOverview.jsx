@@ -4,65 +4,104 @@ import {
   Users,
   Building2,
   DollarSign,
-  FileText,
   TrendingUp,
   Activity,
-  CreditCard,
-  LifeBuoy
 } from 'lucide-react';
 import { adminService } from '@/services/admin.service';
 import { toast } from 'sonner';
 
 export function AdminOverview() {
   const [metrics, setMetrics] = useState({
+    totalBranches: 0,
     totalUsers: 0,
-    totalPharmacies: 0,
-    totalRevenue: 0,
-    activeSubscriptions: 0,
+    totalSales: 0,
     pendingManagers: 0,
-    supportTickets: 0
+    activatedManagers: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
+        setError(null);
 
-        // Fetch admin dashboard data
-        const response = await adminService.getOverview();
+        // Fetch all dashboard metrics in parallel
+        const [
+          branchesResponse,
+          usersResponse,
+          salesResponse,
+          pendingManagersResponse,
+          activatedManagersResponse,
+        ] = await Promise.all([
+          adminService.getDashboardBranches(),
+          adminService.getDashboardUsers(),
+          adminService.getDashboardSales(),
+          adminService.getPendingManagers(),
+          adminService.getActivatedManagers(),
+        ]);
 
-        if (response.success) {
-          setMetrics({
-            totalUsers: response.totalUsers || 0,
-            totalPharmacies: response.totalPharmacies || 0,
-            totalRevenue: response.totalRevenue || 0,
-            activeSubscriptions: response.activeSubscriptions || 0,
-            pendingManagers: response.pendingManagers || 0,
-            supportTickets: response.supportTickets || 0
-          });
+        // Process responses - backend returns { success: boolean, data: {...} }
+        if (branchesResponse.success) {
+          setMetrics(prev => ({
+            ...prev,
+            totalBranches: branchesResponse.data?.count || branchesResponse.data || 0,
+          }));
         } else {
-          // Set default values if API call fails
-          setMetrics({
-            totalUsers: 0,
-            totalPharmacies: 0,
-            totalRevenue: 0,
-            activeSubscriptions: 0,
-            pendingManagers: 0,
-            supportTickets: 0
-          });
-          toast.error(response.message || 'Failed to load dashboard data');
+          console.error('Failed to fetch branches:', branchesResponse.message);
         }
-      } catch (error) {
-        console.error('Error fetching admin dashboard data:', error);
+
+        if (usersResponse.success) {
+          setMetrics(prev => ({
+            ...prev,
+            totalUsers: usersResponse.data?.count || usersResponse.data || 0,
+          }));
+        } else {
+          console.error('Failed to fetch users:', usersResponse.message);
+        }
+
+        if (salesResponse.success) {
+          setMetrics(prev => ({
+            ...prev,
+            totalSales: salesResponse.data?.count || salesResponse.data || 0,
+          }));
+        } else {
+          console.error('Failed to fetch sales:', salesResponse.message);
+        }
+
+        if (pendingManagersResponse.success) {
+          setMetrics(prev => ({
+            ...prev,
+            pendingManagers: pendingManagersResponse.data?.length || 
+                           (Array.isArray(pendingManagersResponse.data) ? pendingManagersResponse.data.length : 0),
+          }));
+        } else {
+          console.error('Failed to fetch pending managers:', pendingManagersResponse.message);
+        }
+
+        if (activatedManagersResponse.success) {
+          setMetrics(prev => ({
+            ...prev,
+            activatedManagers: activatedManagersResponse.data?.length || 
+                            (Array.isArray(activatedManagersResponse.data) ? activatedManagersResponse.data.length : 0),
+          }));
+        } else {
+          console.error('Failed to fetch activated managers:', activatedManagersResponse.message);
+        }
+
+      } catch (err) {
+        console.error('Error fetching admin dashboard data:', err);
+        setError(err.message || 'Failed to load dashboard data');
         toast.error('Failed to load dashboard data');
+        
+        // Set default values on error
         setMetrics({
+          totalBranches: 0,
           totalUsers: 0,
-          totalPharmacies: 0,
-          totalRevenue: 0,
-          activeSubscriptions: 0,
+          totalSales: 0,
           pendingManagers: 0,
-          supportTickets: 0
+          activatedManagers: 0,
         });
       } finally {
         setLoading(false);
@@ -74,28 +113,22 @@ export function AdminOverview() {
 
   const metricCards = [
     {
-      title: "Total Users",
-      value: metrics.totalUsers,
-      icon: Users,
+      title: "Total Branches",
+      value: metrics.totalBranches,
+      icon: Building2,
       color: "text-blue-600"
     },
     {
-      title: "Total Pharmacies",
-      value: metrics.totalPharmacies,
-      icon: Building2,
+      title: "Total Users",
+      value: metrics.totalUsers,
+      icon: Users,
       color: "text-green-600"
     },
     {
-      title: "Total Revenue",
-      value: `ETB ${metrics.totalRevenue.toLocaleString()}`,
+      title: "Total Sales",
+      value: metrics.totalSales,
       icon: DollarSign,
       color: "text-purple-600"
-    },
-    {
-      title: "Active Subscriptions",
-      value: metrics.activeSubscriptions,
-      icon: CreditCard,
-      color: "text-orange-600"
     },
     {
       title: "Pending Managers",
@@ -104,12 +137,29 @@ export function AdminOverview() {
       color: "text-yellow-600"
     },
     {
-      title: "Support Tickets",
-      value: metrics.supportTickets,
-      icon: LifeBuoy,
-      color: "text-red-600"
-    }
+      title: "Activated Managers",
+      value: metrics.activatedManagers,
+      icon: Activity,
+      color: "text-green-600"
+    },
   ];
+
+  if (error) {
+    return (
+      <div className='space-y-6 p-4 md:p-8'>
+        <div className='space-y-2'>
+          <h2 className='text-3xl font-bold tracking-tight text-red-600'>Error Loading Dashboard</h2>
+          <p className='text-muted-foreground'>{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className='px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90'
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-6 p-4 md:p-8'>
@@ -127,7 +177,7 @@ export function AdminOverview() {
       ) : (
         <>
           {/* Metric Cards */}
-          <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6'>
+          <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5'>
             {metricCards.map((metric, index) => {
               const Icon = metric.icon;
               return (
@@ -144,22 +194,22 @@ export function AdminOverview() {
             })}
           </div>
 
-          {/* Additional sections would go here */}
+          {/* Additional sections */}
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
             <Card>
               <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
+                <CardTitle>System Status</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className='text-muted-foreground'>Recent system activity will be displayed here.</p>
+                <p className='text-muted-foreground'>Backend API connected successfully</p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>System Health</CardTitle>
+                <CardTitle>Quick Actions</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className='text-muted-foreground'>System health metrics will be displayed here.</p>
+                <p className='text-muted-foreground'>Manage managers and branches from the sidebar</p>
               </CardContent>
             </Card>
           </div>

@@ -14,41 +14,12 @@ export const getAdminManagers = async () => {
   });
 };
 
-export const getAdminPharmacies = async () => {
-  return await makeApiCall('/admin/pharmacies', {
-    method: 'GET',
-  });
-};
-
-export const approvePharmacy = async (pharmacyId) => {
-  return await makeApiCall(`/admin/pharmacies/${pharmacyId}/approve`, {
-    method: 'PATCH',
-  });
-};
-
-export const getAdminSubscriptions = async () => {
-  return await makeApiCall('/admin/subscriptions', {
-    method: 'GET',
-  });
-};
-
-export const getAdminAuditLogs = async () => {
-  return await makeApiCall('/admin/audit-logs', {
-    method: 'GET',
-  });
-};
-
-export const getAdminSupportTickets = async () => {
-  return await makeApiCall('/admin/support-tickets', {
-    method: 'GET',
-  });
-};
-
-export const getAdminSystemStatistics = async () => {
-  return await makeApiCall('/admin/statistics', {
-    method: 'GET',
-  });
-};
+// REMOVED ENDPOINTS (not supported by backend):
+// - /admin/pharmacies
+// - /admin/subscriptions
+// - /admin/audit-logs
+// - /admin/support-tickets
+// - /admin/statistics
 
 // Manager Dashboard APIs
 export const getManagerDashboard = async () => {
@@ -109,37 +80,9 @@ export const deleteManagerMedicine = async (medicineId) => {
   });
 };
 
-export const getManagerReports = async () => {
-  return await makeApiCall('/manager/reports', {
-    method: 'GET',
-  });
-};
-
-export const getManagerBranches = async () => {
-  return await makeApiCall('/manager/branches', {
-    method: 'GET',
-  });
-};
-
-export const createManagerBranch = async (branchData) => {
-  return await makeApiCall('/manager/branches', {
-    method: 'POST',
-    body: JSON.stringify(branchData),
-  });
-};
-
-export const updateManagerBranch = async (branchId, branchData) => {
-  return await makeApiCall(`/manager/branches/${branchId}`, {
-    method: 'PUT',
-    body: JSON.stringify(branchData),
-  });
-};
-
-export const deleteManagerBranch = async (branchId) => {
-  return await makeApiCall(`/manager/branches/${branchId}`, {
-    method: 'DELETE',
-  });
-};
+// REMOVED ENDPOINTS (not supported by backend):
+// - /manager/branches
+// - /manager/reports (general)
 
 // Pharmacist Dashboard APIs
 export const getPharmacistDashboard = async () => {
@@ -166,36 +109,11 @@ export const getPharmacistReports = async () => {
   });
 };
 
-export const getPharmacistPrescriptions = async () => {
-  return await makeApiCall('/pharmacist/prescriptions', {
-    method: 'GET',
-  });
-};
-
-export const validatePrescription = async (prescriptionId) => {
-  return await makeApiCall(`/pharmacist/prescriptions/${prescriptionId}/validate`, {
-    method: 'PATCH',
-  });
-};
-
-export const dispensePrescription = async (prescriptionId) => {
-  return await makeApiCall(`/pharmacist/prescriptions/${prescriptionId}/dispense`, {
-    method: 'PATCH',
-  });
-};
-
-export const getPharmacistStockTransfers = async () => {
-  return await makeApiCall('/pharmacist/stock-transfers', {
-    method: 'GET',
-  });
-};
-
-export const requestPharmacistStockTransfer = async (transferData) => {
-  return await makeApiCall('/pharmacist/stock-transfers', {
-    method: 'POST',
-    body: JSON.stringify(transferData),
-  });
-};
+// REMOVED ENDPOINTS (not supported by backend):
+// - /pharmacist/stock-transfers
+// - /pharmacist/prescriptions
+// - /pharmacist/prescriptions/:id/validate
+// - /pharmacist/prescriptions/:id/dispense
 
 // Cashier Dashboard APIs
 export const getCashierDashboard = async () => {

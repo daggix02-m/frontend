@@ -114,7 +114,6 @@ export const ProfileSettings = ({ userRole = 'User' }) => {
 
   return (
     <div className='space-y-6'>
-      {}
       <Card>
         <CardHeader>
           <CardTitle>Profile Information</CardTitle>
@@ -188,7 +187,6 @@ export const ProfileSettings = ({ userRole = 'User' }) => {
         </CardContent>
       </Card>
 
-      {}
       <Card>
         <CardHeader>
           <CardTitle>Change Password</CardTitle>
