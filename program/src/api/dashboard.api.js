@@ -252,6 +252,11 @@ export const markPharmacistLowStock = async (itemData) => {
     body: JSON.stringify(itemData),
   });
 };
+export const getPharmacistSales = async () => {
+  return await makeApiCall('/pharmacist/sales', {
+    method: 'GET',
+  });
+};
 
 export const getPharmacistStockHistory = async () => {
   return await makeApiCall('/pharmacist/inventory/stock-history', {

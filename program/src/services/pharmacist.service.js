@@ -2,7 +2,9 @@ import {
   getPharmacistDashboard,
   getPharmacistMedicines,
   getPharmacistSales,
-  getPharmacistReports,
+   getPharmacistLowStockReport,
+  getPharmacistExpiryReport,
+  getPharmacistInventorySummary
 } from '../api/dashboard.api';
 import { makeApiCall } from '../api/apiClient';
 
@@ -146,27 +148,17 @@ export const pharmacistService = {
    * Matches backend: GET /api/pharmacist/reports/low-stock
    * @returns {Promise}
    */
-  async getLowStockReport() {
-    return await makeApiCall('/pharmacist/reports/low-stock', { method: 'GET' });
-  },
+ async getLowStockReport() {
+  return getPharmacistLowStockReport();
+},
 
-  /**
-   * Get expiry report
-   * Matches backend: GET /api/pharmacist/reports/expiry
-   * @returns {Promise}
-   */
-  async getExpiryReport() {
-    return await makeApiCall('/pharmacist/reports/expiry', { method: 'GET' });
-  },
+async getExpiryReport() {
+  return getPharmacistExpiryReport();
+},
 
-  /**
-   * Get inventory summary report
-   * Matches backend: GET /api/pharmacist/reports/inventory-summary
-   * @returns {Promise}
-   */
-  async getInventorySummaryReport() {
-    return await makeApiCall('/pharmacist/reports/inventory-summary', { method: 'GET' });
-  },
+async getInventorySummaryReport() {
+  return getPharmacistInventorySummary();
+},
 
   /**
    * Update product stock level
