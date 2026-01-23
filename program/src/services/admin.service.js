@@ -3,52 +3,56 @@ import { makeApiCall } from '../api/apiClient';
 
 /**
  * Admin Service
- * Handles all admin-related API calls for PharmaCare backend
+ * Normalizes backend responses so UI always receives clean data
  */
 
+const extractNumber = (data) => {
+  if (typeof data === 'number') return data;
+  if (typeof data === 'object' && data !== null) {
+    return (
+      data.count ??
+      data.total ??
+      data.totalSales ??
+      0
+    );
+  }
+  return 0;
+};
+
 export const adminService = {
-  /**
-   * Get admin dashboard overview
-   * Matches backend: GET /api/admin/dashboard
-   * @returns {Promise}
-   */
   async getOverview() {
     return await getAdminDashboard();
   },
 
-  /**
-   * Dashboard helpers matching backend format:
-   * GET /api/admin/dashboard/branches      - total branches count
-   * GET /api/admin/dashboard/users         - total users count
-   * GET /api/admin/dashboard/sales         - total sales count (no revenue)
-   * GET /api/admin/dashboard/branches-list - branch list with employee counts
-   */
   async getDashboardBranches() {
-    return await makeApiCall('/admin/dashboard/branches', { method: 'GET' });
+    const res = await makeApiCall('/admin/dashboard/branches', { method: 'GET' });
+    return {
+      ...res,
+      data: extractNumber(res?.data),
+    };
   },
 
   async getDashboardUsers() {
-    return await makeApiCall('/admin/dashboard/users', { method: 'GET' });
+    const res = await makeApiCall('/admin/dashboard/users', { method: 'GET' });
+    return {
+      ...res,
+      data: extractNumber(res?.data),
+    };
   },
 
   async getDashboardSales() {
-    return await makeApiCall('/admin/dashboard/sales', { method: 'GET' });
+    const res = await makeApiCall('/admin/dashboard/sales', { method: 'GET' });
+    return {
+      ...res,
+      data: extractNumber(res?.data),
+    };
   },
 
   async getDashboardBranchesList() {
     return await makeApiCall('/admin/dashboard/branches-list', { method: 'GET' });
   },
 
-  /**
-   * Manager endpoints matching backend format:
-   * GET  /api/admin/managers                     - All managers
-   * GET  /api/admin/managers/pending             - Pending managers
-   * GET  /api/admin/managers/activated           - Activated managers
-   * GET  /api/admin/managers/branch/:branch_id   - Managers by branch
-   * PUT  /api/admin/managers/:user_id/activate   - Activate manager
-   * PUT  /api/admin/managers/:user_id/deactivate - Deactivate manager
-   */
-  async getManagers(params = {}) {
+  async getManagers() {
     return await getAdminManagers();
   },
 
@@ -76,23 +80,9 @@ export const adminService = {
     });
   },
 
-  /**
-   * Get sales data for live dashboard
-   * @returns {Promise}
-   */
   async getSalesData() {
     return await makeApiCall('/admin/sales-data', { method: 'GET' });
   },
-
-  // REMOVED ENDPOINTS (not supported by backend):
-  // - /admin/pharmacies
-  // - /admin/subscriptions
-  // - /admin/billing
-  // - /admin/support-tickets
-  // - /admin/statistics
-  // - /admin/transactions
-  // - /admin/platform-settings
-  // - /admin/audit-logs
 };
 
 export default adminService;

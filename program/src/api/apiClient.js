@@ -43,12 +43,6 @@ export const apiClient = async (endpoint, options = {}) => {
     ...options,
   };
 
-  if (currentToken) {
-    console.log(`Sending Authorization header: Bearer ${currentToken.substring(0, 20)}...`);
-  } else {
-    console.warn(`No token found for request: ${url}`);
-  }
-
   try {
     let response = await fetchWithTimeout(url, config);
 
